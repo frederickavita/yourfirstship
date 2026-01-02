@@ -1,0 +1,331 @@
+{{extend 'malayout.html'}}
+
+<nav class="fixed w-full z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 transition-all">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-20">
+
+<a href="{{=URL('home')}}" class="flex items-center gap-3 group">
+<div class="text-2xl text-brand-primary group-hover:scale-110 transition-transform">
+    <i class="fa-solid fa-anchor"></i>
+</div>
+<span class="font-bold text-xl text-brand-dark tracking-tight">YourFirstShip</span>
+</a>
+
+<div class="hidden md:flex space-x-8 items-center">
+<a href="{{=URL('home')}}" class="text-sm font-medium text-gray-500 hover:text-brand-primary transition">
+    <i class="fa-solid fa-arrow-left mr-1"></i> Back to website
+</a>
+<a href="{{=URL('terms')}}" class="text-sm font-bold text-brand-primary bg-blue-50 px-3 py-1 rounded-full transition">
+    Terms
+</a>
+<a href="{{=URL('privacy')}}" class="text-sm font-medium text-gray-500 hover:text-brand-primary transition">
+    Privacy
+</a>
+</div>
+
+<div class="flex items-center gap-4">
+<a href="#" class="hidden md:block text-sm font-semibold text-gray-500 hover:text-brand-primary">Log in</a>
+<a href="{{=URL('home')}}#pricing" class="px-5 py-2.5 bg-brand-dark text-white text-sm font-bold rounded-lg shadow-sm hover:bg-gray-800 transition-all hover:-translate-y-0.5">
+    Get started
+</a>
+</div>
+
+</div>
+</div>
+</nav>
+
+<div class="bg-gray-50 border-b border-gray-200 pt-32 pb-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-4xl font-bold text-brand-dark mb-4">Legal Notice & Policies</h1>
+        <p class="text-gray-600">
+            Last updated: <span id="current-date"></span><br>
+            Effective date: <span id="effective-date"></span>
+        </p>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="flex flex-col lg:flex-row gap-12">
+
+        <aside class="w-full lg:w-64 flex-shrink-0">
+            <nav class="sticky top-32 space-y-1">
+                <a href="#terms" class="block px-4 py-2 rounded-md bg-blue-50 text-brand-primary font-bold border-l-4 border-brand-primary">
+                    Terms of Service
+                </a>
+                <a href="#" class="block px-4 py-2 rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition">
+                    Privacy Policy
+                </a>
+                <a href="#" class="block px-4 py-2 rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition">
+                    Acceptable Use (AUP)
+                </a>
+                <a href="#" class="block px-4 py-2 rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition">
+                    Data Processing Agreement (DPA)
+                </a>
+                <a href="#" class="block px-4 py-2 rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition">
+                    Subprocessors
+                </a>
+            </nav>
+        </aside>
+
+        <main class="flex-1 prose prose-blue max-w-none text-gray-700">
+            
+            <div class="mb-12">
+                <h2 class="text-2xl font-bold text-brand-dark mb-4">Welcome to YourFirstShip</h2>
+                <p>
+                    YourFirstShip is a SaaS (Software as a Service) platform that lets you design, generate, host, and maintain web and mobile applications (Progressive Web Apps) with AI assistance. Generated applications may include source code (including Python/Brython), a database structure (SQL), Docker files, and a user interface (HTML/CSS/JS). An export option (ZIP) allows self-hosting outside of YourFirstShip.
+                </p>
+                
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-300 text-sm text-gray-600 mb-6 italic">
+                    <strong>In brief (non-binding):</strong> YourFirstShip helps you build and host an AI-assisted app, with the option to export the code. You stay in control and you can leave with your deliverables.
+                </div>
+
+                <p class="text-sm text-gray-500">
+                    To improve readability, we include italic “In brief” boxes that summarize the main sections. These summaries are provided for informational purposes only and are not legally binding. The legally enforceable version is the numbered text below.
+                </p>
+                <div class="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-md font-bold text-sm my-6">
+                    BY USING THE PLATFORM, YOU CONFIRM THAT YOU HAVE READ AND ACCEPT THESE TERMS. IF YOU DO NOT ACCEPT THEM, YOU MUST NOT USE THE PLATFORM.
+                </div>
+            </div>
+
+            <section class="mb-12 border-b border-gray-100 pb-8" id="terms">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">1. Introduction</h3>
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-300 text-sm text-gray-600 mb-6 italic">
+                    <strong>In brief:</strong> this is a contract between your company and 2 K SERVICE. These Terms include the Privacy Policy/AUP/DPA/Subprocessors. They may change, and continued use means acceptance.
+                </div>
+                <ol class="list-decimal pl-5 space-y-2">
+                    <li><strong>Parties:</strong> These Terms of Service (the “Terms”) form a contract between <strong>2 K SERVICE</strong>, a sole proprietor (micro-business), 8 rue Charles Gide, 77130 Varennes-sur-Seine, France (hereinafter “YourFirstShip”, “we”, “us”, “our”), and the professional legal entity that creates an account (hereinafter the “Customer”, “you”, “your”).</li>
+                    <li><strong>Purpose:</strong> These Terms govern access to and use of the YourFirstShip website and interface (the “Platform”), as well as the editing/generation services, hosting, maintenance, export, and related features.</li>
+                    <li><strong>Related documents:</strong> The following documents form an integral part of these Terms by reference: Privacy Policy, Acceptable Use Policy (AUP), DPA (Data Processing Agreement), Subprocessors page.</li>
+                    <li><strong>Eligibility:</strong> The Platform is reserved for professionals (B2B). You represent that you are 18 years or older and have authority to enter into a contract on behalf of your organization.</li>
+                    <li><strong>Changes:</strong> We may modify these Terms. The current version is published on this page. By continuing to use the Platform after publication, you accept the revised Terms.</li>
+                    <li><strong>Contact:</strong> contact@yourfirstship.com or mail to the address above.</li>
+                </ol>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">2. Definitions</h3>
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-300 text-sm text-gray-600 mb-6 italic">
+                    <strong>In brief:</strong> we define key terms to avoid ambiguity.
+                </div>
+                <ul class="list-disc pl-5 space-y-2">
+                    <li><strong>“Account”:</strong> the Customer’s access to the Platform.</li>
+                    <li><strong>“Application”:</strong> any app/site/PWA created, generated, hosted, or exported via the Platform.</li>
+                    <li><strong>“Customer Content”:</strong> texts, images, databases, data, content, settings, configurations, prompts, instructions, documents provided/imported by the Customer.</li>
+                    <li><strong>“AI” / “AI Tools”:</strong> assisted generation features based on language models and/or AI algorithms.</li>
+                    <li><strong>“Input”:</strong> prompts, instructions, and technical context provided to generate code or assets.</li>
+                    <li><strong>“Output”:</strong> code, files, configurations, DB schemas, pages, and other deliverables generated in response to Inputs.</li>
+                    <li><strong>“Third-Party Services”:</strong> external services used with/from the Platform (payments, AI, hosting, etc.).</li>
+                    <li><strong>“Subscription”:</strong> paid access (monthly/annual) to certain features.</li>
+                    <li><strong>“Booster Packs”:</strong> one-time top-ups (e.g., €10) to increase quotas/usage.</li>
+                </ul>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">3. Platform access — License</h3>
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-300 text-sm text-gray-600 mb-6 italic">
+                    <strong>In brief:</strong> you may use the Platform to create and manage your apps, but you may not copy it, attack it, or bypass its protections.
+                </div>
+                <ol class="list-decimal pl-5 space-y-2">
+                    <li>Subject to your compliance with these Terms, we grant you a non-exclusive, non-transferable, revocable license to access the Platform to create, host, maintain, and export Applications.</li>
+                    <li><strong>Restrictions:</strong> unless we provide written authorization, you must not, in particular:
+                        <ul class="list-disc pl-5 mt-1">
+                            <li>reverse engineer, decompile, analyze, or attempt to extract how the “Narrative Engine” or any proprietary component works;</li>
+                            <li>bypass technical limits, security mechanisms, quotas, or protections;</li>
+                            <li>publish comparative tests/benchmarks with the intent of creating a competing service;</li>
+                            <li>perform massive scraping or abusive use; or</li>
+                            <li>use the Platform for unlawful purposes or in violation of the AUP.</li>
+                        </ul>
+                    </li>
+                    <li>We may suspend or terminate access in case of breach, in accordance with Section 11.</li>
+                </ol>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">4. Account, Security, Agency</h3>
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-300 text-sm text-gray-600 mb-6 italic">
+                    <strong>In brief:</strong> you are responsible for your account. “Agency” accounts exist, and the agency owns the project until transfer.
+                </div>
+                <ol class="list-decimal pl-5 space-y-2">
+                    <li><strong>Creation:</strong> you must provide accurate, current, and complete information. You are responsible for keeping your credentials confidential.</li>
+                    <li><strong>Security:</strong> you must notify us promptly if you suspect unauthorized access. We may require reasonable security measures.</li>
+                    <li><strong>Agency accounts:</strong>
+                        <ul class="list-disc pl-5 mt-1">
+                            <li>An agency may create and manage Applications on behalf of its clients.</li>
+                            <li>By default, the agency is the legal owner of the project and is responsible for payments until the “Ownership Transfer” (a feature of the Agency plan).</li>
+                            <li>After transfer, the end client becomes responsible for their Account and their payment obligations.</li>
+                        </ul>
+                    </li>
+                </ol>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">5. Our obligations</h3>
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-300 text-sm text-gray-600 mb-6 italic">
+                    <strong>In brief:</strong> we aim for a reliable service, but maintenance and incidents can occur.
+                </div>
+                <ol class="list-decimal pl-5 space-y-2">
+                    <li><strong>Availability:</strong> we use reasonable efforts to provide access. Interruptions may occur (maintenance, incidents, force majeure, third-party dependencies).</li>
+                    <li><strong>Maintenance:</strong> we may deploy updates, fixes, and improvements, including for security.</li>
+                    <li><strong>Support:</strong> support is provided according to your plan (and the published terms).</li>
+                </ol>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">6. Applications, Content, and Responsibility</h3>
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-300 text-sm text-gray-600 mb-6 italic">
+                    <strong>In brief:</strong> you are responsible for what you build and for what your end users do on your apps.
+                </div>
+                <ol class="list-decimal pl-5 space-y-2">
+                    <li>You are solely responsible for Customer Content, configuration, business logic, compliance, and operation of your Applications, as well as your relationships with your end users.</li>
+                    <li>You represent that your Content and Applications do not violate the law or third-party rights, comply with the AUP, and do not include prohibited content (illegal activity, pornography, hate, etc.).</li>
+                    <li><strong>Removal:</strong> we may remove, block, or suspend an Application or Content in case of suspected violation of these Terms/AUP or upon a legal request.</li>
+                </ol>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">7. Export and portability</h3>
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-300 text-sm text-gray-600 mb-6 italic">
+                    <strong>In brief:</strong> you can export your application (ZIP) and host it elsewhere. This is a “no lock-in” feature.
+                </div>
+                <ol class="list-decimal pl-5 space-y-2">
+                    <li>Depending on your plan, you may export all or part of your Output (code, files, schemas).</li>
+                    <li>Operation outside of our infrastructure depends on your target environment. We do not guarantee universal compatibility.</li>
+                    <li>Exported deliverables remain subject to any third-party rights (libraries, open-source licenses, etc.).</li>
+                </ol>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">8. AI tools and responsibilities</h3>
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-300 text-sm text-gray-600 mb-6 italic">
+                    <strong>In brief:</strong> AI can be wrong. Outputs may be similar. You must test before commercial use.
+                </div>
+                <ol class="list-decimal pl-5 space-y-2">
+                    <li>The Platform offers AI Tools that generate Outputs from your Inputs.</li>
+                    <li><strong>Non-uniqueness:</strong> you acknowledge that Output may not be unique and that similar requests can produce similar results.</li>
+                    <li><strong>Validation:</strong> you are solely responsible for reviewing, testing, security auditing, and functional/commercial validation before production deployment. Outputs may contain errors.</li>
+                    <li><strong>Compliance:</strong> you represent that your Inputs comply with the law, the AUP, and third-party rights.</li>
+                </ol>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">9. Third-party services</h3>
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-300 text-sm text-gray-600 mb-6 italic">
+                    <strong>In brief:</strong> we rely on providers (Stripe, Google). Their rules may also apply.
+                </div>
+                <ol class="list-decimal pl-5 space-y-2">
+                    <li>Some services rely on Third-Party Services. Their terms may apply in addition to these Terms.</li>
+                    <li><strong>Payments (Stripe):</strong> by paying, you agree to be bound by the applicable Stripe terms.</li>
+                    <li><strong>AI (Google Gemini):</strong> your Inputs may be transmitted to the AI provider to generate Output. We configure privacy options to minimize retention where possible, but the provider’s policies prevail.</li>
+                </ol>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">10. Pricing, billing, refunds</h3>
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-300 text-sm text-gray-600 mb-6 italic">
+                    <strong>In brief:</strong> monthly/annual subscription + top-ups. Cancel anytime (end of period). 14-day “satisfied or refunded” for the first purchase.
+                </div>
+                <ol class="list-decimal pl-5 space-y-2">
+                    <li><strong>Model:</strong> Subscription (monthly/annual) + Booster Packs (one-time top-ups).</li>
+                    <li><strong>Payment:</strong> by credit/debit card (Stripe). Prices are shown excluding taxes. VAT may apply depending on your location.</li>
+                    <li><strong>Renewal:</strong> unless stated otherwise, the Subscription renews automatically.</li>
+                    <li><strong>Cancellation:</strong> you may cancel at any time; cancellation takes effect at the end of the current paid period. No prorated refunds.</li>
+                    <li><strong>Refunds:</strong> 14-day “satisfied or refunded” on the first purchase only. After that: no refunds.</li>
+                </ol>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">11. Payment failure, suspension</h3>
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-300 text-sm text-gray-600 mb-6 italic">
+                    <strong>In brief:</strong> if payment fails, we suspend editor access, but keep the app read-only for a while so you can recover/export.
+                </div>
+                <ol class="list-decimal pl-5 space-y-2">
+                    <li><strong>Failure:</strong> after 3 attempts (around 7 days), we may suspend access to the editor.</li>
+                    <li><strong>Grace period:</strong> the Application may remain accessible in read-only mode for 30 days to allow payment resolution or export.</li>
+                    <li>After the grace period, we may delete the Application.</li>
+                    <li><strong>Termination for cause:</strong> immediate in case of serious breach (AUP, fraud, etc.).</li>
+                </ol>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">12. Personal data — GDPR</h3>
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-300 text-sm text-gray-600 mb-6 italic">
+                    <strong>In brief:</strong> for your account, we are the controller; for your end users, we are the processor.
+                </div>
+                <ol class="list-decimal pl-5 space-y-2">
+                    <li><strong>Account data:</strong> YourFirstShip acts as Data Controller.</li>
+                    <li><strong>End users’ data:</strong> you act as Data Controller and YourFirstShip acts as Data Processor.</li>
+                    <li>The Data Processing Agreement (DPA) applies and details the respective obligations.</li>
+                </ol>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">13. Intellectual property</h3>
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-300 text-sm text-gray-600 mb-6 italic">
+                    <strong>In brief:</strong> you keep your inputs and you own your output. We own the Platform. You grant us a license to host.
+                </div>
+                <ol class="list-decimal pl-5 space-y-2">
+                    <li><strong>Platform:</strong> we retain all rights to the Platform and its components.</li>
+                    <li><strong>Inputs:</strong> you remain the owner of your Customer Content.</li>
+                    <li><strong>Outputs:</strong> you own the generated Application and have the right to export it.</li>
+                    <li><strong>License:</strong> you grant us a worldwide, royalty-free, non-exclusive license to host and run the Application to provide the service.</li>
+                    <li><strong>Attribution:</strong> we may reference you as a customer unless you are on the Agency (white-label) plan.</li>
+                </ol>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">14. Confidentiality</h3>
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-300 text-sm text-gray-600 mb-6 italic">
+                    <strong>In brief:</strong> each party protects the other’s sensitive information.
+                </div>
+                <p>Each party agrees not to disclose the other party’s confidential information, to protect it, and to use it only to perform the contract, except where required by law.</p>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">15. Limitation of liability</h3>
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-300 text-sm text-gray-600 mb-6 italic">
+                    <strong>In brief:</strong> we do not promise “zero bugs”. Our liability is capped.
+                </div>
+                <ol class="list-decimal pl-5 space-y-2">
+                    <li>The Platform is provided “as is”. We do not guarantee it is error-free.</li>
+                    <li><strong>AI:</strong> no Output is guaranteed to be accurate or secure. You must test before production.</li>
+                    <li><strong>Limitation:</strong> we are not liable for indirect damages (lost revenue, etc.).</li>
+                    <li><strong>Cap:</strong> our total liability is limited to the total amount paid by the Customer over the last 12 months.</li>
+                </ol>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">16. Indemnification</h3>
+                <p>You agree to indemnify and defend YourFirstShip against any claim related to your Customer Content, your Application, or a breach of these Terms.</p>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">17. Reporting</h3>
+                <p>To report an infringement (illegal content, copyright), contact contact@yourfirstship.com with the necessary supporting documentation.</p>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">18. Governing law and disputes</h3>
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-300 text-sm text-gray-600 mb-6 italic">
+                    <strong>In brief:</strong> French law, mandatory amicable resolution attempt, then the courts of Paris.
+                </div>
+                <ol class="list-decimal pl-5 space-y-2">
+                    <li><strong>Governing law:</strong> French law.</li>
+                    <li><strong>Amicable resolution:</strong> a good-faith attempt to resolve disputes amicably is required before any legal action.</li>
+                    <li><strong>Jurisdiction:</strong> failing agreement, disputes are submitted to the courts of Paris, subject to any mandatory public policy rules.</li>
+                </ol>
+            </section>
+
+            <section class="mb-12">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">19. Miscellaneous</h3>
+                <p>If any clause is invalid, the rest remains enforceable. Failure to enforce a clause is not a waiver. These Terms constitute the entire agreement.</p>
+            </section>
+
+        </main>
+    </div>
+</div>
+
+<script>
+    // Dynamic dates
+    document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    document.getElementById('effective-date').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+</script>

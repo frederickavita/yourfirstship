@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{=response.title or request.application}}</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            bg: '#f9fafa',       /* Source: body background */
+                            surface: '#ffffff',  /* Source: header background */
+                            dark: '#1e3a8a',     /* Source: h1 color (Dark Royal Blue) */
+                            primary: '#4a90e2',  /* Source: .btn-blue (Soft Blue) */
+                            accent: '#00796b',   /* Source: .tag text color (Teal) */
+                            light: '#e0f7fa',    /* Source: .tag background (Light Cyan) */
+                            text: '#333333',     /* Source: body text */
+                            gray: '#555555',     /* Source: nav links */
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 10px rgba(0,0,0,0.05)', /* Source: .dashboard-preview box-shadow */
+                        'glow': '0 0 15px rgba(74, 144, 226, 0.3)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9fafa; color: #333333; }
+        /* Suppression du style Serif pour coller au design source */
+        h1, h2, h3, h4, h5, h6 { font-family: 'Inter', sans-serif; font-weight: 700; color: #1e3a8a; }
+        
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+    </style>
+</head>
+<body class="antialiased flex flex-col min-h-screen">
+    {{include}}
+</body>
+</html>

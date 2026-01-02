@@ -1,0 +1,313 @@
+
+    {{extend 'malayout.html'}}
+
+<nav class="fixed w-full z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-20">
+
+            <a href="{{=URL('home')}}" class="flex items-center gap-3 group">
+                <div class="text-2xl text-brand-primary group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-anchor"></i>
+                </div>
+                <span class="font-bold text-xl text-brand-dark tracking-tight">YourFirstShip</span>
+            </a>
+
+            <div class="hidden md:flex space-x-8 items-center">
+                <a href="{{=URL('home')}}" class="text-sm font-medium text-gray-500 hover:text-brand-primary transition">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Back to website
+                </a>
+                <a href="{{=URL('terms')}}" class="text-sm font-medium text-gray-500 hover:text-brand-primary transition">
+                    Terms
+                </a>
+                <a href="{{=URL('privacy')}}" class="text-sm font-bold text-brand-primary bg-blue-50 px-3 py-1 rounded-full transition">
+                    Privacy
+                </a>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <a href="#" class="hidden md:block text-sm font-semibold text-gray-500 hover:text-brand-primary">Log in</a>
+                <a href="index.html#pricing" class="px-5 py-2.5 bg-brand-dark text-white text-sm font-bold rounded-lg shadow-sm hover:bg-gray-800 transition-all hover:-translate-y-0.5">
+                    Get started
+                </a>
+            </div>
+            
+        </div>
+    </div>
+</nav>
+
+
+<div class="bg-gray-50 border-b border-gray-200 pt-32 pb-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-4xl font-bold text-brand-dark mb-4">Privacy & Cookie Policy</h1>
+        <p class="text-gray-600">
+            Last updated: <span id="current-date"></span><br>
+            Effective date: <span id="effective-date"></span>
+        </p>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="flex flex-col lg:flex-row gap-12">
+
+        <aside class="w-full lg:w-64 flex-shrink-0">
+            <nav class="sticky top-32 space-y-1">
+                <a href="terms.html" class="block px-4 py-2 rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition">
+                    Terms of Service
+                </a>
+                <a href="#privacy" class="block px-4 py-2 rounded-md bg-blue-50 text-brand-primary font-bold border-l-4 border-brand-primary">
+                    Privacy Policy
+                </a>
+                <a href="#" class="block px-4 py-2 rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition">
+                    Acceptable Use (AUP)
+                </a>
+                <a href="#" class="block px-4 py-2 rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition">
+                    Data Processing Agreement (DPA)
+                </a>
+                <a href="#" class="block px-4 py-2 rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition">
+                    Subprocessors
+                </a>
+            </nav>
+        </aside>
+
+        <main class="flex-1 prose prose-blue max-w-none text-gray-700" id="privacy">
+            
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">0. Introduction</h3>
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-300 text-sm text-gray-600 mb-6 italic">
+                    <strong>In brief:</strong> 2 K SERVICE protects your data. This policy explains how, for both the website and the SaaS app.
+                </div>
+                <p>The company <strong>2 K SERVICE</strong> (sole proprietor / micro-business), operating the YourFirstShip platform (“we”, “us”, “our”), is committed to protecting your personal data.</p>
+                <p>This Privacy & Cookie Policy (“Policy”) describes our practices regarding the collection, use, sharing, and protection of information when you use:</p>
+                <ul class="list-disc pl-5 space-y-2">
+                    <li>the marketing website <strong>yourfirstship.com</strong>; and</li>
+                    <li>the YourFirstShip SaaS application (dashboard, editor, hosting, runtime, support) (together, the “Service”).</li>
+                </ul>
+                <p>By using the Service, you agree to this Policy and our Terms of Service.</p>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">1. Definitions</h3>
+                <ul class="list-disc pl-5 space-y-2">
+                    <li><strong>Customer / Direct User:</strong> a legal entity or professional (B2B) who creates a YourFirstShip account and uses the editor to design / generate / host applications.</li>
+                    <li><strong>End User:</strong> any person who uses an application created by a Customer (e.g., the Customer’s clients, students, patients, prospects).</li>
+                    <li><strong>Account Data:</strong> data related to the Customer’s account (identity, access, billing, logs, support).</li>
+                    <li><strong>Project Data:</strong> prompts (inputs), generated code (outputs), database schemas, files, “Time Machine” versions, configurations, and technical logs related to the project.</li>
+                    <li><strong>Subprocessor (GDPR meaning):</strong> a provider processing data on our behalf (hosting, payments, AI, etc.).</li>
+                </ul>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">2. Important information (controller, contact)</h3>
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <p class="font-bold mb-2">Data Controller (for Customers’ account data):</p>
+                    <p>
+                        2 K SERVICE<br>
+                        8 rue Charles Gide, 77130 Varennes-sur-Seine, France<br>
+                        Email: <a href="mailto:contact@yourfirstship.com" class="text-brand-primary">contact@yourfirstship.com</a>
+                    </p>
+                    <ul class="list-disc pl-5 mt-4 text-sm">
+                        <li><strong>DPO:</strong> no DPO appointed at this time.</li>
+                        <li><strong>Single contact channel:</strong> email only at contact@yourfirstship.com.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">3. GDPR roles: Controller vs Processor</h3>
+                
+                <h4 class="font-bold text-gray-800 mt-6 mb-2">3.1 Customer data (B2B)</h4>
+                <p>For Account Data (account creation, authentication, billing, support, security), 2 K SERVICE acts as the <strong>Data Controller</strong>.</p>
+
+                <h4 class="font-bold text-gray-800 mt-6 mb-2">3.2 End Users’ data in generated apps</h4>
+                <p>For data processed within applications created by our Customers (End Users’ data), the Customer generally acts as the <strong>Data Controller</strong> and YourFirstShip acts as a <strong>Data Processor</strong> under the GDPR.</p>
+                
+                <p>The Customer is responsible for:</p>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li>providing required notices to their End Users;</li>
+                    <li>their own privacy policy;</li>
+                    <li>the legal basis and purposes of processing within their application; and</li>
+                    <li>overall compliance of their application and its content.</li>
+                </ul>
+
+                <p class="mt-4"><strong>YourFirstShip access to such data:</strong></p>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li>by default, access is limited to technical logs required for hosting and security; and</li>
+                    <li>access to End User content occurs only upon the Customer’s explicit request (support) or in case of critical technical intervention (maintenance, security, incident).</li>
+                </ul>
+                <p class="mt-2"><strong>End User export / deletion:</strong> dashboard features enable the Customer to export/delete their End Users’ data (depending on the app configuration).</p>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">4. Data we collect</h3>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h4 class="font-bold text-gray-800 mb-2">A) Account data (B2B)</h4>
+                        <ul class="list-disc pl-5 text-sm space-y-1">
+                            <li>First name, last name</li>
+                            <li>Company (if provided)</li>
+                            <li>Business email</li>
+                            <li>Login IP address, timestamps, activity logs (security, audit)</li>
+                            <li>Account settings (preferences, configuration)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h4 class="font-bold text-gray-800 mb-2">B) Payment data (via Stripe)</h4>
+                        <ul class="list-disc pl-5 text-sm space-y-1">
+                            <li>Information processed by Stripe (e.g., last 4 digits, expiration date, country, billing history)</li>
+                            <li>We do not store full card numbers.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h4 class="font-bold text-gray-800 mb-2">C) Project data</h4>
+                        <ul class="list-disc pl-5 text-sm space-y-1">
+                            <li>Prompts / instructions (Inputs)</li>
+                            <li>Generated code (Outputs): Python/Brython, HTML/CSS/JS, Docker, SQL</li>
+                            <li>DB schemas, migrations, configurations</li>
+                            <li>Files uploaded by the Customer</li>
+                            <li>Version history (“Time Machine”)</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h4 class="font-bold text-gray-800 mb-2">D) Support & Marketing</h4>
+                        <ul class="list-disc pl-5 text-sm space-y-1">
+                            <li>Emails, tickets, technical exchanges</li>
+                            <li>Email (newsletter if opt-in)</li>
+                            <li>Browsing data on the marketing website</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">5. Purposes and legal bases</h3>
+                <p>We process your data only when necessary, including to:</p>
+                <ul class="list-disc pl-5 space-y-2 mt-2">
+                    <li><strong>Perform the contract (Terms / subscription):</strong> create and secure your account, provide the editor, AI generation, hosting, maintenance, and support.</li>
+                    <li><strong>Comply with legal obligations:</strong> invoicing, accounting, retention of certain logs.</li>
+                    <li><strong>Legitimate interests:</strong> security, fraud prevention, product improvement (internal analytics), B2B service communications.</li>
+                    <li><strong>Consent (where required):</strong> non-essential cookies/trackers, marketing newsletter subscription.</li>
+                </ul>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">6. Cookies and trackers</h3>
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-300 text-sm text-gray-600 mb-6 italic">
+                    <strong>In brief:</strong> Privacy-first approach. Essential cookies + anonymized analytics.
+                </div>
+                <h4 class="font-bold text-gray-800 mt-4 mb-2">6.1 Types of cookies</h4>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li><strong>Essential cookies (always active):</strong> session, authentication, security (anti-CSRF), preferences (language).</li>
+                    <li><strong>Audience measurement cookies (analytics):</strong> Google Analytics 4 (or an alternative). Purpose: statistics. Max duration: 13 months.</li>
+                    <li><strong>Third-party cookies related to payments:</strong> Stripe (transaction security).</li>
+                </ul>
+                <h4 class="font-bold text-gray-800 mt-4 mb-2">6.2 Cookie banner</h4>
+                <p>Where required, a banner allows you to accept all, reject all, or customize your choices.</p>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">7. How we use your data</h3>
+                <p>We use your data to:</p>
+                <ul class="list-disc pl-5 space-y-1 mt-2">
+                    <li>provide the Service (editor, AI, hosting);</li>
+                    <li>manage your account (auth, administration, notifications);</li>
+                    <li>process payments and manage billing;</li>
+                    <li>respond to support requests;</li>
+                    <li>secure the Service (fraud/abuse detection, audit, logs);</li>
+                    <li>improve the Service (technical analysis);</li>
+                    <li>send marketing communications only if you opted in.</li>
+                </ul>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">8. Data sharing</h3>
+                <p>We may share data only:</p>
+                <ul class="list-disc pl-5 space-y-1 mt-2">
+                    <li>with necessary <strong>Subprocessors</strong> (hosting, payments, AI, email);</li>
+                    <li>when required by law (valid legal request);</li>
+                    <li>in connection with a corporate event (sale/merger), with appropriate safeguards; or</li>
+                    <li>with your explicit consent.</li>
+                </ul>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">9. AI (Gemini) and project data</h3>
+                <p>YourFirstShip primarily uses Google (Gemini API) to generate code from your instructions.</p>
+                
+                <h4 class="font-bold text-gray-800 mt-4 mb-2">9.1 Data sent to the AI</h4>
+                <p>Your Inputs (prompts), along with the necessary technical context, in order to produce Outputs (code).</p>
+
+                <h4 class="font-bold text-gray-800 mt-4 mb-2">9.2 Prohibited data in prompts</h4>
+                <p>You agree not to include in prompts: sensitive data, third-party personal data (your End Users), or unnecessary secrets.</p>
+
+                <h4 class="font-bold text-gray-800 mt-4 mb-2">9.3 Retention & validation</h4>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li>YourFirstShip retains prompts/outputs while the project is active (including for “Time Machine”).</li>
+                    <li>You are solely responsible for testing, validating, and auditing generated code before production use.</li>
+                </ul>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">10. Subprocessors</h3>
+                <p>As of today, our main subprocessors include:</p>
+                <ul class="list-disc pl-5 space-y-1 mt-2">
+                    <li><strong>PythonAnywhere:</strong> application / database hosting / storage (EU or US).</li>
+                    <li><strong>Stripe:</strong> payments and billing (USA).</li>
+                    <li><strong>Google (Gemini API):</strong> code generation (USA).</li>
+                    <li><strong>Email provider:</strong> (if enabled).</li>
+                </ul>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">11. Transfers outside the European Union</h3>
+                <p>Some providers may process data in the United States (e.g., Google, Stripe). We implement appropriate safeguards, including:</p>
+                <ul class="list-disc pl-5 space-y-1 mt-2">
+                    <li><strong>Data Privacy Framework (DPF)</strong> where the provider is certified; and</li>
+                    <li>Standard Contractual Clauses (SCC) in other cases.</li>
+                </ul>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">12. Security</h3>
+                <p>We implement reasonable measures: HTTPS/TLS, restricted access, logical isolation, daily backups, and monitoring.</p>
+                <p class="mt-2 text-sm">Data breach: in case of an incident presenting a high risk, we will notify affected users by email within applicable regulatory timelines.</p>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">13. Data retention</h3>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li><strong>Active account:</strong> retained while the subscription is active.</li>
+                    <li><strong>Closed account:</strong> “Project” data deleted after 30 days (grace period).</li>
+                    <li><strong>Billing data:</strong> retained for 10 years (accounting obligations).</li>
+                    <li><strong>Technical logs:</strong> retained for 12 months (security / applicable obligations).</li>
+                </ul>
+            </section>
+
+            <section class="mb-12 border-b border-gray-100 pb-8">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">14. Your rights (GDPR)</h3>
+                <p>You may exercise your rights of access, rectification, erasure, restriction, objection, and portability.</p>
+                <p class="mt-2 text-sm italic">End Users: if you are a user of an application created by a Customer, your requests must be addressed to that Customer.</p>
+            </section>
+
+            <section class="mb-12">
+                <h3 class="text-xl font-bold text-brand-dark mb-4">15–18. Miscellaneous and Contact</h3>
+                <ul class="list-disc pl-5 space-y-4">
+                    <li><strong>Complaints:</strong> Contact us or the CNIL (French Data Protection Authority).</li>
+                    <li><strong>Minors:</strong> Service prohibited for users under 18.</li>
+                    <li><strong>Changes:</strong> We will provide 30 days’ notice before any material change.</li>
+                    <li><strong>Contact:</strong> <a href="mailto:contact@yourfirstship.com" class="text-brand-primary font-bold">contact@yourfirstship.com</a><br>2 K SERVICE — 8 rue Charles Gide, 77130 Varennes-sur-Seine, France.</li>
+                </ul>
+            </section>
+
+        </main>
+    </div>
+</div>
+
+<script>
+    // Dynamic dates
+    document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    document.getElementById('effective-date').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+</script>

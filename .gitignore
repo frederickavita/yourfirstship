@@ -1,0 +1,14 @@
+# .gitignore pour yourfirstship
+controllers/*.pyc
+models/*.pyc
+modules/*.pyc
+databases/*.table
+databases/*.log
+databases/*.db
+errors/*
+sessions/*
+cache/*
+private/*
+uploads/*
+*.log
+__pycache__/

@@ -1,0 +1,1029 @@
+{{extend 'malayout.html'}}
+
+
+<nav class="fixed w-full z-50 bg-brand-surface/95 backdrop-blur-sm border-b border-gray-100 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-20">
+            <div class="flex items-center gap-3">
+                <div class="text-2xl text-brand-primary">
+                    <i class="fa-solid fa-anchor"></i>
+                </div>
+                <span class="font-bold text-xl text-brand-dark tracking-tight">YourFirstShip</span>
+            </div>
+
+            <div class="hidden md:flex space-x-8">
+                <a href="#constat" class="text-sm font-medium text-brand-gray hover:text-brand-primary transition">Why us?</a>
+                <a href="#features" class="text-sm font-medium text-brand-gray hover:text-brand-primary transition">Solutions</a>
+                <a href="#pricing" class="text-sm font-medium text-brand-gray hover:text-brand-primary transition">Pricing</a>
+                <a href="#faq" class="text-sm font-medium text-brand-gray hover:text-brand-primary transition">FAQ</a>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <a href="#" class="hidden md:block text-sm font-semibold text-brand-gray hover:text-brand-primary">Login</a>
+                <a href="#pricing" class="px-6 py-2.5 bg-brand-primary text-white text-sm font-bold rounded-md shadow-soft hover:bg-blue-600 transition-all hover:-translate-y-0.5">
+                    Build my prototype
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<section class="pt-32 pb-20 lg:pt-44 relative overflow-hidden text-center">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto mb-16">
+
+            
+          <h1 class="text-4xl lg:text-6xl font-extrabold text-brand-dark leading-tight mb-6">
+    Launch the complex app that other <span class="text-brand-primary">No-Code App Builders</span>
+    <span class="block text-brand-dark mt-2">cannot build.</span>
+</h1>
+      
+        <p class="text-lg text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+    YourFirstShip isn't just a simple AI App Builder, <strong class="text-brand-primary">it's your complete Development Team.</strong> Transform your expertise into a seamless application, designed to last.
+</p>
+            
+            <div class="flex flex-col sm:flex-row justify-center gap-4 mb-6">
+                <a href="#pricing" class="px-8 py-4 bg-brand-primary text-white rounded-md font-bold text-lg shadow-soft hover:shadow-lg transition hover:-translate-y-1">
+                    Build my app now <i class="fa-solid fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+            <p class="text-sm text-gray-400 font-medium">
+               No credit card required. 100% exportable code.
+            </p>
+        </div>
+
+     <div class="relative max-w-6xl mx-auto mt-12">
+    
+    <div class="relative z-20 max-w-2xl mx-auto mb-4">
+        <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-2xl blur opacity-30 animate-pulse"></div>
+        <div class="relative bg-gray-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-2 shadow-2xl flex items-center gap-3">
+            <div class="pl-4 flex-1 text-left">
+                <span class="text-gray-400 text-xs uppercase tracking-wider font-bold mb-0.5 block">Prompt</span>
+                <div class="text-white font-medium text-sm md:text-base truncate">
+                    "Create a camera rental marketplace with a calendar..."
+                </div>
+            </div>
+            <button class="bg-brand-primary hover:bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-sm transition-all shadow-lg shadow-blue-500/20 flex items-center gap-2">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span class="hidden sm:inline">Generate</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="absolute top-16 left-0 w-full h-24 z-10 pointer-events-none overflow-visible">
+        <svg class="w-full h-full" viewBox="0 0 800 100" preserveAspectRatio="none">
+            <defs>
+                <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0" />
+                    <stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0" />
+                </linearGradient>
+            </defs>
+            <path d="M400,0 C400,50 200,50 200,100" fill="none" stroke="url(#flowGradient)" stroke-width="2" class="animate-dash"/>
+            <path d="M400,0 C400,50 600,50 600,100" fill="none" stroke="url(#flowGradient)" stroke-width="2" class="animate-dash-delayed"/>
+        </svg>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-end relative z-10 pt-8 px-4">
+        
+        <div class="hidden md:block md:col-span-7 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden transform transition hover:-translate-y-1 duration-500">
+            <div class="bg-gray-50 px-4 py-3 border-b border-gray-100 flex items-center gap-2">
+                <div class="flex gap-1.5">
+                    <div class="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-green-400"></div>
+                </div>
+                <div class="ml-4 bg-white border border-gray-200 rounded-md px-3 py-0.5 text-[10px] text-gray-400 w-48 flex justify-between items-center">
+                    <span>camerarental.app/dashboard</span>
+                    <i class="fa-solid fa-lock text-[8px]"></i>
+                </div>
+            </div>
+            <div class="p-5 bg-slate-50">
+                <div class="flex justify-between items-end mb-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">Overview</h3>
+                        <p class="text-xs text-gray-500">Welcome, Julien</p>
+                    </div>
+                    <span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-md font-bold">
+                        +24% Revenue
+                    </span>
+                </div>
+                <div class="grid grid-cols-3 gap-3 mb-4">
+                    <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+                        <div class="text-gray-400 text-[10px] uppercase font-bold">Total Sales</div>
+                        <div class="text-lg font-bold text-brand-primary">€1,240</div>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+                        <div class="text-gray-400 text-[10px] uppercase font-bold">Rented Out</div>
+                        <div class="text-lg font-bold text-gray-700">8 Cameras</div>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+                        <div class="text-gray-400 text-[10px] uppercase font-bold">Customers</div>
+                        <div class="text-lg font-bold text-gray-700">142</div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg border border-gray-100 p-3">
+                    <div class="text-xs font-bold text-gray-700 mb-2">Latest Bookings</div>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between p-2 hover:bg-gray-50 rounded transition">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 bg-gray-200 rounded flex items-center justify-center text-gray-500">
+                                    <i class="fa-solid fa-camera"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-bold text-gray-800">Sony A7S III</div>
+                                    <div class="text-[10px] text-gray-400">Rented by Paul M.</div>
+                                </div>
+                            </div>
+                            <div class="text-xs font-bold text-green-600">Paid (€120)</div>
+                        </div>
+                        <div class="flex items-center justify-between p-2 hover:bg-gray-50 rounded transition">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 bg-gray-200 rounded flex items-center justify-center text-gray-500">
+                                    <i class="fa-solid fa-video"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-bold text-gray-800">Canon R5</div>
+                                    <div class="text-[10px] text-gray-400">Rented by Sarah L.</div>
+                                </div>
+                            </div>
+                            <div class="text-xs font-bold text-orange-500">Pending</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-span-1 md:col-span-5 flex justify-center">
+            <div class="relative w-[280px] h-[500px] bg-gray-900 rounded-[3rem] border-[8px] border-gray-800 shadow-2xl overflow-hidden ring-1 ring-white/20">
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-6 bg-black rounded-b-xl z-20"></div>
+                
+                <div class="w-full h-full bg-white pt-10 px-4 flex flex-col relative">
+                    <div class="flex justify-between items-center mb-6">
+                        <i class="fa-solid fa-chevron-left text-gray-400"></i>
+                        <span class="font-bold text-sm">Product Detail</span>
+                        <i class="fa-regular fa-heart text-gray-400"></i>
+                    </div>
+                    
+                    <div class="w-full h-40 bg-gray-100 rounded-2xl mb-4 flex items-center justify-center relative overflow-hidden group">
+                        <i class="fa-solid fa-camera text-4xl text-gray-300"></i>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-60"></div>
+                        <span class="absolute bottom-3 left-3 text-white font-bold text-sm">Sony Alpha 7 IV</span>
+                    </div>
+
+                    <div class="flex justify-between items-end mb-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-900">Creator Pack</h2>
+                            <div class="flex text-yellow-400 text-xs mt-1">
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star text-gray-300"></i>
+                                <span class="text-gray-400 ml-1">(42 reviews)</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-brand-primary font-bold text-xl">€55</div>
+                            <div class="text-[10px] text-gray-400">/day</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="text-xs font-bold text-gray-700 mb-2">Availability</div>
+                        <div class="flex justify-between gap-1">
+                            <div class="bg-gray-100 rounded p-2 text-center w-full opacity-50"><div class="text-[8px]">MON</div><div class="font-bold text-xs">12</div></div>
+                            <div class="bg-brand-primary text-white rounded p-2 text-center w-full shadow-lg shadow-blue-500/30 transform scale-110"><div class="text-[8px]">TUE</div><div class="font-bold text-xs">13</div></div>
+                            <div class="bg-gray-100 rounded p-2 text-center w-full"><div class="text-[8px]">WED</div><div class="font-bold text-xs">14</div></div>
+                            <div class="bg-gray-100 rounded p-2 text-center w-full"><div class="text-[8px]">THU</div><div class="font-bold text-xs">15</div></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto pb-6">
+                        <button class="w-full bg-black text-white py-3.5 rounded-xl font-bold text-sm hover:bg-gray-800 transition flex justify-between px-6 items-center">
+                            <span>Book</span>
+                            <span><i class="fa-brands fa-apple mr-2"></i> Pay</span>
+                        </button>
+                    </div>
+
+                    <div class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1/3 h-1 bg-gray-300 rounded-full"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .animate-dash {
+        stroke-dasharray: 10;
+        animation: dash 3s linear infinite;
+    }
+    .animate-dash-delayed {
+        stroke-dasharray: 10;
+        animation: dash 3s linear infinite;
+        animation-delay: 1.5s;
+    }
+    @keyframes dash {
+        to {
+            stroke-dashoffset: -100;
+        }
+    }
+</style>
+    </div>
+</section>
+
+<section id="constat" class="py-24 bg-white border-t border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+            <h2 class="text-3xl font-bold text-brand-dark mb-4">Why are current tools blocking you?</h2>
+            <p class="text-gray-600">You deserve better than a disposable prototype.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div class="p-6">
+                <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 text-red-500 text-2xl">
+                    <i class="fa-solid fa-layer-group"></i>
+                </div>
+                <h3 class="text-xl font-bold text-brand-dark mb-3">The "Prototype" Trap</h3>
+                <p class="text-gray-600 text-sm leading-relaxed">
+                    It works for 10 users. At 100, everything slows down. You need a robust factory, not a fragile toy.
+                </p>
+            </div>
+
+          <div class="p-6">
+    <div class="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-6 text-orange-500 text-2xl">
+        <i class="fa-solid fa-bug-slash"></i>
+    </div>
+    <h3 class="text-xl font-bold text-brand-dark mb-3">The "Kill Switch" Anti-Hallucination</h3>
+    <p class="text-gray-600 text-sm leading-relaxed">
+        AI says "It's fixed" but nothing changes? No more burnt credits for nothing. 
+        Our system monitors the AI: after <strong>3 failed attempts</strong>, it stops and an engineer takes over.
+    </p>
+</div>
+
+            <div class="p-6">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-600 text-2xl">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 class="text-xl font-bold text-brand-dark mb-3">The Gilded Cage (Lock-in)</h3>
+                <p class="text-gray-600 text-sm leading-relaxed">
+                    If the platform shuts down or increases its prices, you lose everything. Your business deserves to own its technology.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="how-it-works" class="py-24 bg-white border-t border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="max-w-3xl mb-24">
+            <h2 class="text-3xl md:text-5xl font-bold text-brand-dark mb-6 leading-tight">From idea to monopoly in 4 fluid steps.</h2>
+            <p class="text-xl text-gray-600">A simple methodology for complex results.</p>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-12 lg:gap-24 relative items-start">
+            
+            <div class="w-full lg:w-5/12 flex flex-col space-y-32 py-8 z-10">
+                
+                <div class="step-trigger flex gap-6 group cursor-pointer transition-opacity duration-300" data-step="1">
+                    <div class="flex-shrink-0 pt-1 relative">
+                        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-brand-primary text-xl transition-colors duration-300 shadow-sm group-[.active]:bg-brand-primary group-[.active]:text-white">
+                            <i class="fa-solid fa-microphone-lines"></i>
+                        </div>
+                         <div class="absolute top-14 left-6 w-px h-32 bg-blue-100 hidden lg:block -z-10"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-brand-dark mb-2 group-[.active]:text-brand-primary transition-colors">1. Speak</h3>
+                        <div class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">AI Project Manager • Art Director</div>
+                        <p class="text-gray-600 leading-relaxed mb-4 text-lg">
+                            Forget laborious drag-and-drop. Simply discuss with the AI. Describe your business, define your style, and watch the system structure your project.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="step-trigger flex gap-6 group cursor-pointer opacity-50 hover:opacity-100 transition-opacity duration-300" data-step="2">
+                    <div class="flex-shrink-0 pt-1 relative">
+                        <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600 text-xl transition-colors duration-300 shadow-sm group-[.active]:bg-purple-600 group-[.active]:text-white">
+                            <i class="fa-solid fa-mobile-screen-button"></i>
+                        </div>
+                        <div class="absolute top-14 left-6 w-px h-32 bg-purple-100 hidden lg:block -z-10"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-brand-dark mb-2 group-[.active]:text-purple-600 transition-colors">2. Visualize</h3>
+                        <div class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Instant Generator • Real Simulator</div>
+                        <p class="text-gray-600 leading-relaxed mb-4 text-lg">
+                            Your application comes to life instantly. Test it on our simulator or directly on your phone. A detail bothers you? "Make this button blue".
+                        </p>
+                    </div>
+                </div>
+
+                <div class="step-trigger flex gap-6 group cursor-pointer opacity-50 hover:opacity-100 transition-opacity duration-300" data-step="3">
+                    <div class="flex-shrink-0 pt-1 relative">
+                        <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-orange-500 text-xl transition-colors duration-300 shadow-sm group-[.active]:bg-orange-500 group-[.active]:text-white">
+                            <i class="fa-solid fa-gears"></i>
+                        </div>
+                        <div class="absolute top-14 left-6 w-px h-32 bg-orange-100 hidden lg:block -z-10"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-brand-dark mb-2 group-[.active]:text-orange-500 transition-colors">3. Automate</h3>
+                        <div class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Business Logic • Offline Mode</div>
+                        <p class="text-gray-600 leading-relaxed mb-4 text-lg">
+                            This is where the magic happens. Define your rules ("If stock < 10, alert supplier"). The system manages the secure database without a single line of SQL.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="step-trigger flex gap-6 group cursor-pointer opacity-50 hover:opacity-100 transition-opacity duration-300" data-step="4">
+                    <div class="flex-shrink-0 pt-1">
+                        <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600 text-xl transition-colors duration-300 shadow-sm group-[.active]:bg-green-600 group-[.active]:text-white">
+                            <i class="fa-solid fa-unlock-keyhole"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-brand-dark mb-2 group-[.active]:text-green-600 transition-colors">4. Own</h3>
+                        <div class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Code Translator • Source Export</div>
+                        <p class="text-gray-600 leading-relaxed mb-4 text-lg">
+                            Never be a tenant. Use the <strong>Bilingual Mirror</strong> to control your tech. Ready? Export all source code to host it yourself.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden lg:block w-full lg:w-7/12 sticky top-32 h-[600px]">
+                <div class="relative w-full h-full bg-gray-50 rounded-3xl border border-gray-200 shadow-2xl overflow-hidden p-8 flex items-center justify-center">
+                    
+                    <div class="absolute top-0 right-0 w-96 h-96 bg-blue-100/50 rounded-full filter blur-3xl opacity-50 transition-colors duration-500" id="bg-blur-1"></div>
+                    <div class="absolute bottom-0 left-0 w-64 h-64 bg-purple-100/50 rounded-full filter blur-3xl opacity-50 transition-colors duration-500" id="bg-blur-2"></div>
+
+                    <div class="relative w-full max-w-md h-[450px]">
+
+                        <div id="visual-step-1" class="visual-step absolute inset-0 transition-all duration-700 ease-in-out transform translate-y-8 opacity-0 pointer-events-none active-visual">
+                             <div class="w-full h-full bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden flex flex-col">
+                                <div class="bg-blue-50/50 border-b border-blue-100 px-4 py-3 flex items-center gap-2">
+                                    <div class="flex gap-1.5"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div></div>
+                                    <div class="ml-4 text-xs text-blue-400 font-mono">AI Architect</div>
+                                </div>
+                                <div class="p-6 space-y-6 flex-1 overflow-hidden relative">
+                                    <div class="flex items-start gap-3 justify-end animate-slide-in-right">
+                                        <div class="bg-brand-primary rounded-2xl rounded-tr-none p-4 text-sm text-white w-4/5 shadow-md">
+                                            I want an app for tennis coaches. They need to manage students and a court booking calendar.
+                                        </div>
+                                        <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500"><i class="fa-solid fa-user"></i></div>
+                                    </div>
+                                    <div class="flex items-start gap-3 animate-slide-in-left delay-300">
+                                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-brand-primary"><i class="fa-solid fa-robot"></i></div>
+                                        <div class="bg-white border border-gray-200 rounded-2xl rounded-tl-none p-4 text-sm text-gray-600 w-4/5 shadow-sm">
+                                            Understood. Structuring the project:
+                                            <ul class="mt-3 space-y-2 text-xs font-bold text-gray-700">
+                                                <li><i class="fa-solid fa-check text-blue-500 mr-2"></i> Student Base (CRM)</li>
+                                                <li><i class="fa-solid fa-check text-blue-500 mr-2"></i> Interactive Calendar</li>
+                                                <li><i class="fa-solid fa-check text-blue-500 mr-2"></i> Booking System</li>
+                                            </ul>
+                                            <div class="mt-4 text-blue-500 text-xs flex items-center animate-pulse">
+                                                <i class="fa-solid fa-compass-drafting mr-2"></i> Generating mockups...
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="visual-step-2" class="visual-step absolute inset-0 transition-all duration-700 ease-in-out transform translate-y-8 opacity-0 pointer-events-none justify-center flex">
+                             <div class="relative w-[280px] h-full bg-gray-900 rounded-[3rem] border-[8px] border-gray-800 shadow-2xl overflow-hidden ring-1 ring-white/20">
+                                <div class="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-6 bg-black rounded-b-xl z-20"></div>
+                                <div class="w-full h-full bg-white pt-8 flex flex-col relative">
+                                    <div class="px-4 pt-4 pb-2 flex justify-between items-center bg-white z-10">
+                                        <i class="fa-solid fa-bars text-gray-800"></i>
+                                        <span class="font-bold text-gray-800">Tennis Pro</span>
+                                        <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600"><i class="fa-solid fa-user"></i></div>
+                                    </div>
+                                    <div class="p-4 space-y-4 bg-gray-50 flex-1 overflow-hidden">
+                                        <h2 class="text-xl font-bold">Hello, Coach 👋</h2>
+                                        <div class="bg-white p-4 rounded-xl shadow-sm border border-purple-100">
+                                            <div class="flex justify-between items-center mb-3">
+                                                <span class="font-bold text-sm">Today</span>
+                                                <i class="fa-solid fa-calendar text-purple-500"></i>
+                                            </div>
+                                            <div class="flex gap-2">
+                                                <div class="bg-purple-600 text-white p-2 rounded-lg text-center flex-1 shadow-lg shadow-purple-200"><div class="text-xs opacity-80">10:00</div><div class="font-bold">Paul Lesson</div></div>
+                                                <div class="bg-white border border-gray-100 text-gray-400 p-2 rounded-lg text-center flex-1"><div class="text-xs">11:00</div><div class="font-bold">Free</div></div>
+                                                <div class="bg-purple-50 text-purple-700 p-2 rounded-lg text-center flex-1 border border-purple-100"><div class="text-xs opacity-80">14:00</div><div class="font-bold">Sarah Lesson</div></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="absolute bottom-8 left-4 right-4 bg-gray-900/90 backdrop-blur-md text-white p-3 rounded-xl text-xs flex items-center gap-3 shadow-2xl border border-white/10 animate-bounce-subtle">
+                                        <i class="fa-solid fa-wand-magic-sparkles text-purple-400"></i>
+                                        <span>"Turn the calendar buttons green."</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="visual-step-3" class="visual-step absolute inset-0 transition-all duration-700 ease-in-out transform translate-y-8 opacity-0 pointer-events-none">
+                            <div class="w-full h-full bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden flex flex-col">
+                                <div class="bg-orange-50/50 border-b border-orange-100 px-4 py-3 flex items-center gap-2">
+                                    <div class="flex gap-1.5"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div></div>
+                                    <div class="ml-4 text-xs text-orange-500 font-mono">Rule Engine (No-Code SQL)</div>
+                                </div>
+                                <div class="p-6 flex-1 relative bg-slate-50 flex items-center justify-center">
+                                    <div class="relative w-full max-w-sm">
+                                        <div class="bg-white border-2 border-orange-400 p-4 rounded-xl shadow-md flex items-center gap-3 relative z-10">
+                                            <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center text-orange-500"><i class="fa-solid fa-bolt"></i></div>
+                                            <div><div class="text-xs text-gray-500 font-bold uppercase">TRIGGER</div><div class="font-bold text-gray-800">New Booking</div></div>
+                                        </div>
+                                        <div class="h-12 w-0.5 bg-orange-300 mx-auto my-1 relative"><i class="fa-solid fa-chevron-down absolute bottom-0 -left-1.5 text-orange-300 text-xs"></i></div>
+                                        <div class="bg-white border border-gray-300 p-4 rounded-xl shadow-sm flex items-center gap-3 relative z-10">
+                                            <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500"><i class="fa-solid fa-code-branch"></i></div>
+                                            <div><div class="text-xs text-gray-500 font-bold uppercase">CONDITION</div><div class="font-bold text-gray-800">Is slot "Free"?</div></div>
+                                        </div>
+                                         <div class="grid grid-cols-2 h-12 w-full relative">
+                                            <div class="border-r-2 border-green-400 relative"><i class="fa-solid fa-chevron-down absolute bottom-0 -right-1.5 text-green-400 text-xs"></i></div>
+                                            <div class="border-l-2 border-red-400 relative"><i class="fa-solid fa-chevron-down absolute bottom-0 -left-1.5 text-red-400 text-xs"></i></div>
+                                         </div>
+                                         <div class="grid grid-cols-2 gap-4">
+                                            <div class="bg-green-50 border border-green-200 p-3 rounded-lg shadow-sm text-center">
+                                                <i class="fa-solid fa-database text-green-500 mb-2"></i>
+                                                <div class="text-xs font-bold text-green-700">Confirm in DB</div>
+                                            </div>
+                                            <div class="bg-red-50 border border-red-200 p-3 rounded-lg shadow-sm text-center opacity-50">
+                                                <i class="fa-solid fa-xmark text-red-500 mb-2"></i>
+                                                <div class="text-xs font-bold text-red-700">Deny action</div>
+                                            </div>
+                                         </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="visual-step-4" class="visual-step absolute inset-0 transition-all duration-700 ease-in-out transform translate-y-8 opacity-0 pointer-events-none">
+                             <div class="w-full h-full bg-[#1E1E1E] rounded-xl shadow-lg border border-gray-700 overflow-hidden flex flex-col text-xs font-mono relative">
+                                <div class="bg-[#2D2D2D] px-4 py-3 flex items-center justify-between">
+                                    <div class="flex gap-2 items-center">
+                                        <div class="flex gap-1.5"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div></div>
+                                        <span class="text-gray-400 ml-4">Bilingual Mirror (Read-Only)</span>
+                                    </div>
+                                    <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded flex items-center gap-2 text-xs font-sans font-bold transition">
+                                        <i class="fa-solid fa-download"></i> Export ZIP
+                                    </button>
+                                </div>
+                                <div class="flex-1 grid grid-cols-2 divide-x divide-[#2D2D2D]">
+                                    <div class="p-4 text-blue-300 relative">
+                                        <div class="absolute top-2 right-2 text-gray-500 text-[10px] font-sans uppercase">Python Source</div>
+                                        <span class="text-pink-400">class</span> <span class="text-yellow-300">Reservation</span>(Model):<br>
+                                        &nbsp;&nbsp;client = ForeignKey(User)<br>
+                                        &nbsp;&nbsp;date = DateTimeField()<br><br>
+                                        &nbsp;&nbsp;<span class="text-pink-400">def</span> <span class="text-yellow-300">confirm</span>(self):<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-pink-400">if</span> <span class="text-blue-300">not</span> self.is_taken:<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.status = <span class="text-green-300">'confirmed'</span><br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.save()<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-blue-300">return</span> <span class="text-blue-300">True</span>
+                                    </div>
+                                    <div class="p-4 text-gray-300 relative bg-[#252526]">
+                                        <div class="absolute top-2 right-2 text-gray-500 text-[10px] font-sans uppercase">Natural English</div>
+                                        <div class="opacity-60 mb-4"># Data model for a booking</div>
+                                        
+                                        <div class="bg-green-900/30 border-l-2 border-green-500 pl-3 py-2 mb-2">
+                                            If the booking is not already taken, change its status to "confirmed" and save it to the database. Return True.
+                                        </div>
+                                        <div class="text-gray-500 italic mt-4">
+                                            -> Try modifying this text, the Python code on the left will update.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                </div>
+            </div>
+            </div>
+
+
+        <div class="mt-32 relative bg-white rounded-3xl border border-gray-200 shadow-xl overflow-hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 relative z-10">
+                
+                <div class="p-12 lg:p-16 flex flex-col justify-center bg-gradient-to-br from-gray-50 to-white">
+                    <div class="inline-flex items-center gap-2 text-brand-primary font-bold uppercase tracking-wider text-sm mb-6">
+                        <i class="fa-solid fa-shield-heart text-lg"></i>
+                        The Double Safety Net
+                    </div>
+                    <h3 class="text-3xl md:text-4xl font-bold text-brand-dark mb-6 leading-tight">
+                        Launch without fear.<br>We handle the crashes.
+                    </h3>
+                    
+                    <div class="flex gap-4 mb-8 group">
+                         <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 text-xl shrink-0 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-brand-dark mb-1">The Time Machine (Human Error)</h4>
+                            <p class="text-gray-600 text-sm leading-relaxed">
+                                Broken everything? Revert to <strong>"Yesterday 2:00 PM"</strong> in one click. Code, design, and data restored.
+                            </p>
+                        </div>
+                    </div>
+
+                     <div class="flex gap-4 group">
+                         <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-green-600 text-xl shrink-0 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-train-subway"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-brand-dark mb-1">The Subway Test (Network Failure)</h4>
+                            <p class="text-gray-600 text-sm leading-relaxed">
+                                No 4G? Your app continues working offline and syncs data when the network returns.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative bg-gray-900 p-12 lg:p-16 flex items-center justify-center overflow-hidden">
+                    <div class="absolute inset-0 opacity-20">
+                         <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                            <path d="M0,50 Q25,30 50,50 T100,50" stroke="rgba(59, 130, 246, 0.5)" stroke-width="0.5" fill="none" class="animate-pulse"/>
+                            <path d="M0,60 Q25,40 50,60 T100,60" stroke="rgba(59, 130, 246, 0.3)" stroke-width="0.5" fill="none"/>
+                         </svg>
+                    </div>
+
+                    <div class="relative z-10 bg-gray-800/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-2xl w-full max-w-md">
+                        <div class="text-white/60 text-xs font-bold uppercase tracking-wider mb-6 flex justify-between items-center">
+                            <span>Project History</span>
+                            <i class="fa-solid fa-rotate-left"></i>
+                        </div>
+                        
+                        <div class="space-y-6 relative before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-gray-700">
+                            <div class="relative pl-8 opacity-50">
+                                <div class="absolute left-0 top-1 w-4 h-4 bg-gray-600 rounded-full border-2 border-gray-800"></div>
+                                <div class="text-sm text-gray-400 font-bold">Now (Live)</div>
+                                <div class="text-xs text-gray-500">Current version</div>
+                            </div>
+                             <div class="relative pl-8">
+                                <div class="absolute left-0 top-1 w-4 h-4 bg-blue-500 rounded-full border-2 border-blue-300 shadow-[0_0_15px_rgba(59,130,246,0.6)] animate-pulse"></div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <div class="text-sm text-white font-bold">Yesterday, 14:32</div>
+                                    <span class="bg-blue-500/20 text-blue-300 text-[10px] px-2 py-0.5 rounded-full">Stable</span>
+                                </div>
+                                <div class="text-xs text-gray-400 mb-3">Before header modification...</div>
+                                <button class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 rounded-lg transition flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-clock-rotate-left"></i> Restore this version
+                                </button>
+                            </div>
+                             <div class="relative pl-8 opacity-50">
+                                <div class="absolute left-0 top-1 w-4 h-4 bg-gray-600 rounded-full border-2 border-gray-800"></div>
+                                <div class="text-sm text-gray-400 font-bold">Yesterday, 09:15</div>
+                                <div class="text-xs text-gray-500">Project creation</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+</section>
+
+<style>
+    /* Class added by JS when a visual needs to be shown */
+    .visual-step.active-visual {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+        z-index: 10;
+    }
+    /* Small animations for internal elements of visuals */
+    .animate-slide-in-left { animation: slideInLeft 0.5s ease-out forwards; opacity: 0; transform: translateX(-20px); }
+    .animate-slide-in-right { animation: slideInRight 0.5s ease-out forwards; opacity: 0; transform: translateX(20px); }
+    .animate-bounce-subtle { animation: bounceSubtle 2s infinite; }
+    @keyframes slideInLeft { to { opacity: 1; transform: translateX(0); } }
+    @keyframes slideInRight { to { opacity: 1; transform: translateX(0); } }
+    @keyframes bounceSubtle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+</style>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const steps = document.querySelectorAll('.step-trigger');
+    const visuals = document.querySelectorAll('.visual-step');
+    const bgBlur1 = document.getElementById('bg-blur-1');
+    const bgBlur2 = document.getElementById('bg-blur-2');
+
+    // Configuration of background colors for each step
+    const bgColors = {
+        1: { b1: 'bg-blue-100/50', b2: 'bg-purple-100/50' }, // Speak (Blue/Purple)
+        2: { b1: 'bg-purple-100/50', b2: 'bg-pink-100/50' },  // Visualize (Purple/Pink)
+        3: { b1: 'bg-orange-100/50', b2: 'bg-yellow-100/50' }, // Automate (Orange/Yellow)
+        4: { b1: 'bg-green-100/50', b2: 'bg-teal-100/50' }    // Own (Green/Teal)
+    };
+
+    // Observer options
+    // rootMargin: '-40% 0px -40% 0px' means the element must be in the middle of the screen (central 20% zone) to be detected.
+    const observerOptions = {
+        root: null,
+        rootMargin: '-40% 0px -40% 0px', 
+        threshold: 0
+    };
+
+    const observerCallback = (entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // 1. Identify the active step
+                const currentStepIndex = entry.target.getAttribute('data-step');
+
+                // 2. Update classes on left steps (opacity)
+                steps.forEach(step => {
+                    step.classList.remove('active', 'opacity-100');
+                    step.classList.add('opacity-50');
+                });
+                entry.target.classList.add('active', 'opacity-100');
+                entry.target.classList.remove('opacity-50');
+
+                // 3. Activate the corresponding visual on the right
+                visuals.forEach(visual => {
+                    visual.classList.remove('active-visual');
+                });
+                const activeVisual = document.getElementById(`visual-step-${currentStepIndex}`);
+                if (activeVisual) {
+                    activeVisual.classList.add('active-visual');
+                }
+
+                // 4. Dynamically change background colors
+                const colors = bgColors[currentStepIndex];
+                if (colors) {
+                    // Remove all possible color classes first
+                    bgBlur1.className = bgBlur1.className.replace(/bg-\w+-\d+\/\d+/g, '');
+                    bgBlur2.className = bgBlur2.className.replace(/bg-\w+-\d+\/\d+/g, '');
+                    // Add new ones
+                    bgBlur1.classList.add(colors.b1);
+                    bgBlur2.classList.add(colors.b2);
+                }
+            }
+        });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+    steps.forEach(step => {
+        observer.observe(step);
+    });
+});
+</script>
+
+
+
+<section class="py-16 bg-gray-900 text-white text-center">
+    <div class="max-w-3xl mx-auto px-4">
+        <i class="fa-solid fa-quote-left text-4xl text-gray-700 mb-6"></i>
+        <p class="text-2xl font-light italic mb-8">
+            "I was afraid of losing my customer data. With code export, I know my business assets are at home."
+        </p>
+        <div class="flex items-center justify-center gap-4">
+            <div class="w-12 h-12 bg-gray-700 rounded-full overflow-hidden">
+                <img src="https://i.pravatar.cc/150?img=68" alt="Marc" class="object-cover w-full h-full">
+            </div>
+            <div class="text-left">
+                <div class="font-bold">Marc D.</div>
+                <div class="text-sm text-gray-400">Founder of LogiFast</div>
+            </div>
+        </div>
+    </div>
+</section>
+<section id="pricing" class="py-24 bg-brand-bg relative overflow-hidden">
+    <div class="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-white to-transparent opacity-50"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        
+        <div class="text-center mb-10 max-w-3xl mx-auto">
+            <h2 class="text-4xl font-bold text-brand-dark mb-4">Start for free. Pay to last.</h2>
+            <p class="text-xl text-gray-600">No hidden fees. No commission on your sales. You are the owner.</p>
+        </div>
+
+        <div class="flex justify-center items-center mb-16 gap-4">
+            <span class="text-sm font-bold text-gray-500" id="label-monthly">Monthly</span>
+            
+            <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="billing-toggle" class="sr-only peer">
+                <div class="w-14 h-8 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-7 after:w-7 after:transition-all peer-checked:bg-brand-primary"></div>
+            </label>
+            
+            <span class="text-sm font-bold text-brand-dark" id="label-yearly">Yearly</span>
+            
+            <div class="ml-2 bg-green-100 text-green-700 text-xs font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wide animate-pulse">
+                -20%
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden">
+                <div class="p-8 border-b border-gray-100">
+                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">For the Curious</h3>
+                    <div class="text-4xl font-extrabold text-brand-dark mb-2">0 € <span class="text-lg font-medium text-gray-400">/month</span></div>
+                    <p class="text-gray-500 text-sm mb-6">To see the magic happen without commitment.</p>
+                    <a href="#" class="block w-full py-3 px-4 bg-gray-50 hover:bg-gray-100 text-brand-dark font-bold rounded-lg border border-gray-200 transition text-center">
+                        Test now
+                    </a>
+                </div>
+                <div class="p-8 space-y-8">
+                    <div>
+                        <div class="text-xs font-bold text-gray-900 uppercase mb-3">AI Generation</div>
+                        <ul class="space-y-3 text-sm text-gray-600">
+                            <li class="flex items-start"><i class="fa-solid fa-bolt text-brand-primary mt-1 mr-2.5"></i><span><strong>Unlimited (Public)</strong><br><span class="text-xs text-gray-400">Shared Demo Mode</span></span></li>
+                            <li class="flex items-center text-gray-400"><i class="fa-solid fa-shield-halved mt-0.5 mr-2.5"></i> Standard Privacy</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="text-xs font-bold text-gray-900 uppercase mb-3">Infrastructure</div>
+                        <ul class="space-y-3 text-sm text-gray-600">
+                            <li class="flex items-center text-red-500"><i class="fa-solid fa-triangle-exclamation mt-0.5 mr-2.5"></i> <strong>No backup</strong> (Volatile)</li>
+                            <li class="flex items-center"><i class="fa-solid fa-globe mt-0.5 mr-2.5 text-gray-400"></i> Temporary subdomain</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="text-xs font-bold text-gray-900 uppercase mb-3">Freedom</div>
+                        <ul class="space-y-3 text-sm text-gray-600">
+                            <li class="flex items-center text-gray-400"><i class="fa-solid fa-ban mt-0.5 mr-2.5"></i> No code export</li>
+                            <li class="flex items-center text-gray-400"><i class="fa-solid fa-ban mt-0.5 mr-2.5"></i> No payments</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border-2 border-brand-primary shadow-2xl relative transform lg:-translate-y-4 z-20 overflow-hidden transition-all duration-300">
+                <div class="absolute top-0 left-0 w-full h-1.5 bg-brand-primary"></div>
+                <div class="absolute top-4 right-4 bg-yellow-400 text-brand-dark text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Popular</div>
+                
+                <div class="p-8 border-b border-gray-100 bg-blue-50/30">
+                    <h3 class="text-sm font-bold text-brand-primary uppercase tracking-widest mb-2">For Creators</h3>
+                    
+                    <div class="flex items-baseline gap-2 mb-2">
+                        <div class="text-5xl font-extrabold text-brand-dark price-amount" data-monthly="39" data-yearly="31">39 €</div>
+                        <span class="text-lg font-medium text-gray-400">/month</span>
+                    </div>
+                    <div class="h-6 mb-4"> <p class="text-xs text-green-600 font-bold billing-note hidden">Billed €372 / year (2 months free)</p>
+                    </div>
+
+                    <p class="text-gray-600 text-sm mb-6">Launch, sell, and own your tool.</p>
+                    <a href="#" class="block w-full py-4 px-6 bg-brand-primary hover:bg-blue-600 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition text-center transform hover:-translate-y-0.5">
+                        Launch my SaaS
+                    </a>
+                </div>
+
+                <div class="p-8 space-y-8">
+                    <div>
+                        <div class="text-xs font-bold text-brand-dark uppercase mb-3 flex items-center gap-2"><i class="fa-solid fa-robot text-brand-primary"></i> AI Power</div>
+                        <ul class="space-y-3 text-sm text-gray-600">
+                            <li class="flex items-start">
+                                <i class="fa-solid fa-check text-green-500 mt-1 mr-2.5"></i>
+                                <div>
+                                    <strong>~500 Actions / month</strong>
+                                    <div class="text-xs text-gray-500 mt-0.5">Comfort usage (Fair Use)</div>
+                                    <div class="text-[10px] text-blue-500 font-medium mt-1 bg-blue-50 inline-block px-1.5 rounded"><i class="fa-solid fa-battery-half mr-1"></i> Top-up: €10 / 250 actions</div>
+                                </div>
+                            </li>
+                            <li class="flex items-start"><i class="fa-solid fa-check text-green-500 mt-1 mr-2.5"></i><span><strong>Private & Secure</strong><br><span class="text-xs text-gray-400">Your data does not train the AI</span></span></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="text-xs font-bold text-brand-dark uppercase mb-3 flex items-center gap-2"><i class="fa-solid fa-server text-brand-primary"></i> Infrastructure</div>
+                        <ul class="space-y-3 text-sm text-gray-600">
+                            <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mt-0.5 mr-2.5"></i> Secure Cloud Backup</li>
+                            <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mt-0.5 mr-2.5"></i> Custom Domain (SSL)</li>
+                            <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mt-0.5 mr-2.5"></i> Integrated Stripe Payments</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="text-xs font-bold text-brand-dark uppercase mb-3 flex items-center gap-2"><i class="fa-solid fa-unlock text-brand-primary"></i> Total Freedom</div>
+                        <ul class="space-y-3 text-sm text-gray-600">
+                            <li class="flex items-start">
+                                <i class="fa-solid fa-file-export text-green-500 mt-1 mr-2.5"></i>
+                                <div><strong>1 Code Export / month</strong><div class="text-xs text-gray-500">Full ZIP (Python + DB)</div></div>
+                            </li>
+                            <li class="flex items-center text-gray-400"><i class="fa-regular fa-copyright mt-0.5 mr-2.5"></i> Discrete "Powered by YFS" logo</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-900 text-white rounded-2xl border border-gray-700 shadow-xl overflow-hidden transition-all duration-300">
+                <div class="p-8 border-b border-gray-800">
+                    <h3 class="text-sm font-bold text-brand-primary uppercase tracking-widest mb-2">For Agencies</h3>
+                    
+                    <div class="flex items-baseline gap-2 mb-2">
+                        <div class="text-4xl font-extrabold text-white price-amount" data-monthly="129" data-yearly="103">129 €</div>
+                        <span class="text-lg font-medium text-gray-500">/month</span>
+                    </div>
+                     <div class="h-6 mb-4">
+                        <p class="text-xs text-green-400 font-bold billing-note hidden">Billed €1236 / year (2 months free)</p>
+                    </div>
+
+                    <p class="text-gray-400 text-sm mb-6">Build and sell to your clients.</p>
+                    <a href="#" class="block w-full py-3 px-4 bg-white hover:bg-gray-100 text-brand-dark font-bold rounded-lg transition text-center">
+                        Scale up
+                    </a>
+                </div>
+
+                <div class="p-8 space-y-8">
+                    <div>
+                        <div class="text-xs font-bold text-gray-400 uppercase mb-3">AI Power</div>
+                        <ul class="space-y-3 text-sm text-gray-300">
+                            <li class="flex items-start">
+                                <i class="fa-solid fa-rocket text-brand-primary mt-1 mr-2.5"></i>
+                                <div>
+                                    <strong>~2500 Actions / month</strong>
+                                    <div class="text-xs text-gray-500 mt-0.5">Heavy Usage</div>
+                                     <div class="text-[10px] text-gray-400 font-medium mt-1 bg-gray-800 inline-block px-1.5 rounded border border-gray-700"><i class="fa-solid fa-battery-half mr-1 text-brand-primary"></i> Top-up: €10 / 250 actions</div>
+                                </div>
+                            </li>
+                            <li class="flex items-center"><i class="fa-solid fa-infinity text-brand-primary mt-0.5 mr-2.5"></i> Unlimited Projects</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="text-xs font-bold text-gray-400 uppercase mb-3">Business & Clients</div>
+                        <ul class="space-y-3 text-sm text-gray-300">
+                            <li class="flex items-start">
+                                <i class="fa-solid fa-user-secret text-brand-primary mt-1 mr-2.5"></i>
+                                <div><strong>Full White Label</strong><div class="text-xs text-gray-500">100% Invisible to your clients</div></div>
+                            </li>
+                             <li class="flex items-start">
+                                <i class="fa-solid fa-handshake text-brand-primary mt-1 mr-2.5"></i>
+                                <div><strong>Ownership Transfer</strong><div class="text-xs text-gray-500">Deliver final app to client</div></div>
+                            </li>
+                            <li class="flex items-center"><i class="fa-solid fa-box-open text-brand-primary mt-0.5 mr-2.5"></i> Unlimited Code Exports</li>
+                        </ul>
+                    </div>
+                     <div>
+                        <div class="text-xs font-bold text-gray-400 uppercase mb-3">VIP</div>
+                        <ul class="space-y-3 text-sm text-gray-300">
+                            <li class="flex items-center"><i class="fa-solid fa-headset text-brand-primary mt-0.5 mr-2.5"></i> Priority Support (4h)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        
+        <div class="mt-16 text-center">
+            <p class="text-gray-500 text-sm">
+                Need more power? Contact us for an Enterprise offer. <br>
+                All prices are tax exclusive.
+            </p>
+        </div>
+
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggle = document.getElementById('billing-toggle');
+        const prices = document.querySelectorAll('.price-amount');
+        const notes = document.querySelectorAll('.billing-note');
+        
+        toggle.addEventListener('change', function() {
+            const isYearly = this.checked;
+            
+            prices.forEach(price => {
+                // Change price with small animation
+                price.style.opacity = '0';
+                setTimeout(() => {
+                    price.textContent = isYearly ? price.dataset.yearly + ' €' : price.dataset.monthly + ' €';
+                    price.style.opacity = '1';
+                }, 150);
+            });
+
+            notes.forEach(note => {
+                if (isYearly) {
+                    note.classList.remove('hidden');
+                } else {
+                    note.classList.add('hidden');
+                }
+            });
+        });
+    });
+</script>
+<section id="faq" class="py-24 bg-white border-t border-gray-100">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl font-bold text-brand-dark mb-4">Frequently Asked Questions</h2>
+            <p class="text-gray-600">Everything you need to know to start with peace of mind.</p>
+        </div>
+
+        <div class="space-y-12">
+            
+            <div>
+                <h3 class="text-sm font-bold text-brand-primary uppercase tracking-widest mb-6 border-b border-gray-100 pb-2">Concept & Ownership</h3>
+                <div class="space-y-4">
+                    <details class="group bg-gray-50 rounded-lg shadow-sm border border-gray-100 open:bg-white open:ring-1 open:ring-brand-primary/20 transition-all duration-300">
+                        <summary class="flex justify-between items-center cursor-pointer p-6 font-medium text-lg text-brand-dark hover:text-brand-primary transition">
+                            Do I need to know how to code?
+                            <span class="transition-transform duration-300 group-open:rotate-180"><i class="fa-solid fa-chevron-down text-gray-400"></i></span>
+                        </summary>
+                        <div class="px-6 pb-6 text-gray-600 leading-relaxed text-sm">
+                            Absolutely not. YourFirstShip is designed for business experts, not engineers. If you can explain your business to a colleague, you can build your app. Our AI handles the technical translation (Database, API, Security).
+                        </div>
+                    </details>
+
+                    <details class="group bg-gray-50 rounded-lg shadow-sm border border-gray-100 open:bg-white open:ring-1 open:ring-brand-primary/20 transition-all duration-300">
+                        <summary class="flex justify-between items-center cursor-pointer p-6 font-medium text-lg text-brand-dark hover:text-brand-primary transition">
+                            Do I really own the code? (No Lock-in?)
+                            <span class="transition-transform duration-300 group-open:rotate-180"><i class="fa-solid fa-chevron-down text-gray-400"></i></span>
+                        </summary>
+                        <div class="px-6 pb-6 text-gray-600 leading-relaxed text-sm">
+                            <p class="mb-2">Yes, that's our major difference. Unlike other 'black box' platforms, you are not a tenant of your technology.</p>
+                            <p>You can click <strong>"Eject"</strong> at any time to download a ZIP containing:</p>
+                            <ul class="list-disc ml-5 mt-2 space-y-1">
+                                <li>Clean source code (Python/Brython).</li>
+                                <li>Your database structure.</li>
+                                <li>A Docker container ready to be hosted elsewhere.</li>
+                            </ul>
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-sm font-bold text-brand-primary uppercase tracking-widest mb-6 border-b border-gray-100 pb-2">Web & Mobile</h3>
+                <div class="space-y-4">
+                    <details class="group bg-gray-50 rounded-lg shadow-sm border border-gray-100 open:bg-white open:ring-1 open:ring-brand-primary/20 transition-all duration-300">
+                        <summary class="flex justify-between items-center cursor-pointer p-6 font-medium text-lg text-brand-dark hover:text-brand-primary transition">
+                            What is a "PWA" vs a "Native App"?
+                            <span class="transition-transform duration-300 group-open:rotate-180"><i class="fa-solid fa-chevron-down text-gray-400"></i></span>
+                        </summary>
+                        <div class="px-6 pb-6 text-gray-600 leading-relaxed text-sm">
+                            <p class="mb-2">We use <strong>PWA (Progressive Web App)</strong> technology, the modern standard used by Twitter, Uber, or Starbucks.</p>
+                            <p class="mb-2"><strong>Advantages:</strong></p>
+                            <ul class="list-disc ml-5 space-y-1">
+                                <li>No need to pay the 30% commission to Apple/Google.</li>
+                                <li>No waiting for Store validation.</li>
+                                <li>One-click installation via link (QR Code or URL).</li>
+                                <li>Works on iPhone, Android, PC, and Mac with a single version.</li>
+                            </ul>
+                        </div>
+                    </details>
+
+                    <details class="group bg-gray-50 rounded-lg shadow-sm border border-gray-100 open:bg-white open:ring-1 open:ring-brand-primary/20 transition-all duration-300">
+                        <summary class="flex justify-between items-center cursor-pointer p-6 font-medium text-lg text-brand-dark hover:text-brand-primary transition">
+                            Do I have to pay twice for Web and Mobile?
+                            <span class="transition-transform duration-300 group-open:rotate-180"><i class="fa-solid fa-chevron-down text-gray-400"></i></span>
+                        </summary>
+                        <div class="px-6 pb-6 text-gray-600 leading-relaxed text-sm">
+                            No! That's the power of our "Holodeck" architecture. You build <strong>a single project</strong>, and it adapts automatically. Your data, users, and logic are shared between the desktop version (Admin) and mobile version (Client). Everything is included in the single plan.
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-sm font-bold text-brand-primary uppercase tracking-widest mb-6 border-b border-gray-100 pb-2">Pricing & Credits</h3>
+                <div class="space-y-4">
+                    <details class="group bg-gray-50 rounded-lg shadow-sm border border-gray-100 open:bg-white open:ring-1 open:ring-brand-primary/20 transition-all duration-300">
+                        <summary class="flex justify-between items-center cursor-pointer p-6 font-medium text-lg text-brand-dark hover:text-brand-primary transition">
+                            What is an "AI Action"?
+                            <span class="transition-transform duration-300 group-open:rotate-180"><i class="fa-solid fa-chevron-down text-gray-400"></i></span>
+                        </summary>
+                        <div class="px-6 pb-6 text-gray-600 leading-relaxed text-sm">
+                            <p class="mb-2">An "Action" is when you ask the AI to work for you. For example:</p>
+                            <ul class="list-disc ml-5 mb-2 space-y-1">
+                                <li>"Create a login page" = 1 Action.</li>
+                                <li>"Change button color to blue" = 1 Action.</li>
+                                <li>"Generate database schema" = 1 Action.</li>
+                            </ul>
+                            <p>Note that usage of your application by your clients (visits, clicks) <strong>does not consume</strong> your AI credits.</p>
+                        </div>
+                    </details>
+
+                    <details class="group bg-gray-50 rounded-lg shadow-sm border border-gray-100 open:bg-white open:ring-1 open:ring-brand-primary/20 transition-all duration-300">
+                        <summary class="flex justify-between items-center cursor-pointer p-6 font-medium text-lg text-brand-dark hover:text-brand-primary transition">
+                            What happens if I exceed my quota?
+                            <span class="transition-transform duration-300 group-open:rotate-180"><i class="fa-solid fa-chevron-down text-gray-400"></i></span>
+                        </summary>
+                        <div class="px-6 pb-6 text-gray-600 leading-relaxed text-sm">
+                            <p class="mb-2">Unlike other tools, your application <strong>does not stop</strong>. It remains online, and your clients can use it.</p>
+                            <p>It is your ability to <em>modify</em> the app with AI that is paused until the next month. If you are in a rush, you can buy a <strong>Top-up (Booster Pack)</strong> of 250 actions for €10, valid immediately.</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+<section class="py-24 bg-brand-dark text-white text-center relative overflow-hidden">
+    <div class="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+    <div class="max-w-4xl mx-auto px-4 relative z-10">
+        <h2 style="color:white" class="text-4xl lg:text-5xl font-bold mb-6">Ready to launch your Ship?</h2>
+        <p class="text-xl text-blue-100 mb-10">Join founders who have taken back control.</p>
+        
+        <a href="#pricing" class="inline-block px-10 py-5 bg-brand-primary text-white rounded-md font-bold text-xl shadow-lg hover:bg-white hover:text-brand-primary transition-all transform hover:scale-105">
+            Launch my application now
+        </a>
+        <p class="mt-6 text-sm text-gray-400 font-medium">Satisfaction guaranteed or refunded. Export available from day one.</p>
+    </div>
+</section>
+
+<footer class="bg-gray-900 text-gray-500 py-12 border-t border-gray-800 text-sm">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
+        <div class="mb-4 md:mb-0 font-bold text-gray-300">YourFirstShip © 2026</div>
+        <div class="flex gap-6">
+            <a href="{{=URL('default', 'terms')}}" class="hover:text-white transition">Legal Notice</a>
+            <a href="{{=URL('default', 'privacy')}}" class="hover:text-white transition">Privacy Policy</a>
+        </div>
+    </div>
+</footer>
