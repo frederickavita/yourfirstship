@@ -22,6 +22,40 @@ def terms():
 def privacy():
     return dict(app_name="YourFirstShip")
 
+
+def connect():
+    if auth.user:
+        redirect(URL('default', 'projects'))
+    next_url = request.vars._next or session.get('oauth_next') or URL('default', 'projects')
+    mode = request.args(0) or 'login'
+    # 2. Aiguillage des formulaires Auth
+    if mode == 'register':
+        form = auth.register()
+        if request.env.request_method == 'POST':
+            if form.errors:
+        # Ici: erreurs de validateurs (y compris erreurs DB type "email déjà utilisé")
+        # form.errors est un Storage/dict: { 'email': '...', 'password': '...' }
+                print("REGISTER ERRORS:", form.errors)
+
+    elif mode == 'login':
+        form = auth.login()
+    elif mode == 'request_reset_password':
+        # Demande (Email uniquement)
+        form = auth.request_reset_password()
+    elif mode == 'reset_password':
+        # Changement effectif (Nouveau mot de passe + Confirm)
+        # Web2py vérifie la clé 'key' dans l'URL automatiquement ici
+        form = auth.reset_password()
+    else:
+        redirect(URL('default', 'connect', args=['login']))
+    
+    # 3. Nettoyage du style par défaut de Web2py pour qu'il n'interfère pas avec Tailwind
+    if form:
+        form['_class'] = 'space-y-4' # On enlève les classes web2py par défaut
+    google_url = URL('default', 'google_begin', vars={'_next': next_url})    
+    return dict(form=form, mode=mode, google_url=google_url)
+
+
 # ---- API (example) -----
 @auth.requires_login()
 def api_get_user_email():

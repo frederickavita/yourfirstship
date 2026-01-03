@@ -8,6 +8,7 @@ from gluon.contrib.appconfig import AppConfig
 from gluon.tools import Auth
 import os
 import re
+import secrets
 
 REQUIRED_WEB2PY_VERSION = "3.0.10"
 
@@ -97,7 +98,23 @@ auth = Auth(db, host_names=configuration.get("host.names"))
 # -------------------------------------------------------------------------
 # create all tables needed by auth, maybe add a list of extra fields
 # -------------------------------------------------------------------------
-auth.settings.extra_fields["auth_user"] = []
+auth.settings.extra_fields["auth_user"] = [
+    Field('business_name', 'string',label="Nom du Projet / Société"),
+    Field('subscription_plan', 'string', default='free', 
+          requires=IS_IN_SET(['free', 'creators', 'agencies']), writable=False, readable=False),
+    Field('google_id', 'string', writable=False, readable=False),
+    Field('public_id', 'string', default=lambda: f"acc_{secrets.token_hex(12)}", writable=False, readable=False),
+    Field('status', 'string', default='active', requires=IS_IN_SET(['active', 'inactive', 'suspended', 'pending_verification']), writable=False, readable=False),
+    Field('failed_login_attempts', 'integer', default=0),
+    Field('last_login_at', 'datetime'),
+    # Timestamps standards
+    Field('created_at', 'datetime', default=request.now, writable=False),
+    Field('updated_at', 'datetime', default=request.now, update=request.now, writable=False),
+    
+]
+
+
+
 auth.define_tables(username=False, signature=False)
 
 # -------------------------------------------------------------------------
@@ -113,10 +130,65 @@ mail.settings.ssl = configuration.get("smtp.ssl") or False
 # -------------------------------------------------------------------------
 # configure auth policy
 # -------------------------------------------------------------------------
+# --- 5. AUTOMATISATION (La Magie) ---
+
+def record_login_session(form):
+    """
+    Se déclenche AUTOMATIQUEMENT après un login réussi.
+    Crée une entrée dans auth_sessions pour les stats.
+    """
+    user_id = form.vars.id # L'ID de l'utilisateur qui vient de se connecter
+    
+    # 1. Mise à jour de l'utilisateur (Dernière connexion)
+    db(db.auth_user.id == user_id).update(
+        last_login_at=request.now,
+        failed_login_attempts=0 # Reset des échecs
+    )
+    
+    # 2. Enregistrement de la session (Stats)
+    # On stocke l'ID de session dans la session courante pour pouvoir le retrouver au logout
+    new_token = f"sess_{secrets.token_hex(16)}"
+    
+    db.auth_sessions.insert(
+        session_token=new_token,
+        creator_id=user_id,
+        user_agent=request.user_agent,
+        ip_address=request.client,
+        device_info={} # Tu pourras ajouter un parser plus tard
+    )
+    
+    session.custom_token = new_token # On le garde en mémoire vive 
+
+
+def record_logout_session(user):
+    """
+    Se déclenche AUTOMATIQUEMENT après un logout.
+    Blackliste le token actuel.
+    """
+    if session.custom_token:
+        # On marque la session comme révoquée
+        db(db.auth_sessions.session_token == session.custom_token).update(is_revoked=True)
+        
+        # On ajoute à la blacklist
+        db.blacklisted_tokens.insert(
+            creator_id=auth.user_id,
+            token_string=session.custom_token,
+            reason="logout"
+        )
+
+
+
+
+auth.settings.expiration = 3600 * 24 * 7 # 7 jours
 auth.settings.registration_requires_verification = False
 auth.settings.registration_requires_approval = False
 auth.settings.reset_password_requires_verification = True
-
+auth.settings.login_next = URL('default', 'dashboard')
+auth.settings.register_next = URL('default', 'dashboard')
+auth.settings.logout_next = URL('default', 'connect', args=['login'])
+auth.settings.login_onaccept.append(record_login_session)
+#auth.settings.logout_onaccept.append(record_logout_session)  
+auth.settings.on_failed_authorization = URL('default', 'connect', args='login')  
 # -------------------------------------------------------------------------  
 # read more at http://dev.w3.org/html5/markup/meta.name.html               
 # -------------------------------------------------------------------------
@@ -159,3 +231,27 @@ if configuration.get("scheduler.enabled"):
 # after defining tables, uncomment below to enable auditing
 # -------------------------------------------------------------------------
 # auth.enable_record_versioning(db)
+
+
+# --- 3. TABLE SESSIONS (Gestion JWT/Cookie custom) ---
+db.define_table('auth_sessions',
+    Field('session_token', 'string', requires=IS_NOT_IN_DB(db, 'auth_sessions.session_token')),
+    Field('creator_id', 'reference auth_user'),
+    Field('user_agent', 'string'),
+    Field('ip_address', 'string'),
+    Field('device_info', 'json'), # Stockage flexible
+    Field('is_revoked', 'boolean', default=False),
+    Field('created_at', 'datetime', default=request.now),
+)
+
+
+# --- 4. TABLE BLACKLIST (Anti-Spam / Logout) ---
+db.define_table('blacklisted_tokens',
+    Field('creator_id', 'reference auth_user'),
+    Field('token_string', 'string'), # On stocke quel token est banni
+    Field('reason', 'string'), # "logout", "security", "spam"
+    Field('blacklisted_at', 'datetime', default=request.now)
+)
+
+
+
