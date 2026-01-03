@@ -33,6 +33,13 @@ REQUIRED_WEB2PY_VERSION = "3.0.10"
 # -------------------------------------------------------------------------
 configuration = AppConfig(reload=True)
 
+
+try:
+    import pymysql
+    pymysql.install_as_MySQLdb()
+except ImportError:
+    pass
+
 if "GAE_APPLICATION" not in os.environ:
     # ---------------------------------------------------------------------
     # if NOT running on Google App Engine use SQLite or other DB

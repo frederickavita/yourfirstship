@@ -30,6 +30,9 @@ def connect():
     mode = request.args(0) or 'login'
     # 2. Aiguillage des formulaires Auth
     if mode == 'register':
+        db.auth_user.last_name.default = "None"
+        db.auth_user.first_name.default = "None"
+        db.auth_user.business_name.default = "None"
         form = auth.register()
         if request.env.request_method == 'POST':
             if form.errors:
@@ -54,6 +57,31 @@ def connect():
         form['_class'] = 'space-y-4' # On enlève les classes web2py par défaut
     google_url = URL('default', 'google_begin', vars={'_next': next_url})    
     return dict(form=form, mode=mode, google_url=google_url)
+
+
+
+def dashboard():
+    if not auth.user:
+        redirect(URL('default', 'connect', args=['login']))
+    return dict()
+
+
+
+
+def logout():
+    if session.custom_token:
+        # On marque la session comme révoquée
+        db(db.auth_sessions.session_token == session.custom_token).update(is_revoked=True)
+        
+        # On ajoute à la blacklist
+        db.blacklisted_tokens.insert(
+            creator_id=auth.user_id,
+            token_string=session.custom_token,
+            reason="logout"
+        )
+    return dict(form=auth.logout())
+
+
 
 
 # ---- API (example) -----
