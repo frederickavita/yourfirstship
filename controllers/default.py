@@ -3,7 +3,10 @@
 # This is a sample controller
 # this file is released under public domain and you can use without limitations
 # -------------------------------------------------------------------------
-
+GOOGLE_AUTH_URL      = 'https://accounts.google.com/o/oauth2/v2/auth'
+GOOGLE_TOKEN_URL     = 'https://oauth2.googleapis.com/token'
+GOOGLE_USERINFO_URL  = 'https://openidconnect.googleapis.com/v1/userinfo'
+GOOGLE_SCOPE         = 'openid email profile'
 # ---- example index page ----
 def index():
     response.flash = T("Hello World")
@@ -25,8 +28,8 @@ def privacy():
 
 def connect():
     if auth.user:
-        redirect(URL('default', 'projects'))
-    next_url = request.vars._next or session.get('oauth_next') or URL('default', 'projects')
+        redirect(URL('default', 'dashboard'))
+    next_url = request.vars._next or session.get('oauth_next') or URL('default', 'dashboard')
     mode = request.args(0) or 'login'
     # 2. Aiguillage des formulaires Auth
     if mode == 'register':
@@ -58,6 +61,132 @@ def connect():
     google_url = URL('default', 'google_begin', vars={'_next': next_url})    
     return dict(form=form, mode=mode, google_url=google_url)
 
+def google_redirect_uri():
+    # => AJOUTE EXACTEMENT cette URL dans la console Google (Authorized redirect URIs)
+    return URL('default', 'google_callback', scheme=True, host=True)
+
+
+def google_begin():
+    from urllib.parse import urlencode
+    import uuid
+    GOOGLE_CLIENT_ID = configuration.get('google.client_id')
+    GOOGLE_CLIENT_SECRET = configuration.get('google.client_secret')
+    """
+    Démarre l’autorisation Google et envoie l’utilisateur chez Google.
+    Tu peux appeler ce endpoint depuis ton bouton 'Continuer avec Google'.
+    """
+    state = str(uuid.uuid4())
+    session.oauth_state = state
+
+    # Où rediriger après login ? (optionnel)
+    _next = request.vars.get('_next')
+    if _next:
+        session.oauth_next = _next
+
+    params = dict(
+        client_id=GOOGLE_CLIENT_ID,
+        response_type='code',
+        scope=GOOGLE_SCOPE,
+        redirect_uri=google_redirect_uri(),
+        include_granted_scopes='true',
+        access_type='online',         # ou 'offline' si tu veux un refresh_token
+        state=state,
+        prompt='consent'              # optionnel
+    )
+    redirect(GOOGLE_AUTH_URL + '?' + urlencode(params))
+
+
+def google_callback():
+    from urllib.request import Request, urlopen
+    from urllib.parse import urlencode
+    import json
+    import logging
+    GOOGLE_CLIENT_ID = configuration.get('google.client_id')
+    GOOGLE_CLIENT_SECRET = configuration.get('google.client_secret')
+    """
+    Redirect URI autorisée (Google renvoie ici ?code&state ou ?error).
+    Échange le code, récupère /userinfo, connecte/crée l’utilisateur,
+    puis redirige vers _next (ou dashboard par défaut).
+    """
+    logger = logging.getLogger("web2py.app.yourfirstship")
+    # 1) Erreur utilisateur (annule)
+    if request.vars.get('error'):
+        session.flash = 'Connexion Google annulée.'
+        return redirect(URL('default', 'connect', args='login'))
+
+    # 2) Anti-CSRF state
+    if not session.get('oauth_state') or request.vars.get('state') != session.oauth_state:
+        session.flash = 'Jeton de state invalide.'
+        return redirect(URL('default', 'connect', args='login'))
+
+    # 3) Code présent ?
+    code = request.vars.get('code')
+    if not code:
+        session.flash = 'Code manquant.'
+        return redirect(URL('default', 'connect', args='login'))
+
+    # 4) Échange code -> token
+    data = dict(
+        client_id=GOOGLE_CLIENT_ID,
+        client_secret=GOOGLE_CLIENT_SECRET,
+        code=code,
+        grant_type='authorization_code',
+        redirect_uri=google_redirect_uri(),   # DOIT être identique à celle utilisée à l’aller
+    )
+    body = urlencode(data).encode('utf-8')
+    try:
+        resp = urlopen(Request(GOOGLE_TOKEN_URL,
+                               data=body,
+                               headers={'Content-Type':'application/x-www-form-urlencoded'}),
+                       timeout=10)
+        token_payload = json.loads(resp.read().decode('utf-8'))
+    except Exception as e:
+        logger.error('Token exchange failed: %s', e)
+        session.flash = 'Échec échange de jeton.'
+        return redirect(URL('default', 'connect', args='login'))
+
+    access_token = token_payload.get('access_token')
+    if not access_token:
+        session.flash = 'Jeton d’accès absent.'
+        return redirect(URL('default', 'connect', args='login'))
+
+    session.token = access_token  # si tu veux le réutiliser ailleurs
+
+    # 5) /userinfo
+    try:
+        uresp = urlopen(Request(GOOGLE_USERINFO_URL,
+                                headers={'Authorization': 'Bearer %s' % access_token}),
+                        timeout=10)
+        data = json.loads(uresp.read().decode('utf-8'))
+    except Exception as e:
+        logger.error('Userinfo failed: %s', e)
+        session.flash = 'Lecture du profil Google impossible.'
+        return redirect(URL('default', 'connect', args='login'))
+
+    profile = dict(
+        first_name = data.get('given_name', ''),
+        last_name  = data.get('family_name', ''),
+        email      = data.get('email') or '',
+        
+        # --- AJOUT CRUCIAL ---
+        google_id  = data.get('sub'), # C'est l'identifiant unique de l'utilisateur chez Google
+        # ---------------------
+        
+        # Optionnel : On définit le username comme l'email pour éviter des erreurs
+        username   = data.get('email')
+    )
+
+    # 7) Création/connexion utilisateur web2py
+    user = auth.get_or_create_user(profile)   # crée si inexistant
+    if not user:
+        session.flash = 'Création/connexion utilisateur impossible.'
+        return redirect(URL('default', 'connect', args='login'))
+    
+    auth.login_user(user)
+    record_login_session(user)
+    # 8) Redirection finale
+    _next = session.pop('oauth_next', None) or request.vars.get('_next') or URL('default','projects')
+    redirect(_next)
 
 
 def dashboard():

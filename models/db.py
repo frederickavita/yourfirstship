@@ -5,7 +5,8 @@
 # Auth is for authenticaiton and access control
 # -------------------------------------------------------------------------
 from gluon.contrib.appconfig import AppConfig
-from gluon.tools import Auth
+from gluon.tools import Auth, Mail, prettydate
+from gluon import current
 import os
 import re
 import secrets
@@ -32,6 +33,8 @@ REQUIRED_WEB2PY_VERSION = "3.0.10"
 # once in production, remove reload=True to gain full speed
 # -------------------------------------------------------------------------
 configuration = AppConfig(reload=True)
+
+
 
 
 try:
@@ -138,22 +141,40 @@ mail.settings.ssl = configuration.get("smtp.ssl") or False
 # configure auth policy
 # -------------------------------------------------------------------------
 # --- 5. AUTOMATISATION (La Magie) ---
+# models/db.py
 
-def record_login_session(form):
+def record_login_session(source):
     """
-    Se déclenche AUTOMATIQUEMENT après un login réussi.
-    Crée une entrée dans auth_sessions pour les stats.
+    Fonction polyvalente : accepte soit un formulaire (Login standard),
+    soit un objet User ou un ID (Google OAuth).
     """
-    user_id = form.vars.id # L'ID de l'utilisateur qui vient de se connecter
+    user_id = None
+
+    # CAS 1 : C'est un Formulaire Web2py (Login Classique)
+    if hasattr(source, 'vars'):
+        user_id = source.vars.id
+        
+    # CAS 2 : C'est un objet User (Row) (Google Login)
+    elif hasattr(source, 'id'):
+        user_id = source.id
+        
+    # CAS 3 : C'est directement l'ID (Entier)
+    elif isinstance(source, int):
+        user_id = source
+
+    # Si on n'a pas trouvé d'ID, on arrête
+    if not user_id:
+        return
+
+    # --- LE RESTE EST IDENTIQUE À TON CODE ---
     
     # 1. Mise à jour de l'utilisateur (Dernière connexion)
     db(db.auth_user.id == user_id).update(
         last_login_at=request.now,
-        failed_login_attempts=0 # Reset des échecs
+        failed_login_attempts=0
     )
     
     # 2. Enregistrement de la session (Stats)
-    # On stocke l'ID de session dans la session courante pour pouvoir le retrouver au logout
     new_token = f"sess_{secrets.token_hex(16)}"
     
     db.auth_sessions.insert(
@@ -161,29 +182,10 @@ def record_login_session(form):
         creator_id=user_id,
         user_agent=request.user_agent,
         ip_address=request.client,
-        device_info={} # Tu pourras ajouter un parser plus tard
+        device_info={}
     )
     
-    session.custom_token = new_token # On le garde en mémoire vive 
-
-
-def record_logout_session(user):
-    """
-    Se déclenche AUTOMATIQUEMENT après un logout.
-    Blackliste le token actuel.
-    """
-    if session.custom_token:
-        # On marque la session comme révoquée
-        db(db.auth_sessions.session_token == session.custom_token).update(is_revoked=True)
-        
-        # On ajoute à la blacklist
-        db.blacklisted_tokens.insert(
-            creator_id=auth.user_id,
-            token_string=session.custom_token,
-            reason="logout"
-        )
-
-
+    session.custom_token = new_token
 
 
 auth.settings.expiration = 3600 * 24 * 7 # 7 jours
@@ -193,8 +195,7 @@ auth.settings.reset_password_requires_verification = True
 auth.settings.login_next = URL('default', 'dashboard')
 auth.settings.register_next = URL('default', 'dashboard')
 auth.settings.logout_next = URL('default', 'connect', args=['login'])
-auth.settings.login_onaccept.append(record_login_session)
-#auth.settings.logout_onaccept.append(record_logout_session)  
+auth.settings.login_onaccept.append(record_login_session) 
 auth.settings.on_failed_authorization = URL('default', 'connect', args='login')  
 # -------------------------------------------------------------------------  
 # read more at http://dev.w3.org/html5/markup/meta.name.html               
