@@ -102,7 +102,7 @@ pass
                     <label class="block text-xs font-medium text-slate-700 mb-1">Email Address</label>
                     {{ form.custom.widget.email['_class'] = "w-full px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition" }}
                     {{=form.custom.widget.email}}
-                    <div class="text-red-500 text-[10px] mt-1">{{=form.errors.email or ''}}</div>
+        
                 </div>
                 {{pass}}
 
@@ -122,13 +122,13 @@ pass
                         {{form.custom.widget.password['_v-model'] = "password"}}
                         {{form.custom.widget.password['_@input'] = "handleInput"}}
                         {{=form.custom.widget.password}}
-                        <div class="text-red-500 text-[10px] mt-1">{{=form.errors.password or ''}}</div>
+              
                     {{else:}}
                         {{ form.custom.widget.new_password['_class'] = "w-full px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition" }}
                         {{form.custom.widget.new_password['_v-model'] = "password"}}
                         {{form.custom.widget.new_password['_@input'] = "handleInput"}}
                         {{=form.custom.widget.new_password}}
-                        <div class="text-red-500 text-[10px] mt-1">{{=form.errors.new_password or ''}}</div>
+                
                     {{pass}}
 
                     {{if is_register or is_new_password:}}
@@ -157,9 +157,9 @@ pass
                 {{if is_new_password:}}
                 <div>
                     <label class="block text-xs font-medium text-slate-700 mb-1">Confirm Password</label>
-                    {{ form.custom.widget.new_password_two['_class'] = "w-full px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition" }}
-                    {{=form.custom.widget.new_password_two}}
-                    <div class="text-red-500 text-[10px] mt-1">{{=form.errors.new_password_two or ''}}</div>
+                    {{ form.custom.widget.new_password2['_class'] = "w-full px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition" }}
+                    {{=form.custom.widget.new_password2}}
+             
                 </div>
                 {{pass}}
 

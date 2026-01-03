@@ -130,13 +130,15 @@ auth.define_tables(username=False, signature=False)
 # -------------------------------------------------------------------------
 # configure email
 # -------------------------------------------------------------------------
-mail = auth.settings.mailer
-mail.settings.server = "logging" if request.is_local else configuration.get("smtp.server")
-mail.settings.sender = configuration.get("smtp.sender")
-mail.settings.login = configuration.get("smtp.login")
-mail.settings.tls = configuration.get("smtp.tls") or False
-mail.settings.ssl = configuration.get("smtp.ssl") or False
+mail = Mail()
+mail.settings.server = configuration.get('smtp.server')
+mail.settings.sender = configuration.get('smtp.sender')
+mail.settings.login  = configuration.get('smtp.login')
+mail.settings.tls    = configuration.get('smtp.tls') or False
+mail.settings.ssl    = configuration.get('smtp.ssl') or True
+auth.settings.mailer = mail
 
+print(configuration)
 # -------------------------------------------------------------------------
 # configure auth policy
 # -------------------------------------------------------------------------
@@ -197,6 +199,111 @@ auth.settings.register_next = URL('default', 'dashboard')
 auth.settings.logout_next = URL('default', 'connect', args=['login'])
 auth.settings.login_onaccept.append(record_login_session) 
 auth.settings.on_failed_authorization = URL('default', 'connect', args='login')  
+auth.settings.request_reset_password_next = URL('confirmation_email_sent')
+auth.settings.reset_password_next = URL('default','connect', args='login')
+target_url = URL('default', 'connect', args='reset_password', scheme=True, host=True) 
+# models/db.py
+
+auth.messages.reset_password_subject = 'Reset your YourFirstShip password'
+
+# 2. Le Template HTML stylisé
+# Note : On utilise f""" ... """ donc on double les accolades {{ }} du CSS
+auth.messages.reset_password = f"""
+<html>
+    <head>
+        <style>
+            /* Style global pour éviter que ça prenne toute la largeur */
+            body {{
+                font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+                background-color: #f8fafc;
+                margin: 0;
+                padding: 20px;
+            }}
+            
+            /* La "Carte" blanche */
+            .card {{
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: #ffffff;
+                padding: 40px;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+                border: 1px solid #e2e8f0;
+            }}
+
+            /* Le texte */
+            p {{
+                color: #334155;
+                font-size: 16px;
+                line-height: 1.6;
+                margin-bottom: 20px;
+            }}
+            
+            strong {{
+                color: #0f172a;
+            }}
+
+            /* Le Bouton */
+            .btn {{
+                background-color: #0f172a;
+                color: #ffffff !important;
+                padding: 14px 28px;
+                text-decoration: none;
+                border-radius: 6px;
+                font-weight: bold;
+                display: inline-block;
+                text-align: center;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            }}
+            .btn:hover {{
+                background-color: #1e293b;
+            }}
+
+            /* Le lien moche (fallback) en petit en bas */
+            .fallback {{
+                margin-top: 30px;
+                padding-top: 20px;
+                border-top: 1px solid #e2e8f0;
+                font-size: 12px;
+                color: #94a3b8;
+                word-break: break-all;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="card">
+            
+            <h2 style="color: #0f172a; margin-top: 0;">Password Reset</h2>
+
+            <p>Hello,</p>
+            
+            <p>You requested a password reset for <strong>YourFirstShip</strong>.</p>
+            
+            <p>Click the button below to choose a new password:</p>
+            
+            <p style="text-align: center; margin: 30px 0;">
+                <a href="{target_url}?key=%(key)s" class="btn">Reset Password</a>
+            </p>
+            
+            <p>If you did not request this action, you can safely ignore this email. Your password will remain unchanged.</p>
+
+            <p style="margin-top: 30px;">
+                See you on board,<br>
+                <strong>The YourFirstShip Team</strong>
+            </p>
+
+            <div class="fallback">
+                <p style="font-size: 12px; color: #94a3b8; margin-bottom: 5px;">
+                    If the button doesn't work, copy-paste this link into your browser:
+                </p>
+                {target_url}?key=%(key)s
+            </div>
+
+        </div>
+    </body>
+</html>
+"""
+
 # -------------------------------------------------------------------------  
 # read more at http://dev.w3.org/html5/markup/meta.name.html               
 # -------------------------------------------------------------------------

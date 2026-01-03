@@ -37,12 +37,6 @@ def connect():
         db.auth_user.first_name.default = "None"
         db.auth_user.business_name.default = "None"
         form = auth.register()
-        if request.env.request_method == 'POST':
-            if form.errors:
-        # Ici: erreurs de validateurs (y compris erreurs DB type "email déjà utilisé")
-        # form.errors est un Storage/dict: { 'email': '...', 'password': '...' }
-                print("REGISTER ERRORS:", form.errors)
-
     elif mode == 'login':
         form = auth.login()
     elif mode == 'request_reset_password':
@@ -52,6 +46,7 @@ def connect():
         # Changement effectif (Nouveau mot de passe + Confirm)
         # Web2py vérifie la clé 'key' dans l'URL automatiquement ici
         form = auth.reset_password()
+        print(form)
     else:
         redirect(URL('default', 'connect', args=['login']))
     
@@ -211,6 +206,9 @@ def logout():
     return dict(form=auth.logout())
 
 
+
+def confirmation_email_sent():
+    return dict()
 
 
 # ---- API (example) -----
