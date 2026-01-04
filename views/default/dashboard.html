@@ -6,51 +6,10 @@
 
 <div class="flex h-screen bg-slate-50 font-sans text-slate-900 overflow-hidden">
 
-    <aside class="w-64 bg-slate-900 text-slate-300 hidden md:flex flex-col border-r border-slate-800">
-        <div class="h-16 flex items-center px-6 border-b border-slate-800">
-            <i data-lucide="ship" class="text-indigo-500 h-6 w-6 mr-3"></i>
-            <span class="font-bold text-white text-lg tracking-tight">YourFirstShip</span>
-        </div>
-        <nav class="flex-1 px-4 py-6 space-y-2">
-            <a href="{{=URL('dashboard')}}" class="flex items-center gap-3 px-4 py-3 bg-indigo-600/10 text-indigo-400 rounded-lg border border-indigo-600/20">
-                <i data-lucide="layout-grid" class="h-5 w-5"></i><span class="font-medium">Dashboard</span>
-            </a>
-            <a href="{{=URL('treasury')}}" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition-colors">
-                <i data-lucide="wallet" class="h-5 w-5"></i><span class="font-medium">Trésorerie</span>
-            </a>
-            <a href="{{=URL('support')}}" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition-colors">
-                <i data-lucide="life-buoy" class="h-5 w-5"></i><span class="font-medium">Support</span>
-            </a>
-        </nav>
-        <div class="p-4 border-t border-slate-800">
-            <div class="flex items-center gap-3 mb-4 px-2">
-                <div class="h-8 w-8 rounded-full bg-indigo-500 flex items-center justify-center text-white font-bold text-xs">{{=user.first_name[0]}}</div>
-                <div class="overflow-hidden">
-                    <p class="text-sm font-medium text-white truncate">{{=user.first_name}}</p>
-                    <a href="{{=URL('user','profile')}}" class="text-xs text-slate-500 hover:text-indigo-400">Voir Profil</a>
-                </div>
-            </div>
-            <a href="{{=URL('user', args='logout')}}" class="flex items-center gap-2 text-xs text-slate-500 hover:text-red-400 px-2 transition-colors">
-                <i data-lucide="log-out" class="h-3 w-3"></i> Déconnexion
-            </a>
-        </div>
-    </aside>
-
+{{include 'sidebar.html'}}
     <div class="flex-1 flex flex-col overflow-hidden relative">
-        
-        <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 z-20 shrink-0">
-            <div class="flex items-center gap-3">
-                <h1 class="text-xl font-bold text-slate-800">Mission Control</h1>
-                <div class="flex items-center gap-1.5 px-2 py-0.5 bg-green-50 rounded-full border border-green-100">
-                    <span class="relative flex h-2 w-2">
-                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                      <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                    </span>
-                    <span class="text-[10px] font-bold text-green-700 uppercase tracking-wide">Online</span>
-                </div>
-            </div>
-            </header>
-
+ {{ page_title = "Mission Control" }}       
+{{include 'header.html'}}
         <main class="flex-1 overflow-y-auto p-8 bg-slate-50 relative scroll-smooth">
             
             <div class="max-w-4xl mx-auto mb-16 pt-4">

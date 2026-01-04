@@ -214,80 +214,61 @@ def dashboard():
     )
 
 
-def populate_fake_data():
-    if not auth.user: return "Connectez-vous d'abord"
-    
-    # Nettoyage (Optionnel, pour éviter les doublons en dev)
-    # db(db.projects.owner_id == auth.user.id).delete()
-    
-    # Création projet 1 (Déployé)
-    db.projects.insert(
-        title="Dental CRM SaaS",
-        status="deployed",
-        last_action="Stripe webhook configured",
-        owner_id=auth.user.id,
-        health_score=98
-        # modified_on est auto, mais on peut le forcer si besoin pour tester les dates
-    )
-    
-    # Création projet 2 (Draft)
-    db.projects.insert(
-        title="Dog Walking Marketplace",
-        status="draft",
-        last_action="Database schema generated",
-        owner_id=auth.user.id,
-        health_score=45
-    )
-    
-    return "Données fictives générées ! Allez sur /dashboard"
+
 
 
 def treasury():
-    # --- MOCK DATA (À remplacer par vos appels DB / Stripe) ---
+    if not auth.user:
+        redirect(URL('default', 'connect'))
+    # 1. On recharge l'utilisateur pour avoir les données fraîches
+    user = db.auth_user(auth.user.id)
+    
+    # --- SÉCURISATION (Le Fix) ---
+    # Si le champ est vide (None) en base, on utilise 0 par défaut
+    current_balance = user.credits_balance or 0
+    
+    # 1. Calcul du Burn Rate (Consommation journalière)
+    # On compte les apps déployées
+    active_apps = db((db.projects.owner_id == user.id) & (db.projects.status == 'deployed')).count()
+    burn_rate = active_apps * COST_HOSTING_DAILY
+    
+    # 2. Estimation de l'autonomie
+    if burn_rate > 0:
+        # On utilise 'current_balance' qui est garanti d'être un entier
+        days_left = int(current_balance / burn_rate)
+        prediction = f"Consommation: -{burn_rate}/jour. Panne sèche dans ~{days_left} jours."
+        status = "warning" if days_left < 7 else "optimal"
+    else:
+        days_left = 999
+        prediction = "Aucune consommation (Systèmes en veille)."
+        status = "optimal"
+
+    # 3. Récupération Historique
+    rows = db(db.credit_transactions.user_id == user.id).select(orderby=~db.credit_transactions.created_on, limitby=(0, 10))
+    
+    history = []
+    for row in rows:
+        history.append({
+            "date": row.created_on.strftime("%d %b %Y, %H:%M"),
+            "desc": row.description,
+            "amount": row.amount, 
+            "balance": row.balance_after
+        })
+
+    # 4. JSON pour le Front
+    data = {
+        "balance": current_balance, # On envoie la valeur sécurisée
+        "burn_rate": burn_rate,
+        "prediction": prediction,
+        "status": status,
+        "history": history
+    }
+    
     import json
-    # Simulation d'un utilisateur "Creator"
-    subscription = {
-        "plan_name": "Creator", # "Curious", "Creator", "Agency"
-        "price": 39,
-        "currency": "€",
-        "interval": "month",
-        "status": "active",
-        "renewal_date": (request.now + datetime.timedelta(days=12)).strftime("%d %b, %Y"),
-        "card_last4": "4242",
-        "card_brand": "Visa"
-    }
-    
-    # Simulation de la consommation (Le "Fuel")
-    usage = {
-        "credits_total": 500, # 500 pour Creator, 2500 pour Agency
-        "credits_used": 342,
-        "credits_remaining": 158,
-        # L'IA a analysé la tendance :
-        "ai_prediction": "Cruising speed detected. Fuel sufficient for ~8 days.",
-        "ai_status": "optimal" # optimal, warning, critical
-    }
-    
-    # Si plan gratuit, on change la logique d'affichage
-    if subscription['plan_name'] == 'Curious':
-        usage['credits_total'] = '∞'
-        usage['ai_prediction'] = "Demo Mode (Public). No limits, no export."
+    return dict(user=user, data_json=json.dumps(data))
 
-    # Historique factures
-    invoices = [
-        {"id": "inv_1A2B3C", "date": "01 Jan, 2026", "amount": "39.00€", "status": "Paid", "pdf_url": "#"},
-        {"id": "inv_9X8Y7Z", "date": "01 Dec, 2025", "amount": "39.00€", "status": "Paid", "pdf_url": "#"},
-        {"id": "inv_TopUp1", "date": "15 Nov, 2025", "amount": "10.00€", "status": "Paid", "pdf_url": "#", "desc": "Booster Pack (250)"}
-    ]
 
-    # Sérialisation
-    data_json = json.dumps({
-        "sub": subscription,
-        "usage": usage,
-        "invoices": invoices
-    })
 
-    return dict(user=auth.user, 
-                data_json=data_json)
 
 
 def support():

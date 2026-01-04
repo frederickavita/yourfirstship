@@ -105,13 +105,28 @@ response.form_label_separator = ""
 # host names must be a list of allowed host names (glob syntax allowed)
 auth = Auth(db, host_names=configuration.get("host.names"))
 
+
+
+# --- CONFIGURATION DES COÛTS (CONSTANTES GLOBALES) ---
+COST_AI_ACTION = 10       # Prix d'un prompt
+COST_HOSTING_DAILY = 50   # Prix hébergement / jour / app
+COST_EXPORT = 2000        # Prix du ZIP final
+
 # -------------------------------------------------------------------------
 # create all tables needed by auth, maybe add a list of extra fields
 # -------------------------------------------------------------------------
 auth.settings.extra_fields["auth_user"] = [
     Field('business_name', 'string',label="Nom du Projet / Société"),
-    Field('subscription_plan', 'string', default='free', 
-          requires=IS_IN_SET(['free', 'creators', 'agencies']), writable=False, readable=False),
+    
+    # LE CHIFFRE CLÉ : Solde de Crédits
+    # On offre 500 crédits à l'inscription (de quoi tester un peu)
+    Field('credits_balance', 'integer', default=500, writable=False),
+    
+    # Pour éviter de facturer l'hébergement 2 fois le même jour
+    Field('last_hosting_deduction', 'datetime', default=request.now, writable=False),
+    
+    # Lien Stripe (Client ID uniquement)
+    Field('stripe_customer_id', 'string', writable=False, readable=False),
     Field('google_id', 'string', writable=False, readable=False),
     Field('public_id', 'string', default=lambda: f"acc_{secrets.token_hex(12)}", writable=False, readable=False),
     Field('status', 'string', default='active', requires=IS_IN_SET(['active', 'inactive', 'suspended', 'pending_verification']), writable=False, readable=False),
