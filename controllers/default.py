@@ -269,7 +269,75 @@ def treasury():
 
 
 
-
+def buy_credits():
+    if not auth.user:
+        redirect(URL('default', 'connect'))
+    """
+    Crée une Session Stripe Checkout complète avec :
+    - Description vendeuse (Marketing)
+    - Email pré-rempli (UX)
+    - Adresse et Taxe automatiques (Légal)
+    """
+    pack_id = request.vars.pack
+    
+    # 1. Sécurité : Vérifier que le pack existe dans notre config
+    if pack_id not in STRIPE_PRICES:
+        raise HTTP(400, "Ce pack n'existe pas.")
+    
+    product = STRIPE_PRICES[pack_id]
+    
+    try:
+        # 2. Création de la session Stripe
+        checkout_session = stripe.checkout.Session.create(
+            line_items=[{
+                'price_data': {
+                    'currency': product['currency'],
+                    'product_data': {
+                        'name': product['name'],
+                        # La description vendeuse définie dans stripe_config.py
+                        'description': product['description'], 
+                        # Optionnel : Ajouter une image ici plus tard
+                        # 'images': ['https://votre-domaine.com/static/img/coin.png'],
+                    },
+                    'unit_amount': product['amount'],
+                    # Indique à Stripe d'ajouter la TVA par-dessus ce prix
+                    'tax_behavior': 'exclusive', 
+                },
+                'quantity': 1,
+            }],
+            mode='payment',
+            
+            # --- UX & Conformité ---
+            customer_email=auth.user.email,        # Évite les erreurs de saisie / doublons
+            billing_address_collection='required', # Obligatoire pour une facture légale valide
+            allow_promotion_codes=True,            # Permet d'utiliser des coupons (ex: LAUNCH20)
+            automatic_tax={'enabled': True},       # Active le moteur de taxe Stripe
+            
+            # --- TRACKING (Vital pour le Webhook) ---
+            # C'est ce qui nous permettra de livrer les crédits à la bonne personne
+            metadata={
+                'user_id': auth.user.id,
+                'credits_amount': product['credits'],
+                'pack_name': pack_id
+            },
+            
+            # --- REDIRECTIONS ---
+            # scheme=True et host=True sont indispensables pour générer https://domaine.com/...
+            success_url=URL('treasury', vars=dict(payment='success'), scheme=True, host=True),
+            cancel_url=URL('treasury', vars=dict(payment='cancel'), scheme=True, host=True),
+        )
+        
+        # 3. Renvoi de l'URL au Frontend (Brython)
+        import json
+        return json.dumps({'url': checkout_session.url})
+        
+    except Exception as e:
+        # En cas de problème (ex: Clés API invalides, Tax non activée sur Dashboard)
+        # On log l'erreur dans la console serveur pour le débug
+        print(f"Erreur Stripe Checkout : {str(e)}")
+        response.status = 500
+        import json
+        return json.dumps({'error': str(e)})
 
 def support():
     return dict(message="Module Support en construction")

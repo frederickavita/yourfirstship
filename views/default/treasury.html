@@ -40,7 +40,7 @@
                         <i data-lucide="battery" class="h-5 w-5"></i>
                     </div>
                     <h4 class="font-bold text-lg">Starter Pack</h4>
-                    <p class="text-3xl font-bold mt-2">10€ <span class="text-sm text-slate-400 font-normal">HT</span></p>
+                    <p class="text-3xl font-bold mt-2">10$ <span class="text-sm text-slate-400 font-normal">HT</span></p>
                     <p class="text-indigo-600 font-bold text-sm mt-1">+ 1,000 Crédits</p>
                     <button class="w-full mt-6 py-2 rounded-lg border border-slate-200 font-bold text-sm text-slate-600 group-hover:border-indigo-600 group-hover:text-indigo-600 transition">Choisir</button>
                 </div>
@@ -51,7 +51,7 @@
                         <i data-lucide="battery-charging" class="h-5 w-5"></i>
                     </div>
                     <h4 class="font-bold text-lg text-white">Builder Pack</h4>
-                    <p class="text-3xl font-bold mt-2 text-white">39€ <span class="text-sm text-slate-500 font-normal">HT</span></p>
+                    <p class="text-3xl font-bold mt-2 text-white">39$ <span class="text-sm text-slate-500 font-normal">HT</span></p>
                     <p class="text-green-400 font-bold text-sm mt-1">+ 5,000 Crédits</p>
                     <p class="text-xs text-slate-500 mt-1">Bonus +25% inclus</p>
                     <button class="w-full mt-6 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 font-bold text-sm text-white transition shadow-lg shadow-indigo-900/50">Choisir</button>
@@ -62,7 +62,7 @@
                         <i data-lucide="battery-full" class="h-5 w-5"></i>
                     </div>
                     <h4 class="font-bold text-lg">Agency Pack</h4>
-                    <p class="text-3xl font-bold mt-2">129€ <span class="text-sm text-slate-400 font-normal">HT</span></p>
+                    <p class="text-3xl font-bold mt-2">129$ <span class="text-sm text-slate-400 font-normal">HT</span></p>
                     <p class="text-purple-600 font-bold text-sm mt-1">+ 20,000 Crédits</p>
                     <p class="text-xs text-slate-400 mt-1">Bonus +50% inclus</p>
                     <button class="w-full mt-6 py-2 rounded-lg border border-slate-200 font-bold text-sm text-slate-600 group-hover:border-purple-600 group-hover:text-purple-600 transition">Choisir</button>
@@ -83,7 +83,7 @@
 </div>
 
 <script type="text/python">
-from browser import document, html, window
+from browser import document, html, window, ajax
 import json
 
 def init():
@@ -130,6 +130,29 @@ def init():
 
     if hasattr(window, 'lucide'): window.lucide.createIcons()
 
-window.buyPack = lambda pack: window.alert(f"Redirection Stripe pour le pack {pack}...")
+def on_checkout_success(req):
+    """Redirige vers Stripe quand l'URL est reçue"""
+    try:
+        data = json.loads(req.text)
+        # Redirection vers la page de paiement sécurisée
+        window.location.href = data['url']
+    except:
+        window.alert("Erreur lors de la création du paiement.")
+
+def buy_pack_click(pack_id):
+    """Déclenche l'achat"""
+    # Change le curseur pour montrer que ça charge
+    document.body.style.cursor = "wait"
+    
+    # Appel AJAX vers notre contrôleur Python
+    req = ajax.ajax()
+    req.bind('complete', on_checkout_success)
+    req.open('POST', "{{=URL('default', 'buy_credits')}}", True)
+    req.set_header('content-type', 'application/x-www-form-urlencoded')
+    req.send({'pack': pack_id})
+
+# On expose la fonction au Javascript global pour les onclick=""
+window.buyPack = buy_pack_click
+
 init()
 </script>
