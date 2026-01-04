@@ -301,6 +301,7 @@ def create_project():
 def dashboard():
     if not auth.user:
         redirect(URL('default', 'connect'))
+    print(auth.user)    
      # Récupère les projets de l'utilisateur connecté
     import json
     rows = db(db.projects.owner_id == auth.user.id).select(orderby=~db.projects.modified_on)
@@ -328,58 +329,112 @@ def dashboard():
     )
 
 
+def create_invoice_record(amount, pack_name, stripe_id="manual"):
+    """
+    Fonction interne pour créer une facture après paiement réussi.
+    """
+    # 1. Insertion brute
+    new_id = db.invoices.insert(
+        owner_id = auth.user.id,
+        amount_paid = amount,
+        pack_name = pack_name,
+        vat_rate = 0.20, # Exemple TVA 20%
+        stripe_payment_intent = stripe_id,
+        billing_name = f"{auth.user.first_name} {auth.user.last_name}",
+        # Idéalement, récupérez l'adresse depuis le profil user ou Stripe
+        billing_address = "Adresse client..." 
+    )
+    
+    # 2. Génération de la référence propre (INV-2026-000X)
+    # On met à jour la ligne qu'on vient de créer
+    ref = generate_invoice_ref(new_id)
+    db(db.invoices.id == new_id).update(invoice_ref=ref)
+    
+    return new_id
 
 
 
+@auth.requires_login()
 def treasury():
-    if not auth.user:
-        redirect(URL('default', 'connect'))
-    # 1. On recharge l'utilisateur pour avoir les données fraîches
-    user = db.auth_user(auth.user.id)
-    
-    # --- SÉCURISATION (Le Fix) ---
-    # Si le champ est vide (None) en base, on utilise 0 par défaut
-    current_balance = user.credits_balance or 0
-    
-    # 1. Calcul du Burn Rate (Consommation journalière)
-    # On compte les apps déployées
-    active_apps = db((db.projects.owner_id == user.id) & (db.projects.status == 'deployed')).count()
-    burn_rate = active_apps * COST_HOSTING_DAILY
-    
-    # 2. Estimation de l'autonomie
-    if burn_rate > 0:
-        # On utilise 'current_balance' qui est garanti d'être un entier
-        days_left = int(current_balance / burn_rate)
-        prediction = f"Consommation: -{burn_rate}/jour. Panne sèche dans ~{days_left} jours."
-        status = "warning" if days_left < 7 else "optimal"
+    import json
+    # 1. Solde actuel (via fonction du modèle pour avoir la donnée fraîche)
+    # Assurez-vous d'avoir défini get_wallet_balance() dans models/db_custom.py
+    # Sinon remplacez par : db.auth_user(auth.user.id).credits_balance or 0
+    current_balance = get_wallet_balance()
+    COST_PER_SHIP_DAILY = 50
+    active_ships_count = db((db.projects.owner_id == auth.user.id) & (db.projects.status == 'deployed')).count()
+    if active_ships_count == 0:
+        # Cas spécial : Aucun vaisseau, consommation nulle (ou très faible)
+        burn_rate = 0
+        prediction_str = "Standby Mode (Infinite)"
     else:
-        days_left = 999
-        prediction = "Aucune consommation (Systèmes en veille)."
-        status = "optimal"
+        # Conso = (Nb Vaisseaux * Coût) + Petite marge pour les actions manuelles
+        burn_rate = (active_ships_count * COST_PER_SHIP_DAILY)
+        
+        # D. Calcul de l'autonomie (en jours)
+        days_left = int(current_balance / burn_rate)
+        
+        # E. Formatage du texte pour l'UI
+        if days_left < 1:
+            prediction_str = "CRITICAL (< 24h)"
+        elif days_left < 3:
+            prediction_str = f"Low Fuel ({days_left} days)"
+        elif days_left > 90:
+            prediction_str = "Optimal (> 3 months)"
+        else:
+            prediction_str = f"{days_left} Days autonomy"
 
-    # 3. Récupération Historique
-    rows = db(db.credit_transactions.user_id == user.id).select(orderby=~db.credit_transactions.created_on, limitby=(0, 10))
+    # 2. Historique des factures
+    rows = db(db.invoices.owner_id == auth.user.id).select(orderby=~db.invoices.created_on)
     
     history = []
+    
     for row in rows:
+        # Montant Payé (TTC) tel qu'enregistré
+        amt_ttc = row.amount_paid
+        curr = row.currency
+        
+        # Récupération du taux stocké (ex: 0.20 pour 20%, ou 0.0)
+        rate = row.vat_rate or 0.0
+        
+        # Calcul inverse pour retrouver le montant de la taxe
+        # Formule : Taxe = TTC - (TTC / (1 + Taux))
+        # Ex: 12€ TTC avec taux 0.2 => 12 - (12/1.2) = 2€ de TVA
+        tax_val = amt_ttc - (amt_ttc / (1 + rate))
+        
+        # Fallback si le nom/adresse n'était pas dans la facture
+        b_name = row.billing_name or f"{auth.user.first_name} {auth.user.last_name}"
+        b_address = row.billing_address or "Adresse non renseignée"
+
         history.append({
-            "date": row.created_on.strftime("%d %b %Y, %H:%M"),
-            "desc": row.description,
-            "amount": row.amount, 
-            "balance": row.balance_after
+            # A. Données légères pour le tableau Dashboard
+            "date": row.created_on.strftime('%d/%m/%Y'),
+            "desc": row.pack_name, 
+            "amount": amt_ttc, # Utilisé pour la couleur vert/rouge en JS
+            
+            # B. Données complètes pour l'impression PDF (Injectées dans invoice-template)
+            "full_date": row.created_on.strftime('%d/%m/%Y'),
+            "ref": row.invoice_ref or f"ID-{row.id}",
+            "pack": row.pack_name,
+            
+            # Formatage des prix
+            "display_amount": f"{amt_ttc:.2f} {curr}", # Total Payé
+            "tax": f"{tax_val:.2f} {curr}",             # Part TVA
+            "total": f"{amt_ttc:.2f} {curr}",           # Total (Rappel)
+            
+            "billing_name": b_name,
+            "billing_address": b_address
         })
 
-    # 4. JSON pour le Front
-    data = {
-        "balance": current_balance, # On envoie la valeur sécurisée
-        "burn_rate": burn_rate,
-        "prediction": prediction,
-        "status": status,
+    # 3. Renvoi JSON (via json.dumps pour éviter le changement de Header)
+    return dict(data_json=json.dumps({
+        "balance": current_balance,
+        "prediction": prediction_str, 
         "history": history
-    }
-    
-    import json
-    return dict(user=user, data_json=json.dumps(data))
+    }))
+
+
+
 
 
 
@@ -456,8 +511,6 @@ def buy_credits():
 def support():
     return dict(message="Module Support en construction")
 
-
-
 def stripe_webhook():
     import json
     import stripe
@@ -468,45 +521,128 @@ def stripe_webhook():
     payload = request.body.read()
     sig_header = request.env.http_stripe_signature
     event = None
+    
+    # ⚠️ EN PROD : Ce secret doit venir de vos variables d'environnement ou config
+    # Vous le trouverez dans le Dashboard Stripe > Developers > Webhooks
+    if configuration.take('stripe.mode') == 'prod':
+        endpoint_secret = configuration.take('stripe.webhook_secret_prod')
+    else:
+        endpoint_secret = configuration.take('stripe.webhook_secret_dev')
 
-    # 1. Vérification de sécurité (Est-ce vraiment Stripe ?)
-    # Pour le moment, en local, on ne vérifie pas le 'endpoint_secret' strict 
-    # car on va utiliser le CLI. En prod, il faudra le configurer.
+    # 1. Vérification de sécurité STRICTE (Signature)
     try:
-        event = stripe.Event.construct_from(
-            json.loads(payload), 
-            stripe.api_key
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, endpoint_secret
         )
     except ValueError as e:
+        # Payload invalide
         raise HTTP(400, "Invalid payload")
     except stripe.error.SignatureVerificationError as e:
+        # Signature invalide (Tentative de piratage ?)
         raise HTTP(400, "Invalid signature")
 
     # 2. Traitement de l'événement
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
+
+        # A. INFO CLIENT (Nom & Adresse certifiés par Stripe)
+        details = session.get('customer_details', {})
+        stripe_full_name = details.get('name', 'Client Inconnu')
         
-        # Récupération des infos critiques stockées dans les métadonnées
-        metadata = session.get('metadata', {})
-        user_id = metadata.get('user_id')
-        credits_to_add = int(metadata.get('credits_amount', 0))
-        pack_name = metadata.get('pack_name', 'Inconnu')
+        address_info = details.get('address', {})
+        full_address = f"{address_info.get('line1', '')}\n"
+        if address_info.get('line2'):
+            full_address += f"{address_info.get('line2')}\n"
+        full_address += f"{address_info.get('postal_code', '')} {address_info.get('city', '')}\n"
+        full_address += f"{address_info.get('country', '')}"
+
+        # B. INFO FINANCIÈRE & TAXES (Automatic Tax Logic)
+        total_cents = session.get('amount_total', 0)
         
-        # 3. Livraison des Crédits (via notre logique wallet)
-        if user_id and credits_to_add > 0:
-            # On ajoute les crédits !
-            wallet_add_credits(
-                user_id=user_id, 
-                amount=credits_to_add, 
-                description=f"Achat Stripe: {pack_name.capitalize()}"
+        # Récupération de la part Taxe calculée par Stripe
+        total_details = session.get('total_details') or {}
+        tax_cents = total_details.get('amount_tax', 0) or 0
+        
+        # Calcul du Hors Taxe (Subtotal)
+        subtotal_cents = total_cents - tax_cents
+
+        # Conversion en unités réelles pour la DB
+        amount_paid = total_cents / 100.0  # Montant TTC
+        
+        # Calcul du taux de TVA déduit (ex: 0.20)
+        if subtotal_cents > 0 and tax_cents > 0:
+            calculated_vat_rate = tax_cents / subtotal_cents
+        else:
+            calculated_vat_rate = 0.0
+
+        currency = session.get('currency', 'usd').upper()
+        metadata = session.get('metadata', {})      
+        
+        # Sécurité ID
+        try:
+            user_id = int(metadata.get('user_id'))
+        except:
+            return "Error: User ID missing"
+
+        pack_name = metadata.get('pack_name', 'Credits Pack')
+        owner = user_id 
+
+        # C. CRÉATION FACTURE (DB)
+        # On vérifie si le paiement a déjà été traité (Idempotency)
+        payment_intent = session.get('payment_intent')
+        exists = db(db.invoices.stripe_payment_intent == payment_intent).count()
+        
+        if exists == 0:
+            new_inv_id = db.invoices.insert(
+                owner_id = owner,
+                amount_paid = amount_paid, # TTC
+                currency = '€' if currency == 'EUR' else '$',
+                pack_name = pack_name,
+                
+                # On stocke le taux réel (ex: 0.2)
+                vat_rate = round(calculated_vat_rate, 4), 
+                
+                stripe_payment_intent = payment_intent,
+                billing_name = stripe_full_name,
+                billing_address = full_address.strip()
             )
             
-            print(f"💰 SUCCÈS: {credits_to_add} crédits ajoutés pour User {user_id}")
+            # Génération référence unique (INV-2026-XXXX)
+            ref = generate_invoice_ref(new_inv_id)
+            db(db.invoices.id == new_inv_id).update(invoice_ref=ref)
 
-    # 4. Réponse obligatoire pour Stripe (sinon il réessaie pendant 3 jours)
-    return "Received"
+            # D. MISE À JOUR PROFIL USER (Crédits + Nom)
+            user = db.auth_user(owner)
+            if user:
+                # 1. Ajout Crédits (Clé 'credits_amount')
+                credits_to_add = int(metadata.get('credits_amount', 0))
+                
+                # Log serveur (utile en prod)
+                print(f"💰 INFO: Créditer User {owner} de {credits_to_add} crédits.")
+                
+                new_balance = (user.credits_balance or 0) + credits_to_add
+                
+                # 2. Mise à jour intelligente du nom (si vide)
+                new_first = user.first_name
+                new_last = user.last_name
+                
+                if not new_first or str(new_first) == 'None':
+                    if stripe_full_name:
+                        parts = stripe_full_name.split(' ', 1)
+                        new_first = parts[0]
+                        if len(parts) > 1:
+                            new_last = parts[1]
+                
+                user.update_record(
+                    credits_balance=new_balance,
+                    first_name=new_first,
+                    last_name=new_last
+                )
+                print(f"✅ SUCCÈS: User {owner} mis à jour. Solde: {new_balance}")
+        else:
+            print("⚠️ INFO: Doublon détecté pour ce paiement.")
 
-
+    return 'success'
 
 
 
