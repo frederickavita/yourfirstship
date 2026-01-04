@@ -10,75 +10,74 @@
     <div class="flex-1 flex flex-col overflow-hidden relative">
  {{ page_title = "Mission Control" }}       
 {{include 'header.html'}}
-        <main class="flex-1 overflow-y-auto p-8 bg-slate-50 relative scroll-smooth">
+        <main class="flex-1 overflow-y-auto p-6 bg-slate-50 relative scroll-smooth">
             
-            <div class="max-w-4xl mx-auto mb-16 pt-4">
-                <h2 class="text-3xl font-bold text-slate-800 mb-2">Captain, what are we building today?</h2>
-                <p class="text-slate-500 mb-8">Describe your vision. AI handles the architecture.</p>
+            <div class="max-w-4xl mx-auto mb-10 pt-2"> <h2 class="text-xl font-bold text-slate-800 mb-1">Captain, what are we building today?</h2>
+                <p class="text-xs text-slate-500 mb-6">Describe your vision. AI handles the architecture.</p>
 
                 <div class="relative group z-10">
                     <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
                     
-                    <div class="relative bg-white rounded-xl p-2 shadow-xl border border-slate-100 transition-all duration-300" id="launchpad-container">
+                    <div class="relative bg-white rounded-xl p-1.5 shadow-xl border border-slate-100 transition-all duration-300" id="launchpad-container">
                         
                         <textarea id="launchpad-input" rows="2" 
-                                  class="w-full resize-none border-none focus:ring-0 text-slate-700 placeholder-slate-400 text-lg p-4 bg-transparent" 
+                                  class="w-full resize-none border-none focus:ring-0 text-slate-700 placeholder-slate-400 text-sm p-3 bg-transparent" 
                                   placeholder="I want a SaaS for [Target Audience] that allows them to [Core Feature]..."></textarea>
                         
-                        <div class="flex flex-col sm:flex-row justify-between items-center px-2 pb-2 mt-2 border-t border-slate-50 pt-3 gap-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-center px-2 pb-1 mt-1 border-t border-slate-50 pt-2 gap-4">
                             
                             <div class="flex flex-wrap gap-2" id="modifiers-container">
-                                <button class="modifier-btn bg-slate-100 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 px-3 py-1 rounded-full text-xs font-bold transition flex items-center gap-1 border border-transparent hover:border-indigo-100" data-add=" + SaaS Platform">
+                                <button class="modifier-btn bg-slate-100 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 px-2.5 py-0.5 rounded-full text-[10px] font-bold transition flex items-center gap-1 border border-transparent hover:border-indigo-100" data-add=" + SaaS Platform">
                                     <i data-lucide="plus" class="h-3 w-3"></i> SaaS
                                 </button>
-                                <button class="modifier-btn bg-slate-100 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 px-3 py-1 rounded-full text-xs font-bold transition flex items-center gap-1 border border-transparent hover:border-indigo-100" data-add=" + Admin Dashboard">
+                                <button class="modifier-btn bg-slate-100 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 px-2.5 py-0.5 rounded-full text-[10px] font-bold transition flex items-center gap-1 border border-transparent hover:border-indigo-100" data-add=" + Admin Dashboard">
                                     <i data-lucide="plus" class="h-3 w-3"></i> Admin
                                 </button>
-                                <button class="modifier-btn bg-slate-100 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 px-3 py-1 rounded-full text-xs font-bold transition flex items-center gap-1 border border-transparent hover:border-indigo-100" data-add=" + Mobile App">
+                                <button class="modifier-btn bg-slate-100 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 px-2.5 py-0.5 rounded-full text-[10px] font-bold transition flex items-center gap-1 border border-transparent hover:border-indigo-100" data-add=" + Mobile App">
                                     <i data-lucide="plus" class="h-3 w-3"></i> Mobile
                                 </button>
-                                 <button class="modifier-btn bg-slate-100 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 px-3 py-1 rounded-full text-xs font-bold transition flex items-center gap-1 border border-transparent hover:border-indigo-100" data-add=" + Stripe Payments">
+                                 <button class="modifier-btn bg-slate-100 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 px-2.5 py-0.5 rounded-full text-[10px] font-bold transition flex items-center gap-1 border border-transparent hover:border-indigo-100" data-add=" + Stripe Payments">
                                     <i data-lucide="plus" class="h-3 w-3"></i> Stripe
                                 </button>
                             </div>
 
-                            <button id="ignite-btn" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
-                                <i data-lucide="flame" class="h-4 w-4"></i> Ignite Engines
+                            <button id="ignite-btn" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2 text-xs">
+                                <i data-lucide="flame" class="h-3 w-3"></i> Ignite Engines
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <div id="narrative-feedback" class="hidden mt-6 bg-slate-900 rounded-xl p-6 border border-slate-800 shadow-2xl relative overflow-hidden animate-in fade-in slide-in-from-top-4 duration-500">
+                <div id="narrative-feedback" class="hidden mt-4 bg-slate-900 rounded-xl p-4 border border-slate-800 shadow-2xl relative overflow-hidden animate-in fade-in slide-in-from-top-4 duration-500">
                      <div class="absolute top-0 left-0 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-300 ease-out" id="narrative-progress" style="width: 0%"></div>
 
-                     <div class="flex items-center gap-4">
-                         <div class="h-10 w-10 rounded-full bg-indigo-500/20 flex items-center justify-center relative">
+                     <div class="flex items-center gap-3">
+                         <div class="h-8 w-8 rounded-full bg-indigo-500/20 flex items-center justify-center relative">
                              <div class="absolute inset-0 rounded-full bg-indigo-500 opacity-20 animate-ping"></div>
-                             <i data-lucide="cpu" class="h-5 w-5 text-indigo-400 relative z-10"></i>
+                             <i data-lucide="cpu" class="h-4 w-4 text-indigo-400 relative z-10"></i>
                          </div>
                          <div>
-                             <h4 class="text-indigo-400 font-mono text-xs font-bold uppercase tracking-widest mb-1">System Status</h4>
-                             <p class="text-slate-200 font-mono text-sm tracking-wide" id="narrative-text">Initializing sequence...</p>
+                             <h4 class="text-indigo-400 font-mono text-[10px] font-bold uppercase tracking-widest mb-0.5">System Status</h4>
+                             <p class="text-slate-200 font-mono text-xs tracking-wide" id="narrative-text">Initializing sequence...</p>
                          </div>
                      </div>
                 </div>
             </div>
 
 
-            <div class="flex flex-wrap items-center gap-6 border-b border-slate-200 mb-8" id="tabs-container">
+            <div class="flex flex-wrap items-center gap-6 border-b border-slate-200 mb-6" id="tabs-container">
                 </div>
 
-            <div id="skeleton-loader" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div id="skeleton-loader" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {{for i in range(3):}}
-                <div class="bg-white rounded-xl border border-slate-200 p-6 h-64 animate-pulse flex flex-col gap-4">
+                <div class="bg-white rounded-xl border border-slate-200 p-4 h-48 animate-pulse flex flex-col gap-3">
                     <div class="flex justify-between">
-                        <div class="h-12 w-12 bg-slate-200 rounded-lg"></div>
-                        <div class="h-6 w-24 bg-slate-200 rounded"></div>
+                        <div class="h-10 w-10 bg-slate-200 rounded-lg"></div>
+                        <div class="h-5 w-20 bg-slate-200 rounded"></div>
                     </div>
-                    <div class="h-6 bg-slate-200 rounded w-3/4 mt-4"></div>
-                    <div class="h-4 bg-slate-200 rounded w-full"></div>
-                    <div class="h-4 bg-slate-200 rounded w-1/2"></div>
+                    <div class="h-5 bg-slate-200 rounded w-3/4 mt-2"></div>
+                    <div class="h-3 bg-slate-200 rounded w-full"></div>
+                    <div class="h-3 bg-slate-200 rounded w-1/2"></div>
                 </div>
                 {{pass}}
             </div>
@@ -89,12 +88,12 @@
     </div>
 </div>
 
-<div id="toast-notification" class="fixed bottom-6 right-6 bg-slate-900 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-4 transform translate-y-32 transition-transform duration-300 z-50">
+<div id="toast-notification" class="fixed bottom-6 right-6 bg-slate-900 text-white px-4 py-3 rounded-lg shadow-2xl flex items-center gap-3 transform translate-y-32 transition-transform duration-300 z-50">
     <div class="flex items-center gap-2">
-        <i data-lucide="archive" class="h-5 w-5 text-amber-400"></i>
-        <span>Action successful.</span>
+        <i data-lucide="archive" class="h-4 w-4 text-amber-400"></i>
+        <span class="font-bold text-sm">Action successful.</span>
     </div>
-    <button id="undo-btn" class="text-indigo-300 font-bold hover:text-white underline text-sm">Undo</button>
+    <button id="undo-btn" class="text-indigo-300 font-bold hover:text-white underline text-xs">Undo</button>
 </div>
 
 
@@ -117,28 +116,23 @@ app_state = {
     'current_tab': 'active', 
     'last_archived_id': None,
     'open_menu_id': None,
-    'modifiers': [] # <--- On stocke les modifiers proprement
+    'modifiers': []
 }
 
 def init():
-    # 1. Chargement Données
     try:
         app_state['projects'] = json.loads(document['initial-data'].text)
     except:
         app_state['projects'] = []
 
-    # 2. Bindings Généraux
     document['undo-btn'].bind('click', handle_undo)
     document.bind('click', handle_global_click)
 
-    # 3. Bindings Launchpad
     document['ignite-btn'].bind('click', handle_ignite)
     for btn in document.select('.modifier-btn'):
         btn.bind('click', handle_modifier)
 
-    # 4. Rendu Initial
     render_tabs()
-    # Petit délai pour laisser l'anim se lancer
     timer.set_timeout(finalize_loading, 100)
 
 def finalize_loading():
@@ -148,17 +142,10 @@ def finalize_loading():
     c.classList.add('animate-fade-in')
     render_projects()
 
-
-# ============================================================
-# LOGIQUE LAUNCHPAD (LE CERVEAU)
-# ============================================================
-
 def handle_modifier(ev):
-    """Gère l'activation visuelle et logique des boutons"""
-    btn = ev.currentTarget # Utiliser currentTarget pour avoir le bouton, pas l'icône
+    btn = ev.currentTarget
     tag = btn.attrs.get('data-add', '').strip()
     
-    # Gestion UI (Toggle style)
     if tag in app_state['modifiers']:
         app_state['modifiers'].remove(tag)
         btn.classList.remove('bg-indigo-100', 'text-indigo-700', 'border-indigo-200')
@@ -169,38 +156,30 @@ def handle_modifier(ev):
         btn.classList.add('bg-indigo-100', 'text-indigo-700', 'border-indigo-200')
 
 def handle_ignite(ev):
-    """Lance la création REELLE du projet"""
     prompt = document['launchpad-input'].value.strip()
     
-    # Validation
     if not prompt:
         document['launchpad-input'].classList.add('ring-2', 'ring-red-500')
         timer.set_timeout(lambda: document['launchpad-input'].classList.remove('ring-2', 'ring-red-500'), 1000)
         return
 
-    # UI Loading
     document['launchpad-input'].disabled = True
     document['ignite-btn'].disabled = True
     document['ignite-btn'].classList.add('opacity-50', 'cursor-not-allowed')
     document['ignite-btn'].text = "Igniting..."
     
-    # Afficher la console narrative
     fb = document['narrative-feedback']
     fb.classList.remove('hidden')
     
-    # Lancer la fausse progression visuelle
     run_narrative_sequence(0)
 
-    # --- APPEL AJAX AU BACKEND ---
     req = ajax.ajax()
     req.bind('complete', on_creation_complete)
     req.open('POST', URLS['create'], True)
     req.set_header('content-type', 'application/x-www-form-urlencoded')
-    # On envoie le prompt ET la liste des modifiers
     req.send({'prompt': prompt, 'modifiers[]': app_state['modifiers']})
 
 def run_narrative_sequence(step_idx):
-    """Animation visuelle seulement"""
     steps = [
         ("Analysis confirmed. Intent detected.", 20),
         ("Allocating credits...", 40),
@@ -208,8 +187,6 @@ def run_narrative_sequence(step_idx):
         ("Compiling modules...", 80),
         ("Finalizing environment...", 90)
     ]
-    
-    # On s'arrête à 90% tant que l'AJAX n'a pas répondu
     if step_idx < len(steps):
         text, percent = steps[step_idx]
         document['narrative-text'].text = text
@@ -217,22 +194,16 @@ def run_narrative_sequence(step_idx):
         timer.set_timeout(lambda: run_narrative_sequence(step_idx + 1), 500)
 
 def on_creation_complete(req):
-    """Retour du serveur"""
     try:
         data = json.loads(req.text)
-        
-        # Cas d'erreur (Pas de sous !)
         if data.get('status') == 'error':
             window.alert(data['message'])
             if "Fuel" in data['message']:
                 window.location.href = URLS['treasury']
             return
 
-        # SUCCÈS : On finit l'animation
         document['narrative-text'].text = "Ready. Ship Launched."
         document['narrative-progress'].style.width = "100%"
-        
-        # On attend 1 seconde pour que l'utilisateur voie "100%"
         timer.set_timeout(lambda: finalize_creation_ui(data['project']), 800)
         
     except Exception as e:
@@ -241,18 +212,9 @@ def on_creation_complete(req):
         reset_launchpad()
 
 def finalize_creation_ui(new_project):
-    """Ajoute le projet et reset l'interface"""
-    # 1. Ajouter aux données locales (State)
-    # On l'insère au début de la liste
     app_state['projects'].insert(0, new_project)
-    
-    # 2. Reset UI Launchpad
     reset_launchpad()
-    
-    # 3. Rafraîchir la grille (Le nouveau projet apparaîtra !)
     render_projects()
-    
-    # 4. Feedback
     show_toast(f"Ship '{new_project['title']}' initialized!")
 
 def reset_launchpad():
@@ -264,36 +226,21 @@ def reset_launchpad():
     document['narrative-feedback'].classList.add('hidden')
     document['narrative-progress'].style.width = "0%"
     app_state['modifiers'] = []
-    # Reset boutons modifiers
     for btn in document.select('.modifier-btn'):
         btn.classList.remove('bg-indigo-100', 'text-indigo-700', 'border-indigo-200')
         btn.classList.add('bg-slate-100', 'text-slate-600')
 
-
-# ============================================================
-# LOGIQUE FLOTTE (Ton code existant, inchangé ou presque)
-# ============================================================
 def handle_deploy(ev):
-    """
-    Version robuste : Récupère l'ID depuis l'attribut HTML data-pid
-    """
     ev.stopPropagation()
-    btn = ev.currentTarget # Le bouton sur lequel on a cliqué
-    
-    # On récupère l'ID stocké dans le HTML (C'est du texte, ex: "5")
+    btn = ev.currentTarget 
     pid = btn.attrs.get('data-pid')
 
-    
-    print(f"DEBUG JS: Envoi deploy pour ID = {pid} (Type: {type(pid)})")
-    
     if not pid:
         window.alert("Erreur: ID projet introuvable sur le bouton")
         return
 
     btn.text = "..."
-    
     req = ajax.ajax()
-    # Note: on passe 'pid' (variable locale), plus besoin de l'argument de fonction
     req.bind('complete', lambda r: on_deploy_complete(r, pid)) 
     req.open('POST', URLS['deploy'], True)
     req.set_header('content-type', 'application/x-www-form-urlencoded')
@@ -304,23 +251,22 @@ def on_deploy_complete(req, pid):
         data = json.loads(req.text)
         if data['status'] == 'error':
             window.alert(data['message'])
-            # Si manque de fuel, redirection trésorerie
             if "fuel" in data['message'].lower():
                 window.location.href = URLS['treasury']
             return
             
-        # Mise à jour locale du projet
         for p in app_state['projects']:
             if p['id'] == pid:
                 p['status'] = data['new_status']
                 break
         
         show_toast(data['message'])
-        render_projects() # Rafraîchit la carte (change la couleur)
+        render_projects() 
         
     except Exception as e:
         print(e)
         window.alert("Comms error.")
+
 def set_tab(ev, tab_name):
     app_state['current_tab'] = tab_name
     render_tabs()    
@@ -334,28 +280,28 @@ def render_tabs():
     
     for tab_id, label, icon in tabs:
         is_active = (app_state['current_tab'] == tab_id)
-        base_cls = "flex items-center gap-2 pb-3 text-sm font-medium transition-colors border-b-2 cursor-pointer"
+        base_cls = "flex items-center gap-2 pb-2 text-xs font-medium transition-colors border-b-2 cursor-pointer" # pb-3->pb-2, text-sm->text-xs
         active_cls = "border-indigo-600 text-indigo-600"
         inactive_cls = "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
         
         btn = html.DIV(Class=f"{base_cls} {active_cls if is_active else inactive_cls}")
-        btn <= html.I(**{'data-lucide': icon, 'class': 'h-4 w-4'})
+        btn <= html.I(**{'data-lucide': icon, 'class': 'h-3.5 w-3.5'})
         btn <= label
         
         count = len([p for p in app_state['projects'] if (p['status'] == 'archived') == (tab_id == 'archived')])
-        btn <= html.SPAN(str(count), Class="bg-slate-100 text-slate-600 py-0.5 px-2 rounded-full text-xs ml-1")
+        btn <= html.SPAN(str(count), Class="bg-slate-100 text-slate-600 py-0.5 px-1.5 rounded-full text-[10px] ml-1")
 
         btn.bind('click', lambda ev, t=tab_id: set_tab(ev, t))
         container <= btn
 
-    # SEARCH INPUT
+    # SEARCH INPUT COMPACT
     search_wrapper = html.DIV(Class="ml-auto relative group")
-    icon_div = html.DIV(Class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none")
-    icon_div <= html.I(**{'data-lucide': 'search', 'class': 'h-4 w-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors'})
+    icon_div = html.DIV(Class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none")
+    icon_div <= html.I(**{'data-lucide': 'search', 'class': 'h-3.5 w-3.5 text-slate-400 group-focus-within:text-indigo-500 transition-colors'})
     search_wrapper <= icon_div
     
     search_inp = html.INPUT(Type="text", Id="project-search-input", 
-        Class="block w-64 pl-10 pr-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all",
+        Class="block w-48 pl-8 pr-2 py-1.5 border border-slate-200 rounded-lg text-xs bg-slate-50 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all",
         Placeholder="Filter fleet...")
     
     search_inp.bind('input', handle_search)
@@ -390,34 +336,22 @@ def toggle_menu(ev, pid):
     render_projects()
 
 def handle_archive(ev):
-    """
-    Archive ou Restaure un projet.
-    Version robuste : Récupère l'ID depuis l'attribut HTML data-pid
-    """
     ev.stopPropagation()
     btn = ev.currentTarget
     pid = btn.attrs.get('data-pid')
     
-    # Simulation locale (En attendant de le connecter au backend si besoin)
-    # Si tu veux le connecter au backend plus tard, on fera pareil que handle_deploy
-    
-    # On met à jour l'état local
     for p in app_state['projects']:
-        # Attention: p['id'] est un int, pid est un str
         if str(p['id']) == str(pid):
             new_status = 'archived' if p['status'] != 'archived' else 'draft'
             p['status'] = new_status
             app_state['last_archived_id'] = p['id']
-            
-            msg = "Project sent to Dry Dock." if new_status == 'archived' else "Project restored to active fleet."
+            msg = "Project sent to Dry Dock." if new_status == 'archived' else "Project restored."
             show_toast(msg)
             break
             
     app_state['open_menu_id'] = None
     render_tabs()     
     render_projects()
-
-
 
 def handle_undo(ev):
     pid = app_state['last_archived_id']
@@ -447,23 +381,16 @@ def render_projects():
     to_show = []
     
     for p in app_state['projects']:
-        # Map DB status to Tab logic
         is_archived = (p['status'] == 'archived')
-        is_deployed = (p['status'] == 'deployed')
-        
-        # Filtre Onglets
         if current_tab == 'active' and is_archived: continue
         if current_tab == 'archived' and not is_archived: continue
-        
-        # Filtre Recherche
-        if term and (term not in p['title'].lower() and term not in p['status'].lower()):
-            continue
+        if term and (term not in p['title'].lower() and term not in p['status'].lower()): continue
         to_show.append(p)
 
     if not to_show:
         render_empty_state(container, current_tab)
     else:
-        grid = html.DIV(Class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 projects-grid animate-fade-in")
+        grid = html.DIV(Class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 projects-grid animate-fade-in") # gap-6->gap-4
         for p in to_show:
             grid <= create_no_image_card(p)
         container <= grid
@@ -471,15 +398,15 @@ def render_projects():
 
 def render_empty_state(container, tab):
     msg = "No active ships found." if tab == 'active' else "Dry dock is empty."
-    wrapper = html.DIV(Class="flex flex-col items-center justify-center h-64 text-center border-2 border-dashed border-slate-200 rounded-xl")
-    wrapper <= html.H3(msg, Class="text-lg font-bold text-slate-500")
+    wrapper = html.DIV(Class="flex flex-col items-center justify-center h-48 text-center border-2 border-dashed border-slate-200 rounded-xl")
+    wrapper <= html.H3(msg, Class="text-sm font-bold text-slate-500")
     container <= wrapper
 
 
 def create_no_image_card(p):
+    # Padding réduit p-6 -> p-4
     card = html.DIV(Class="group bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-indigo-300 transition-all duration-300 flex flex-col overflow-hidden relative")
     
-    # 1. COULEURS & STATUTS
     if p['status'] == 'deployed':
         bg_color = "bg-green-500"
         status_text = "Deployed"
@@ -493,105 +420,96 @@ def create_no_image_card(p):
         status_text = "Draft"
         status_cls = "text-amber-600 bg-amber-50"
 
-    # Bandeau couleur
-    header_strip = html.DIV(Class=f"h-2 w-full {bg_color}")
+    header_strip = html.DIV(Class=f"h-1.5 w-full {bg_color}") # h-2 -> h-1.5
     card <= header_strip
 
-    body = html.DIV(Class="p-6 flex-1 flex flex-col")
+    body = html.DIV(Class="p-4 flex-1 flex flex-col") # p-6 -> p-4 (PLUS COMPACT)
     
-    # 2. LIGNE DU HAUT (Icône + Titre)
-    top_row = html.DIV(Class="flex items-start gap-4 mb-4")
+    # 2. LIGNE DU HAUT
+    top_row = html.DIV(Class="flex items-start gap-3 mb-3")
     
-    icon_box = html.DIV(Class=f"h-12 w-12 rounded-lg {bg_color} bg-opacity-10 flex items-center justify-center shrink-0")
-    icon_box <= html.I(**{'data-lucide': 'rocket', 'class': f"h-6 w-6 {bg_color.replace('bg-', 'text-')}"})
+    # Icône réduite h-12->h-10
+    icon_box = html.DIV(Class=f"h-10 w-10 rounded-lg {bg_color} bg-opacity-10 flex items-center justify-center shrink-0")
+    icon_box <= html.I(**{'data-lucide': 'rocket', 'class': f"h-5 w-5 {bg_color.replace('bg-', 'text-')}"})
     top_row <= icon_box
     
     title_col = html.DIV(Class="flex-1 min-w-0")
-    title_col <= html.H3(p['title'], Class="font-bold text-lg text-slate-800 truncate group-hover:text-indigo-600 transition-colors")
-    title_col <= html.SPAN(status_text, Class=f"text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded mt-1 inline-block {status_cls}")
+    # Titre réduit text-lg -> text-sm
+    title_col <= html.H3(p['title'], Class="font-bold text-sm text-slate-800 truncate group-hover:text-indigo-600 transition-colors")
+    title_col <= html.SPAN(status_text, Class=f"text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded mt-0.5 inline-block {status_cls}")
     top_row <= title_col
     
-    body <= top_row # On ferme la ligne du haut ici pour passer les boutons en dessous ou à côté
+    body <= top_row
 
-    # 3. ZONE DES BOUTONS (Nouvelle version Texte)
-    # On met les boutons sur une nouvelle ligne ou à la suite selon la place, 
-    # mais ici on va utiliser une div flexible
-    actions_row = html.DIV(Class="flex items-center justify-end gap-2 mt-2")
+    # 3. ZONE DES BOUTONS
+    actions_row = html.DIV(Class="flex items-center justify-end gap-2 mt-1")
 
-    # A. BOUTON ARCHIVER / RESTAURER (TEXTE)
     if p['status'] == 'archived':
         lbl_arch = "Restaurer"
         cls_arch = "bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border-indigo-200"
         ico_arch = "refresh-ccw"
     else:
         lbl_arch = "Archiver"
-        # Gris neutre pour ne pas confondre avec le Launch vert
         cls_arch = "bg-slate-100 text-slate-600 hover:bg-slate-200 border-slate-200"
         ico_arch = "archive"
 
-    btn_arch = html.BUTTON(Class=f"{cls_arch} px-3 py-1 rounded-md text-xs font-bold border transition flex items-center gap-1")
+    # Boutons plus petits py-1 -> py-0.5
+    btn_arch = html.BUTTON(Class=f"{cls_arch} px-2.5 py-0.5 rounded-md text-[10px] font-bold border transition flex items-center gap-1")
     btn_arch <= html.I(**{'data-lucide': ico_arch, 'class': 'h-3 w-3'})
     btn_arch <= lbl_arch
-    # Sécurité ID
     btn_arch.attrs['data-pid'] = str(p['id'])
     btn_arch.bind('click', handle_archive)
     
     actions_row <= btn_arch
 
-    # B. BOUTON LAUNCH / STOP (TEXTE)
     if p['status'] == 'deployed':
-        btn_deploy = html.BUTTON(Class="bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1 rounded-md text-xs font-bold border border-red-200 transition flex items-center gap-1")
+        btn_deploy = html.BUTTON(Class="bg-red-50 text-red-600 hover:bg-red-100 px-2.5 py-0.5 rounded-md text-[10px] font-bold border border-red-200 transition flex items-center gap-1")
         btn_deploy <= html.I(**{'data-lucide': 'power-off', 'class': 'h-3 w-3'})
         btn_deploy <= "Stop"
     else:
-        btn_deploy = html.BUTTON(Class="bg-green-50 text-green-600 hover:bg-green-100 px-3 py-1 rounded-md text-xs font-bold border border-green-200 transition flex items-center gap-1")
+        btn_deploy = html.BUTTON(Class="bg-green-50 text-green-600 hover:bg-green-100 px-2.5 py-0.5 rounded-md text-[10px] font-bold border border-green-200 transition flex items-center gap-1")
         btn_deploy <= html.I(**{'data-lucide': 'rocket', 'class': 'h-3 w-3'})
         btn_deploy <= "Launch"
     
-    # Sécurité ID
     btn_deploy.attrs['data-pid'] = str(p['id'])
     btn_deploy.bind('click', handle_deploy)
     
     actions_row <= btn_deploy
 
-    # C. MENU (Optionnel, on le garde pour la suppression future)
-    menu_btn = html.BUTTON(Class="text-slate-400 hover:text-slate-600 p-1 rounded hover:bg-slate-100 transition dropdown-btn ml-1")
-    menu_btn <= html.I(**{'data-lucide': 'more-vertical', 'class': 'h-5 w-5'})
+    menu_btn = html.BUTTON(Class="text-slate-400 hover:text-slate-600 p-0.5 rounded hover:bg-slate-100 transition dropdown-btn ml-1")
+    menu_btn <= html.I(**{'data-lucide': 'more-vertical', 'class': 'h-4 w-4'})
     menu_btn.bind('click', lambda ev, pid=p['id']: toggle_menu(ev, pid))
     actions_row <= menu_btn
 
     body <= actions_row
 
     # 4. PROGRÈS & META
-    progress_label = html.DIV(Class="flex justify-between text-xs text-slate-500 mb-1 mt-4")
+    progress_label = html.DIV(Class="flex justify-between text-[10px] text-slate-500 mb-1 mt-3")
     progress_label <= html.SPAN("Integrity")
     progress_label <= html.SPAN("100%")
     body <= progress_label
-    progress_track = html.DIV(Class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden mb-4")
+    progress_track = html.DIV(Class="h-1 w-full bg-slate-100 rounded-full overflow-hidden mb-3")
     progress_fill = html.DIV(Class=f"h-full {bg_color} w-full")
     progress_track <= progress_fill
     body <= progress_track
 
-    meta = html.DIV(Class="text-xs text-slate-500 flex flex-col gap-1 mt-auto pt-4 border-t border-slate-50")
+    meta = html.DIV(Class="text-[10px] text-slate-500 flex flex-col gap-0.5 mt-auto pt-3 border-t border-slate-50")
     meta <= html.SPAN(f"ID: {p['uid'] if 'uid' in p else 'Unknown'}")
     meta <= html.SPAN(f"Created: {p['date'] if 'date' in p else 'Just now'}")
     body <= meta
 
     card <= body
 
-    # 5. MENU DÉROULANT (Pour suppression future)
     if app_state['open_menu_id'] == p['id']:
-        dd = html.DIV(Class="absolute right-4 top-32 w-48 bg-white rounded-lg shadow-xl border border-slate-100 z-50 py-1 text-sm animate-in fade-in zoom-in-95 dropdown-menu")
+        dd = html.DIV(Class="absolute right-4 top-28 w-40 bg-white rounded-lg shadow-xl border border-slate-100 z-50 py-1 text-xs animate-in fade-in zoom-in-95 dropdown-menu")
         
-        btn_open = html.A(Class="w-full text-left px-4 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2", href=f"#")
-        btn_open <= html.I(**{'data-lucide': 'external-link', 'class': 'h-4 w-4'})
+        btn_open = html.A(Class="w-full text-left px-3 py-1.5 text-slate-700 hover:bg-slate-50 flex items-center gap-2", href=f"#")
+        btn_open <= html.I(**{'data-lucide': 'external-link', 'class': 'h-3.5 w-3.5'})
         btn_open <= "Open Studio"
         
-        # On peut laisser l'archive ici aussi ou l'enlever vu qu'on a le bouton
-        btn_del = html.BUTTON(Class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 flex items-center gap-2")
-        btn_del <= html.I(**{'data-lucide': 'trash-2', 'class': 'h-4 w-4'})
+        btn_del = html.BUTTON(Class="w-full text-left px-3 py-1.5 text-red-600 hover:bg-red-50 flex items-center gap-2")
+        btn_del <= html.I(**{'data-lucide': 'trash-2', 'class': 'h-3.5 w-3.5'})
         btn_del <= "Delete Ship"
-        # Pas encore connecté
         
         dd <= btn_open
         dd <= btn_del
@@ -599,12 +517,8 @@ def create_no_image_card(p):
 
     return card
 
-
-
-
 init()
 </script>
-
 
 <style>
     .animate-fade-in { animation: fadeInUp 0.5s ease-out forwards; }

@@ -7,6 +7,8 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
     <script>
         tailwind.config = {
             theme: {
@@ -42,7 +44,6 @@
 
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f9fafa; color: #333333; }
-        /* Suppression du style Serif pour coller au design source */
         h1, h2, h3, h4, h5, h6 { font-family: 'Inter', sans-serif; font-weight: 700; color: #1e3a8a; }
         
         .font-mono { font-family: 'JetBrains Mono', monospace; }
@@ -55,21 +56,20 @@
         .animate-float { animation: float 6s ease-in-out infinite; }
     </style>
 </head>
+
 {{if auth.user:}}
 <body onload="brython()" class="antialiased flex flex-col min-h-screen">
- {{else:}}
+{{else:}}
 <body class="antialiased flex flex-col min-h-screen">   
 {{pass}}    
+
 {{include}}
+
 </body>
 
 {{if auth.user:}}
-<script src="https://cdn.jsdelivr.net/npm/brython@3/brython.min.js">
-</script>
-<script src="https://cdn.jsdelivr.net/npm/brython@3/brython_stdlib.js">
-</script>
-
-
+<script src="https://cdn.jsdelivr.net/npm/brython@3/brython.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/brython@3/brython_stdlib.js"></script>
 {{pass}}
 
 </html>

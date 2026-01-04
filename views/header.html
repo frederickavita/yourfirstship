@@ -1,18 +1,27 @@
 <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 z-20 shrink-0">
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-4">
 
-        <h1 class="text-xl font-bold text-slate-800">{{=page_title}}</h1>
+               <h1 class="text-xl font-bold text-slate-800">{{=page_title}}</h1>
         
-        <div class="flex items-center gap-1.5 px-2 py-0.5 bg-green-50 rounded-full border border-green-100">
-            <span class="relative flex h-2 w-2">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-            </span>
-            <span class="text-[10px] font-bold text-green-700 uppercase tracking-wide">Online</span>
-        </div>
-    </div>
+       {{if auth.user and request.function != 'treasury':}}
     
-    {{if 'header_right' in globals() and header_right:}}
-        {{=XML(header_right)}}
-    {{pass}}
+    {{ balance = get_wallet_balance() }}
+            
+            <a href="{{=URL('default', 'treasury')}}" class="group flex items-center gap-3 px-4 py-1.5 bg-slate-900 rounded-full border border-slate-700 hover:border-indigo-500 hover:shadow-lg transition-all cursor-pointer">
+                <div class="flex flex-col items-end leading-none">
+                    <span class="text-[10px] text-slate-400 font-mono uppercase tracking-wider group-hover:text-indigo-300">Fuel Level</span>
+                    <span class="text-sm font-bold text-amber-400 font-mono">{{=balance}} CR</span>
+                </div>
+                <div class="h-8 w-8 rounded-full bg-slate-800 flex items-center justify-center group-hover:bg-indigo-600 transition-colors">
+                    <i data-lucide="zap" class="h-4 w-4 text-amber-400 group-hover:text-white"></i>
+                </div>
+            </a>
+
+        {{pass}}
+
+        {{if 'header_right' in globals() and header_right:}}
+            {{=XML(header_right)}}
+        {{pass}}
+        
+    </div>
 </header>

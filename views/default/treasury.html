@@ -1,84 +1,195 @@
 {{extend 'malayout.html'}}
 
+<style>
+    @media print {
+        /* Cache tout le site normal */
+        body > * { display: none !important; }
+        
+        /* Affiche uniquement la facture */
+        #invoice-template { 
+            display: block !important; 
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 9999;
+        }
+        
+        /* Force la visibilité du contenu */
+        #invoice-template * { visibility: visible !important; }
+        
+        /* Réinitialise les marges pour l'impression */
+        @page { margin: 0; }
+        body { margin: 1.6cm; }
+    }
+</style>
+
 <script id="treasury-data" type="application/json">
     {{=XML(data_json)}}
 </script>
 
-<div class="flex h-screen bg-slate-50 font-sans text-slate-900 overflow-hidden">
+<div class="flex h-screen bg-slate-50 font-sans text-slate-900 overflow-hidden print:hidden">
 {{include 'sidebar.html'}}
 
     <div class="flex-1 flex flex-col overflow-hidden relative">
         {{ page_title = "Fuel & Credits" }}
     {{include 'header.html'}}
 
-        <main class="flex-1 overflow-y-auto p-8 bg-slate-50">
+        <main class="flex-1 overflow-y-auto p-6 bg-slate-50">
             
-            <div class="bg-white rounded-xl p-8 shadow-sm border border-slate-200 mb-8 relative overflow-hidden">
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 mb-6 relative overflow-hidden">
                 <div class="flex justify-between items-end mb-4 relative z-10">
                     <div>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Solde Actuel</p>
-                        <h2 class="text-5xl font-black text-slate-900" id="balance-display">0</h2>
-                        <p class="text-indigo-500 font-bold text-sm mt-1">Crédits Disponibles</p>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Solde Actuel</p>
+                        <h2 class="text-4xl font-black text-slate-900" id="balance-display">0</h2>
+                        <p class="text-indigo-500 font-bold text-xs mt-1">Crédits Disponibles</p>
                     </div>
                     <div class="text-right">
-                        <div class="bg-slate-50 px-4 py-2 rounded-lg border border-slate-100">
-                            <p class="text-xs text-slate-500 font-bold uppercase">Autonomie Estimée</p>
-                            <p class="text-sm font-medium text-slate-700 mt-1" id="prediction-text">Calculating...</p>
+                        <div class="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
+                            <p class="text-[10px] text-slate-500 font-bold uppercase">Autonomie Estimée</p>
+                            <p class="text-xs font-medium text-slate-700 mt-1" id="prediction-text">Calculating...</p>
                         </div>
                     </div>
                 </div>
                 <div class="absolute -right-10 -bottom-10 opacity-5">
-                    <i data-lucide="zap" class="h-64 w-64"></i>
+                    <i data-lucide="zap" class="h-48 w-48"></i>
                 </div>
             </div>
 
-            <h3 class="text-lg font-bold text-slate-800 mb-4">Recharger le Moteur</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                
-                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 group cursor-pointer" onclick="buyPack('starter')">
-                    <div class="h-10 w-10 bg-slate-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition">
-                        <i data-lucide="battery" class="h-5 w-5"></i>
+            <h3 class="text-sm font-bold text-slate-800 mb-3 uppercase tracking-wide">Recharger le Moteur</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 group cursor-pointer" onclick="buyPack('starter')">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-bold text-sm text-slate-700">Starter Pack</h4>
+                            <p class="text-indigo-600 font-bold text-xs">+ 1,000 Crédits</p>
+                        </div>
+                        <div class="h-8 w-8 bg-slate-50 rounded-full flex items-center justify-center group-hover:bg-indigo-50 group-hover:text-indigo-600 transition">
+                            <i data-lucide="battery" class="h-4 w-4"></i>
+                        </div>
                     </div>
-                    <h4 class="font-bold text-lg">Starter Pack</h4>
-                    <p class="text-3xl font-bold mt-2">10$ <span class="text-sm text-slate-400 font-normal">HT</span></p>
-                    <p class="text-indigo-600 font-bold text-sm mt-1">+ 1,000 Crédits</p>
-                    <button class="w-full mt-6 py-2 rounded-lg border border-slate-200 font-bold text-sm text-slate-600 group-hover:border-indigo-600 group-hover:text-indigo-600 transition">Choisir</button>
+                    <div class="mt-3 flex justify-between items-center">
+                        <p class="text-xl font-bold">10$</p>
+                        <button class="px-3 py-1 rounded bg-slate-50 border border-slate-200 text-xs font-bold text-slate-600 group-hover:border-indigo-200 group-hover:text-indigo-600 transition">Acheter</button>
+                    </div>
                 </div>
 
-                <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-xl transform scale-105 relative overflow-hidden cursor-pointer" onclick="buyPack('builder')">
-                    <div class="absolute top-0 right-0 bg-indigo-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase">Populaire</div>
-                    <div class="h-10 w-10 bg-slate-800 rounded-full flex items-center justify-center mb-4 text-indigo-400">
-                        <i data-lucide="battery-charging" class="h-5 w-5"></i>
+                 <div class="bg-slate-900 p-4 rounded-lg border border-slate-800 shadow-lg transform scale-105 relative overflow-hidden cursor-pointer" onclick="buyPack('builder')">
+                    <div class="absolute top-0 right-0 bg-indigo-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg uppercase">Best</div>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-bold text-sm text-white">Builder Pack</h4>
+                            <p class="text-green-400 font-bold text-xs">+ 5,000 Crédits</p>
+                        </div>
+                        <div class="h-8 w-8 bg-slate-800 rounded-full flex items-center justify-center text-indigo-400">
+                            <i data-lucide="battery-charging" class="h-4 w-4"></i>
+                        </div>
                     </div>
-                    <h4 class="font-bold text-lg text-white">Builder Pack</h4>
-                    <p class="text-3xl font-bold mt-2 text-white">39$ <span class="text-sm text-slate-500 font-normal">HT</span></p>
-                    <p class="text-green-400 font-bold text-sm mt-1">+ 5,000 Crédits</p>
-                    <p class="text-xs text-slate-500 mt-1">Bonus +25% inclus</p>
-                    <button class="w-full mt-6 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 font-bold text-sm text-white transition shadow-lg shadow-indigo-900/50">Choisir</button>
+                    <div class="mt-3 flex justify-between items-center">
+                        <p class="text-xl font-bold text-white">39$</p>
+                        <button class="px-3 py-1 rounded bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition shadow-lg shadow-indigo-900/50">Acheter</button>
+                    </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 group cursor-pointer" onclick="buyPack('agency')">
-                    <div class="h-10 w-10 bg-slate-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-purple-50 group-hover:text-purple-600 transition">
-                        <i data-lucide="battery-full" class="h-5 w-5"></i>
+                <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 group cursor-pointer" onclick="buyPack('agency')">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-bold text-sm text-slate-700">Agency Pack</h4>
+                            <p class="text-purple-600 font-bold text-xs">+ 20,000 Crédits</p>
+                        </div>
+                        <div class="h-8 w-8 bg-slate-50 rounded-full flex items-center justify-center group-hover:bg-purple-50 group-hover:text-purple-600 transition">
+                            <i data-lucide="battery-full" class="h-4 w-4"></i>
+                        </div>
                     </div>
-                    <h4 class="font-bold text-lg">Agency Pack</h4>
-                    <p class="text-3xl font-bold mt-2">129$ <span class="text-sm text-slate-400 font-normal">HT</span></p>
-                    <p class="text-purple-600 font-bold text-sm mt-1">+ 20,000 Crédits</p>
-                    <p class="text-xs text-slate-400 mt-1">Bonus +50% inclus</p>
-                    <button class="w-full mt-6 py-2 rounded-lg border border-slate-200 font-bold text-sm text-slate-600 group-hover:border-purple-600 group-hover:text-purple-600 transition">Choisir</button>
+                    <div class="mt-3 flex justify-between items-center">
+                        <p class="text-xl font-bold">129$</p>
+                        <button class="px-3 py-1 rounded bg-slate-50 border border-slate-200 text-xs font-bold text-slate-600 group-hover:border-purple-200 group-hover:text-purple-600 transition">Acheter</button>
+                    </div>
                 </div>
-
             </div>
 
-            <h3 class="text-lg font-bold text-slate-800 mb-4">Transactions Récentes</h3>
-            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                <table class="w-full text-left">
-                    <tbody id="history-body" class="text-sm text-slate-600">
-                        </tbody>
-                </table>
+            <h3 class="text-sm font-bold text-slate-800 mb-3 uppercase tracking-wide">Historique</h3>
+            
+            <div class="bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col h-96">
+                <div class="px-4 py-3 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center shrink-0">
+                    <span class="text-xs font-bold text-slate-500 uppercase">Dernières opérations</span>
+                    <button class="text-[10px] text-indigo-500 font-bold hover:underline">Tout voir</button>
+                </div>
+
+                <div class="overflow-y-auto flex-1 p-0 custom-scrollbar">
+                    <table class="w-full text-left border-collapse">
+                        <tbody id="history-body" class="text-xs text-slate-600 divide-y divide-slate-50">
+                            </tbody>
+                    </table>
+                </div>
             </div>
 
         </main>
+    </div>
+</div>
+
+<div id="invoice-template" class="hidden">
+    <div class="p-10 bg-white max-w-3xl mx-auto text-slate-900 font-sans print:max-w-full">
+        
+        <div class="flex justify-between items-start mb-12">
+            <div>
+                <div class="flex items-center gap-2 mb-2">
+                    <i data-lucide="ship" class="h-8 w-8 text-indigo-600"></i>
+                    <span class="font-bold text-2xl tracking-tight text-slate-900">YourFirstShip</span>
+                </div>
+                <p class="text-sm text-slate-500">8 rue Charles Gide, 77130 Varennes sur Seine, France</p>
+                <p class="text-sm text-slate-500">VAT ID: FR 478 310 097 00025</p> 
+            </div>
+            <div class="text-right">
+                <h1 class="text-3xl font-bold text-slate-900 mb-2">INVOICE</h1>
+                <p class="text-sm text-slate-500">Ref: <span id="inv-ref" class="font-mono font-bold text-slate-700">#INV-000</span></p>
+                <p class="text-sm text-slate-500">Date: <span id="inv-date">01/01/2024</span></p>
+            </div>
+        </div>
+
+        <div class="mb-12 p-6 bg-slate-50 rounded-lg border border-slate-100 print:bg-slate-50 print:border-slate-200">
+            <p class="text-xs font-bold text-slate-400 uppercase mb-2">Billed to:</p>
+            <h3 class="font-bold text-lg" id="inv-client-name">Client Name</h3>
+            <p class="text-slate-600 whitespace-pre-line" id="inv-client-address">Address...</p>
+        </div>
+
+        <table class="w-full mb-8">
+            <thead>
+                <tr class="border-b-2 border-slate-200">
+                    <th class="text-left py-3 font-bold text-sm uppercase text-slate-500">Description</th>
+                    <th class="text-right py-3 font-bold text-sm uppercase text-slate-500">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="py-4 border-b border-slate-100 font-medium text-lg">
+                        <span id="inv-pack">Pack Name</span>
+                    </td>
+                    <td class="py-4 border-b border-slate-100 text-right font-bold text-lg">
+                        <span id="inv-amount">0.00 $</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="flex justify-end">
+            <div class="w-1/2 space-y-2">
+                <div class="flex justify-between text-slate-500 text-sm">
+                    <span>Tax (VAT)</span>
+                    <span id="inv-tax">0.00 $</span>
+                </div>
+                <div class="flex justify-between py-2 border-t border-slate-200">
+                    <span class="font-bold text-xl">Total Paid</span>
+                    <span id="inv-total" class="font-bold text-xl text-indigo-600">0.00 $</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-16 pt-8 border-t border-slate-200 text-center text-xs text-slate-400">
+            Thank you for your business. Generated automatically by YourFirstShip.
+        </div>
     </div>
 </div>
 
@@ -90,97 +201,121 @@
 </div>
 
 <script type="text/python">
-from browser import document, html, window, ajax
+from browser import document, html, window, ajax, timer
 import json
 
 def init():
-    # 1. Parse Data
     try:
         data = json.loads(document['treasury-data'].text)
     except:
         data = {"balance": 0, "history": []}
 
-    # 2. Update Hero
     document['balance-display'].text = f"{data.get('balance', 0):,}"
     document['prediction-text'].text = data.get('prediction', 'No data')
 
-    # 3. Render History
+    render_history(data.get('history', []))
+    
+    handle_toast()
+    if hasattr(window, 'lucide'): window.lucide.createIcons()
+
+def render_history(history):
     tbody = document['history-body']
     tbody.clear()
     
-    for item in data.get('history', []):
-        row = html.TR(Class="border-b border-slate-50 last:border-none hover:bg-slate-50 transition")
+    for item in history:
+        row = html.TR(Class="hover:bg-indigo-50/30 transition group border-b border-slate-50 last:border-0")
         
-        # Icone selon type (Positif/Négatif)
+        # 1. Icone (Type)
         is_positive = item['amount'] > 0
         icon_name = "arrow-down-left" if is_positive else "arrow-up-right"
         color_cls = "text-green-600 bg-green-50" if is_positive else "text-slate-400 bg-slate-100"
         
-        icon_cell = html.TD(Class="px-6 py-4 w-16")
-        icon_div = html.DIV(Class=f"h-8 w-8 rounded-full flex items-center justify-center {color_cls}")
+        icon_cell = html.TD(Class="px-4 py-3 w-12") 
+        icon_div = html.DIV(Class=f"h-8 w-8 rounded-md flex items-center justify-center {color_cls}")
         icon_div <= html.I(**{'data-lucide': icon_name, 'class': 'h-4 w-4'})
         icon_cell <= icon_div
         row <= icon_cell
         
-        # Description & Date
-        desc_cell = html.TD(Class="px-6 py-4")
-        desc_cell <= html.DIV(item['desc'], Class="font-bold text-slate-700")
-        desc_cell <= html.DIV(item['date'], Class="text-xs text-slate-400")
+        # 2. Description
+        desc_cell = html.TD(Class="px-4 py-3")
+        desc_cell <= html.DIV(item['desc'], Class="font-bold text-slate-700 text-xs truncate max-w-[140px]")
+        desc_cell <= html.DIV(item['date'], Class="text-[10px] text-slate-400")
         row <= desc_cell
         
-        # Montant
+        # 3. Montant
         amt_str = f"+{item['amount']}" if is_positive else str(item['amount'])
-        amt_cls = "font-mono font-bold text-green-600" if is_positive else "font-mono text-slate-600"
-        row <= html.TD(amt_str, Class=f"px-6 py-4 text-right {amt_cls}")
+        amt_cls = "text-green-600" if is_positive else "text-slate-600"
+        row <= html.TD(amt_str, Class=f"px-4 py-3 text-right font-mono font-bold text-xs {amt_cls}")
+
+        # 4. BOUTON IMPRIMER
+        print_cell = html.TD(Class="px-4 py-3 text-right w-12")
         
+        # On affiche le bouton seulement si c'est un achat positif (Pack)
+        if is_positive: 
+            btn_print = html.BUTTON(Class="text-indigo-400 hover:text-indigo-600 p-2 rounded hover:bg-indigo-50 transition", Title="Télécharger Facture")
+            btn_print <= html.I(**{'data-lucide': 'printer', 'class': 'h-4 w-4'})
+            # IMPORTANT: On passe 'item' qui contient maintenant 'ref', 'address', etc.
+            btn_print.bind('click', lambda ev, i=item: print_invoice(i))
+            print_cell <= btn_print
+        
+        row <= print_cell
         tbody <= row
-    # 4. Init Lucide Icons
+
+    if hasattr(window, 'lucide'): 
+        window.lucide.createIcons()
+
+def print_invoice(item):
+    """
+    Remplit le template avec les données reçues du contrôleur
+    puis lance l'impression.
+    """
+    # 1. Mapping des données JSON -> HTML IDs
+    # On utilise .get('', '...') pour éviter les crashs si une donnée manque
+    document['inv-date'].text = item.get('full_date', item['date'])
+    document['inv-ref'].text = item.get('ref', 'REF-???')
+    
+    document['inv-client-name'].text = item.get('billing_name', 'Client')
+    document['inv-client-address'].text = item.get('billing_address', '')
+    
+    document['inv-pack'].text = item.get('pack', item['desc'])
+    document['inv-amount'].text = item.get('display_amount', str(item['amount']))
+    
+    document['inv-tax'].text = item.get('tax', '0.00')
+    document['inv-total'].text = item.get('total', str(item['amount']))
+    
+    # 2. Lancer l'impression
+    # Le CSS @media print s'occupe de cacher le dashboard et d'afficher #invoice-template
+    window.print()
+
+def handle_toast():
     qs = window.location.search
     if "payment=success" in qs:
-        # On affiche le Toast (déjà présent dans le HTML dashboard/layout)
-        toast = document['toast-notification']
-        # On change le texte et l'icône
-        toast.select_one('span').text = "Paiement réussi ! Moteurs ravitaillés."
-        toast.select_one('i').className = "text-green-400 h-5 w-5" # Icône verte
-        
-        # Animation d'entrée
-        toast.style.transform = "translateY(0)"
-        
-        # On cache après 5 secondes
-        def hide_toast():
-            toast.style.transform = "translateY(8rem)"
-            # Nettoyer l'URL pour ne pas réafficher le toast si on refresh
-            window.history.replaceState({}, "", window.location.pathname)
-            
-        timer.set_timeout(hide_toast, 5000)
-
+        show_toast("Paiement réussi !", "check-circle", "text-green-400")
     elif "payment=cancel" in qs:
-        window.alert("Paiement annulé. Aucun montant n'a été débité.")
-    if hasattr(window, 'lucide'): window.lucide.createIcons()
+        window.alert("Paiement annulé.")
+
+def show_toast(msg, icon, color):
+    toast = document['toast-notification']
+    toast.select_one('span').text = msg
+    toast.select_one('i').className = f"{color} h-5 w-5"
+    toast.style.transform = "translateY(0)"
+    timer.set_timeout(lambda: setattr(toast.style, 'transform', "translateY(8rem)"), 5000)
 
 def on_checkout_success(req):
-    """Redirige vers Stripe quand l'URL est reçue"""
     try:
         data = json.loads(req.text)
-        # Redirection vers la page de paiement sécurisée
         window.location.href = data['url']
     except:
-        window.alert("Erreur lors de la création du paiement.")
+        window.alert("Erreur Checkout")
 
 def buy_pack_click(pack_id):
-    """Déclenche l'achat"""
-    # Change le curseur pour montrer que ça charge
     document.body.style.cursor = "wait"
-    
-    # Appel AJAX vers notre contrôleur Python
     req = ajax.ajax()
     req.bind('complete', on_checkout_success)
     req.open('POST', "{{=URL('default', 'buy_credits')}}", True)
     req.set_header('content-type', 'application/x-www-form-urlencoded')
     req.send({'pack': pack_id})
 
-# On expose la fonction au Javascript global pour les onclick=""
 window.buyPack = buy_pack_click
-
 init()
 </script>
