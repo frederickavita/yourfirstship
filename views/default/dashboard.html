@@ -99,13 +99,15 @@
 
 
 <script type="text/python">
-from browser import document, html, window, timer
+from browser import document, html, window, ajax, timer
 import json
 
 # --- CONFIG ---
 URLS = {
     'holodeck': "{{=URL('the_holodeck')}}",
-    'narrative': "{{=URL('narrative_engine')}}" 
+    'create': "{{=URL('default', 'create_project')}}",
+    'deploy': "{{=URL('default', 'toggle_deploy')}}",
+    'treasury': "{{=URL('treasury')}}"
 }
 
 # --- STATE ---
@@ -115,8 +117,7 @@ app_state = {
     'current_tab': 'active', 
     'last_archived_id': None,
     'open_menu_id': None,
-    # Launchpad State
-    'narrative_step': 0
+    'modifiers': [] # <--- On stocke les modifiers proprement
 }
 
 def init():
@@ -126,9 +127,7 @@ def init():
     except:
         app_state['projects'] = []
 
-    # 2. Bindings Flotte
-    # L'input n'existe pas encore au chargement initial car généré par render_tabs
-    # On le bindera dans render_tabs
+    # 2. Bindings Généraux
     document['undo-btn'].bind('click', handle_undo)
     document.bind('click', handle_global_click)
 
@@ -139,7 +138,8 @@ def init():
 
     # 4. Rendu Initial
     render_tabs()
-    timer.set_timeout(finalize_loading, 600)
+    # Petit délai pour laisser l'anim se lancer
+    timer.set_timeout(finalize_loading, 100)
 
 def finalize_loading():
     document['skeleton-loader'].classList.add('hidden')
@@ -150,60 +150,177 @@ def finalize_loading():
 
 
 # ============================================================
-# LOGIQUE LAUNCHPAD
+# LOGIQUE LAUNCHPAD (LE CERVEAU)
 # ============================================================
 
 def handle_modifier(ev):
-    target = ev.target
-    while target.tagName != 'BUTTON':
-        target = target.parent
-    text_to_add = target.attrs.get('data-add', '')
-    input_box = document['launchpad-input']
-    input_box.value += text_to_add
-    input_box.focus()
+    """Gère l'activation visuelle et logique des boutons"""
+    btn = ev.currentTarget # Utiliser currentTarget pour avoir le bouton, pas l'icône
+    tag = btn.attrs.get('data-add', '').strip()
+    
+    # Gestion UI (Toggle style)
+    if tag in app_state['modifiers']:
+        app_state['modifiers'].remove(tag)
+        btn.classList.remove('bg-indigo-100', 'text-indigo-700', 'border-indigo-200')
+        btn.classList.add('bg-slate-100', 'text-slate-600')
+    else:
+        app_state['modifiers'].append(tag)
+        btn.classList.remove('bg-slate-100', 'text-slate-600')
+        btn.classList.add('bg-indigo-100', 'text-indigo-700', 'border-indigo-200')
 
 def handle_ignite(ev):
-    input_val = document['launchpad-input'].value.strip()
-    if not input_val:
+    """Lance la création REELLE du projet"""
+    prompt = document['launchpad-input'].value.strip()
+    
+    # Validation
+    if not prompt:
         document['launchpad-input'].classList.add('ring-2', 'ring-red-500')
         timer.set_timeout(lambda: document['launchpad-input'].classList.remove('ring-2', 'ring-red-500'), 1000)
         return
 
+    # UI Loading
     document['launchpad-input'].disabled = True
     document['ignite-btn'].disabled = True
     document['ignite-btn'].classList.add('opacity-50', 'cursor-not-allowed')
-    document['ignite-btn'].text = "Engines Running..."
+    document['ignite-btn'].text = "Igniting..."
     
+    # Afficher la console narrative
     fb = document['narrative-feedback']
     fb.classList.remove('hidden')
     
-    run_narrative_sequence()
+    # Lancer la fausse progression visuelle
+    run_narrative_sequence(0)
 
-def run_narrative_sequence():
+    # --- APPEL AJAX AU BACKEND ---
+    req = ajax.ajax()
+    req.bind('complete', on_creation_complete)
+    req.open('POST', URLS['create'], True)
+    req.set_header('content-type', 'application/x-www-form-urlencoded')
+    # On envoie le prompt ET la liste des modifiers
+    req.send({'prompt': prompt, 'modifiers[]': app_state['modifiers']})
+
+def run_narrative_sequence(step_idx):
+    """Animation visuelle seulement"""
     steps = [
         ("Analysis confirmed. Intent detected.", 20),
-        ("Drafting database schema...", 45),
-        ("Compiling Python logic modules...", 70),
-        ("Finalizing Holodeck environment...", 90),
-        ("Ready. Handoff to Studio.", 100)
+        ("Allocating credits...", 40),
+        ("Drafting database schema...", 60),
+        ("Compiling modules...", 80),
+        ("Finalizing environment...", 90)
     ]
     
-    step_idx = app_state['narrative_step']
-    
+    # On s'arrête à 90% tant que l'AJAX n'a pas répondu
     if step_idx < len(steps):
         text, percent = steps[step_idx]
         document['narrative-text'].text = text
         document['narrative-progress'].style.width = f"{percent}%"
-        app_state['narrative_step'] += 1
-        timer.set_timeout(run_narrative_sequence, 800)
-    else:
-        window.location.href = URLS['narrative']
+        timer.set_timeout(lambda: run_narrative_sequence(step_idx + 1), 500)
+
+def on_creation_complete(req):
+    """Retour du serveur"""
+    try:
+        data = json.loads(req.text)
+        
+        # Cas d'erreur (Pas de sous !)
+        if data.get('status') == 'error':
+            window.alert(data['message'])
+            if "Fuel" in data['message']:
+                window.location.href = URLS['treasury']
+            return
+
+        # SUCCÈS : On finit l'animation
+        document['narrative-text'].text = "Ready. Ship Launched."
+        document['narrative-progress'].style.width = "100%"
+        
+        # On attend 1 seconde pour que l'utilisateur voie "100%"
+        timer.set_timeout(lambda: finalize_creation_ui(data['project']), 800)
+        
+    except Exception as e:
+        print(e)
+        window.alert("Critical error connecting to HQ.")
+        reset_launchpad()
+
+def finalize_creation_ui(new_project):
+    """Ajoute le projet et reset l'interface"""
+    # 1. Ajouter aux données locales (State)
+    # On l'insère au début de la liste
+    app_state['projects'].insert(0, new_project)
+    
+    # 2. Reset UI Launchpad
+    reset_launchpad()
+    
+    # 3. Rafraîchir la grille (Le nouveau projet apparaîtra !)
+    render_projects()
+    
+    # 4. Feedback
+    show_toast(f"Ship '{new_project['title']}' initialized!")
+
+def reset_launchpad():
+    document['launchpad-input'].value = ""
+    document['launchpad-input'].disabled = False
+    document['ignite-btn'].disabled = False
+    document['ignite-btn'].classList.remove('opacity-50', 'cursor-not-allowed')
+    document['ignite-btn'].text = "Ignite Engines"
+    document['narrative-feedback'].classList.add('hidden')
+    document['narrative-progress'].style.width = "0%"
+    app_state['modifiers'] = []
+    # Reset boutons modifiers
+    for btn in document.select('.modifier-btn'):
+        btn.classList.remove('bg-indigo-100', 'text-indigo-700', 'border-indigo-200')
+        btn.classList.add('bg-slate-100', 'text-slate-600')
 
 
 # ============================================================
-# LOGIQUE FLOTTE
+# LOGIQUE FLOTTE (Ton code existant, inchangé ou presque)
 # ============================================================
+def handle_deploy(ev):
+    """
+    Version robuste : Récupère l'ID depuis l'attribut HTML data-pid
+    """
+    ev.stopPropagation()
+    btn = ev.currentTarget # Le bouton sur lequel on a cliqué
+    
+    # On récupère l'ID stocké dans le HTML (C'est du texte, ex: "5")
+    pid = btn.attrs.get('data-pid')
 
+    
+    print(f"DEBUG JS: Envoi deploy pour ID = {pid} (Type: {type(pid)})")
+    
+    if not pid:
+        window.alert("Erreur: ID projet introuvable sur le bouton")
+        return
+
+    btn.text = "..."
+    
+    req = ajax.ajax()
+    # Note: on passe 'pid' (variable locale), plus besoin de l'argument de fonction
+    req.bind('complete', lambda r: on_deploy_complete(r, pid)) 
+    req.open('POST', URLS['deploy'], True)
+    req.set_header('content-type', 'application/x-www-form-urlencoded')
+    req.send({'project_id': pid})
+
+def on_deploy_complete(req, pid):
+    try:
+        data = json.loads(req.text)
+        if data['status'] == 'error':
+            window.alert(data['message'])
+            # Si manque de fuel, redirection trésorerie
+            if "fuel" in data['message'].lower():
+                window.location.href = URLS['treasury']
+            return
+            
+        # Mise à jour locale du projet
+        for p in app_state['projects']:
+            if p['id'] == pid:
+                p['status'] = data['new_status']
+                break
+        
+        show_toast(data['message'])
+        render_projects() # Rafraîchit la carte (change la couleur)
+        
+    except Exception as e:
+        print(e)
+        window.alert("Comms error.")
 def set_tab(ev, tab_name):
     app_state['current_tab'] = tab_name
     render_tabs()    
@@ -213,7 +330,6 @@ def render_tabs():
     container = document['tabs-container']
     container.clear()
     
-    # 1. RENDU DES ONGLETS
     tabs = [('active', 'Active Fleet', 'ship'), ('archived', 'Dry Dock (Archives)', 'archive')]
     
     for tab_id, label, icon in tabs:
@@ -232,9 +348,8 @@ def render_tabs():
         btn.bind('click', lambda ev, t=tab_id: set_tab(ev, t))
         container <= btn
 
-    # 2. RENDU DE L'INPUT RECHERCHE (FLOAT RIGHT via ml-auto)
+    # SEARCH INPUT
     search_wrapper = html.DIV(Class="ml-auto relative group")
-    
     icon_div = html.DIV(Class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none")
     icon_div <= html.I(**{'data-lucide': 'search', 'class': 'h-4 w-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors'})
     search_wrapper <= icon_div
@@ -243,10 +358,7 @@ def render_tabs():
         Class="block w-64 pl-10 pr-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all",
         Placeholder="Filter fleet...")
     
-    # On bind l'event ici car l'élément vient d'être créé
     search_inp.bind('input', handle_search)
-    
-    # Restaurer la valeur si elle existe
     if app_state['filter_text']:
         search_inp.value = app_state['filter_text']
         
@@ -277,18 +389,35 @@ def toggle_menu(ev, pid):
     app_state['open_menu_id'] = pid if app_state['open_menu_id'] != pid else None
     render_projects()
 
-def archive_project_action(ev, pid):
-    if ev: ev.stopPropagation()
+def handle_archive(ev):
+    """
+    Archive ou Restaure un projet.
+    Version robuste : Récupère l'ID depuis l'attribut HTML data-pid
+    """
+    ev.stopPropagation()
+    btn = ev.currentTarget
+    pid = btn.attrs.get('data-pid')
+    
+    # Simulation locale (En attendant de le connecter au backend si besoin)
+    # Si tu veux le connecter au backend plus tard, on fera pareil que handle_deploy
+    
+    # On met à jour l'état local
     for p in app_state['projects']:
-        if p['id'] == pid:
+        # Attention: p['id'] est un int, pid est un str
+        if str(p['id']) == str(pid):
             new_status = 'archived' if p['status'] != 'archived' else 'draft'
             p['status'] = new_status
-            app_state['last_archived_id'] = pid
+            app_state['last_archived_id'] = p['id']
+            
+            msg = "Project sent to Dry Dock." if new_status == 'archived' else "Project restored to active fleet."
+            show_toast(msg)
             break
+            
     app_state['open_menu_id'] = None
-    show_toast()
     render_tabs()     
-    render_projects() 
+    render_projects()
+
+
 
 def handle_undo(ev):
     pid = app_state['last_archived_id']
@@ -301,8 +430,9 @@ def handle_undo(ev):
     render_tabs()
     render_projects()
 
-def show_toast():
+def show_toast(msg):
     t = document['toast-notification']
+    t.select_one('span').text = msg
     t.style.transform = "translateY(0)"
     timer.set_timeout(hide_toast, 5000)
 
@@ -315,10 +445,17 @@ def render_projects():
     term = app_state['filter_text']
     current_tab = app_state['current_tab']
     to_show = []
+    
     for p in app_state['projects']:
+        # Map DB status to Tab logic
         is_archived = (p['status'] == 'archived')
+        is_deployed = (p['status'] == 'deployed')
+        
+        # Filtre Onglets
         if current_tab == 'active' and is_archived: continue
         if current_tab == 'archived' and not is_archived: continue
+        
+        # Filtre Recherche
         if term and (term not in p['title'].lower() and term not in p['status'].lower()):
             continue
         to_show.append(p)
@@ -326,7 +463,7 @@ def render_projects():
     if not to_show:
         render_empty_state(container, current_tab)
     else:
-        grid = html.DIV(Class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 projects-grid")
+        grid = html.DIV(Class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 projects-grid animate-fade-in")
         for p in to_show:
             grid <= create_no_image_card(p)
         container <= grid
@@ -334,88 +471,140 @@ def render_projects():
 
 def render_empty_state(container, tab):
     msg = "No active ships found." if tab == 'active' else "Dry dock is empty."
-    wrapper = html.DIV(Class="flex flex-col items-center justify-center h-64 text-center animate-fade-in-up border-2 border-dashed border-slate-200 rounded-xl")
+    wrapper = html.DIV(Class="flex flex-col items-center justify-center h-64 text-center border-2 border-dashed border-slate-200 rounded-xl")
     wrapper <= html.H3(msg, Class="text-lg font-bold text-slate-500")
     container <= wrapper
+
 
 def create_no_image_card(p):
     card = html.DIV(Class="group bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-indigo-300 transition-all duration-300 flex flex-col overflow-hidden relative")
     
-    bg_color = "bg-indigo-500" if p['status'] == 'deployed' else "bg-slate-500" if p['status'] == 'archived' else "bg-amber-500"
+    # 1. COULEURS & STATUTS
+    if p['status'] == 'deployed':
+        bg_color = "bg-green-500"
+        status_text = "Deployed"
+        status_cls = "text-green-600 bg-green-50"
+    elif p['status'] == 'archived':
+        bg_color = "bg-slate-500"
+        status_text = "Archived"
+        status_cls = "text-slate-500 bg-slate-100"
+    else:
+        bg_color = "bg-amber-500"
+        status_text = "Draft"
+        status_cls = "text-amber-600 bg-amber-50"
+
+    # Bandeau couleur
     header_strip = html.DIV(Class=f"h-2 w-full {bg_color}")
     card <= header_strip
 
     body = html.DIV(Class="p-6 flex-1 flex flex-col")
     
+    # 2. LIGNE DU HAUT (Icône + Titre)
     top_row = html.DIV(Class="flex items-start gap-4 mb-4")
+    
     icon_box = html.DIV(Class=f"h-12 w-12 rounded-lg {bg_color} bg-opacity-10 flex items-center justify-center shrink-0")
-    icon_box <= html.I(**{'data-lucide': 'box', 'class': f"h-6 w-6 {bg_color.replace('bg-', 'text-')}"})
+    icon_box <= html.I(**{'data-lucide': 'rocket', 'class': f"h-6 w-6 {bg_color.replace('bg-', 'text-')}"})
     top_row <= icon_box
     
     title_col = html.DIV(Class="flex-1 min-w-0")
     title_col <= html.H3(p['title'], Class="font-bold text-lg text-slate-800 truncate group-hover:text-indigo-600 transition-colors")
-    if p['status'] == 'deployed':
-        badge = html.SPAN("Deployed", Class="text-xs font-bold text-green-600 flex items-center gap-1 mt-1")
-    elif p['status'] == 'archived':
-        badge = html.SPAN("Archived", Class="text-xs font-bold text-slate-400 mt-1")
-    else:
-        badge = html.SPAN("Draft Mode", Class="text-xs font-bold text-amber-600 mt-1")
-    title_col <= badge
+    title_col <= html.SPAN(status_text, Class=f"text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded mt-1 inline-block {status_cls}")
     top_row <= title_col
+    
+    body <= top_row # On ferme la ligne du haut ici pour passer les boutons en dessous ou à côté
 
-    # --- BOUTON TEXTE ---
-    is_arch = (p['status'] == 'archived')
-    if is_arch:
-        btn_label = "Restaurer"
-        btn_cls = "bg-green-100 text-green-700 hover:bg-green-200 border-green-200"
+    # 3. ZONE DES BOUTONS (Nouvelle version Texte)
+    # On met les boutons sur une nouvelle ligne ou à la suite selon la place, 
+    # mais ici on va utiliser une div flexible
+    actions_row = html.DIV(Class="flex items-center justify-end gap-2 mt-2")
+
+    # A. BOUTON ARCHIVER / RESTAURER (TEXTE)
+    if p['status'] == 'archived':
+        lbl_arch = "Restaurer"
+        cls_arch = "bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border-indigo-200"
+        ico_arch = "refresh-ccw"
     else:
-        btn_label = "Archiver"
-        btn_cls = "bg-amber-100 text-amber-700 hover:bg-amber-200 border-amber-200"
+        lbl_arch = "Archiver"
+        # Gris neutre pour ne pas confondre avec le Launch vert
+        cls_arch = "bg-slate-100 text-slate-600 hover:bg-slate-200 border-slate-200"
+        ico_arch = "archive"
 
-    quick_btn = html.BUTTON(Class=f"{btn_cls} px-3 py-1 rounded-md transition mr-2 shrink-0 text-xs font-bold border shadow-sm flex items-center")
-    quick_btn <= btn_label
-    quick_btn.bind('click', lambda ev, pid=p['id']: archive_project_action(ev, pid))
-    top_row <= quick_btn
+    btn_arch = html.BUTTON(Class=f"{cls_arch} px-3 py-1 rounded-md text-xs font-bold border transition flex items-center gap-1")
+    btn_arch <= html.I(**{'data-lucide': ico_arch, 'class': 'h-3 w-3'})
+    btn_arch <= lbl_arch
+    # Sécurité ID
+    btn_arch.attrs['data-pid'] = str(p['id'])
+    btn_arch.bind('click', handle_archive)
+    
+    actions_row <= btn_arch
 
-    menu_btn = html.BUTTON(Class="text-slate-400 hover:text-slate-600 p-1 rounded hover:bg-slate-100 transition dropdown-btn shrink-0")
+    # B. BOUTON LAUNCH / STOP (TEXTE)
+    if p['status'] == 'deployed':
+        btn_deploy = html.BUTTON(Class="bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1 rounded-md text-xs font-bold border border-red-200 transition flex items-center gap-1")
+        btn_deploy <= html.I(**{'data-lucide': 'power-off', 'class': 'h-3 w-3'})
+        btn_deploy <= "Stop"
+    else:
+        btn_deploy = html.BUTTON(Class="bg-green-50 text-green-600 hover:bg-green-100 px-3 py-1 rounded-md text-xs font-bold border border-green-200 transition flex items-center gap-1")
+        btn_deploy <= html.I(**{'data-lucide': 'rocket', 'class': 'h-3 w-3'})
+        btn_deploy <= "Launch"
+    
+    # Sécurité ID
+    btn_deploy.attrs['data-pid'] = str(p['id'])
+    btn_deploy.bind('click', handle_deploy)
+    
+    actions_row <= btn_deploy
+
+    # C. MENU (Optionnel, on le garde pour la suppression future)
+    menu_btn = html.BUTTON(Class="text-slate-400 hover:text-slate-600 p-1 rounded hover:bg-slate-100 transition dropdown-btn ml-1")
     menu_btn <= html.I(**{'data-lucide': 'more-vertical', 'class': 'h-5 w-5'})
     menu_btn.bind('click', lambda ev, pid=p['id']: toggle_menu(ev, pid))
-    top_row <= menu_btn
-    
-    body <= top_row
+    actions_row <= menu_btn
 
-    progress_label = html.DIV(Class="flex justify-between text-xs text-slate-500 mb-1")
-    progress_label <= html.SPAN("System Integrity")
-    progress_label <= html.SPAN("94%")
+    body <= actions_row
+
+    # 4. PROGRÈS & META
+    progress_label = html.DIV(Class="flex justify-between text-xs text-slate-500 mb-1 mt-4")
+    progress_label <= html.SPAN("Integrity")
+    progress_label <= html.SPAN("100%")
     body <= progress_label
     progress_track = html.DIV(Class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden mb-4")
-    progress_fill = html.DIV(Class=f"h-full {bg_color} w-[94%]")
+    progress_fill = html.DIV(Class=f"h-full {bg_color} w-full")
     progress_track <= progress_fill
     body <= progress_track
 
     meta = html.DIV(Class="text-xs text-slate-500 flex flex-col gap-1 mt-auto pt-4 border-t border-slate-50")
-    meta <= html.SPAN(f"Last update: {p['last_updated']}")
-    meta <= html.SPAN(f"Activity: {p['last_action']}", Class="text-slate-400 italic")
+    meta <= html.SPAN(f"ID: {p['uid'] if 'uid' in p else 'Unknown'}")
+    meta <= html.SPAN(f"Created: {p['date'] if 'date' in p else 'Just now'}")
     body <= meta
 
     card <= body
 
+    # 5. MENU DÉROULANT (Pour suppression future)
     if app_state['open_menu_id'] == p['id']:
-        dd = html.DIV(Class="absolute right-4 top-16 w-48 bg-white rounded-lg shadow-xl border border-slate-100 z-50 py-1 text-sm animate-in fade-in zoom-in-95 dropdown-menu")
-        btn_open = html.A(Class="w-full text-left px-4 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2", href=f"{URLS['holodeck']}/{p['id']}")
+        dd = html.DIV(Class="absolute right-4 top-32 w-48 bg-white rounded-lg shadow-xl border border-slate-100 z-50 py-1 text-sm animate-in fade-in zoom-in-95 dropdown-menu")
+        
+        btn_open = html.A(Class="w-full text-left px-4 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2", href=f"#")
         btn_open <= html.I(**{'data-lucide': 'external-link', 'class': 'h-4 w-4'})
-        btn_open <= "Open Holodeck"
+        btn_open <= "Open Studio"
+        
+        # On peut laisser l'archive ici aussi ou l'enlever vu qu'on a le bouton
         btn_del = html.BUTTON(Class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 flex items-center gap-2")
         btn_del <= html.I(**{'data-lucide': 'trash-2', 'class': 'h-4 w-4'})
-        btn_del <= "Delete Project"
+        btn_del <= "Delete Ship"
+        # Pas encore connecté
+        
         dd <= btn_open
         dd <= btn_del
         card <= dd
 
     return card
 
+
+
+
 init()
 </script>
+
 
 <style>
     .animate-fade-in { animation: fadeInUp 0.5s ease-out forwards; }

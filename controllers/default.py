@@ -183,6 +183,120 @@ def google_callback():
     _next = session.pop('oauth_next', None) or request.vars.get('_next') or URL('default','projects')
     redirect(_next)
 
+def narrative_engine():
+    if not auth.user:
+        redirect(URL('default', 'connect', args='login'))
+    return dict()
+
+
+def toggle_deploy():
+    """
+    Bascule entre 'draft' et 'deployed'.
+    Version Debug: Affiche les IDs dans la console.
+    """
+    response.headers['Content-Type'] = 'application/json'
+    import json
+    try:
+        # 1. RÉCUPÉRATION ET CONVERSION DE L'ID
+        raw_id = request.vars.project_id
+        print(f"🔍 DEBUG: Reçu project_id={raw_id} (Type: {type(raw_id)})")
+        
+        if not raw_id:
+            return json.dumps({'status': 'error', 'message': 'Project ID missing.'})
+            
+        # FORCE LE CAST EN ENTIER
+        try:
+            pid = raw_id
+        except ValueError:
+             return json.dumps({'status': 'error', 'message': 'Invalid ID format.'})
+
+        # 2. CONFIGURATION
+        COST_DAY = 50
+        
+        # 3. RECHERCHE (Avec l'ID converti)
+        project = db((db.projects.project_uid == pid) & (db.projects.owner_id == auth.user.id)).select().first()
+        
+        if not project:
+            print(f"❌ DEBUG: Projet {pid} introuvable pour l'user {auth.user.id}")
+            # Si le projet n'est pas trouvé, c'est peut-être que l'interface (HTML) 
+            # a des vieux IDs. Il faut rafraîchir la page.
+            return json.dumps({'status': 'error', 'message': 'Project not found. Please refresh page.'})
+
+        print(f"✅ DEBUG: Projet trouvé: {project.title} (Status actuel: {project.status})")
+
+        # 4. LOGIQUE
+        if project.status == 'deployed':
+            # STOP
+            project.update_record(status='draft')
+            return json.dumps({
+                'status': 'success', 
+                'new_status': 'draft', 
+                'message': "Ship in dry dock. Billing stopped."
+            })
+        else:
+            # LAUNCH
+            fresh_user = db.auth_user(auth.user.id)
+            current_balance = fresh_user.credits_balance or 0
+            
+            if current_balance < COST_DAY:
+                return json.dumps({
+                    'status': 'error', 
+                    'message': f"Insufficient fuel! Need {COST_DAY} credits."
+                })
+            
+            project.update_record(status='deployed')
+            return json.dumps({
+                'status': 'success', 
+                'new_status': 'deployed', 
+                'message': "Ship LAUNCHED! Consuming fuel daily."
+            })
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return json.dumps({'status': 'error', 'message': f"System Failure: {str(e)}"})
+
+def create_project():
+    """
+    1. Vérifie le solde (Coût: 10 crédits)
+    2. Crée le projet en base de données
+    3. Renvoie les infos pour l'affichage
+    """
+    import json
+    
+    # Récupérer le prompt utilisateur
+    prompt = request.vars.prompt or "New Project"
+    modifiers = request.vars.getlist('modifiers[]') # Liste des tags
+    
+    # 1. TENTATIVE DE PAIEMENT (10 Crédits)
+    # On utilise ta fonction blindée du modèle
+    # Note: On importe pas, c'est dispo globalement dans Web2py
+    if not wallet_spend_credits(auth.user.id, COST_AI_ACTION, "New Mission: " + prompt[:20]):
+        return json.dumps({'status': 'error', 'message': 'Fuel insufficient! Please recharge.'})
+    
+    # 2. CRÉATION DU PROJET
+    # On génère un titre court basé sur le prompt (Simulation IA pour l'instant)
+    title = prompt.split('.')[0][:40] 
+    if len(title) < 5: title = "New Undefined Ship"
+    
+    project_id = db.projects.insert(
+        title=title,
+        status='draft',
+        last_action=f"Initialized with: {', '.join(modifiers)}" if modifiers else "Initialized",
+        owner_id=auth.user.id
+    )
+    
+    # 3. RENVOI DES DONNÉES AU FRONT
+    new_project = {
+        'id': project_id,
+        'uid': db.projects(project_id).project_uid,
+        'title': title,
+        'status': 'draft',
+        'date': request.now.strftime("%d %b, %H:%M")
+    }
+    
+    return json.dumps({'status': 'success', 'project': new_project})
+
 
 def dashboard():
     if not auth.user:
@@ -341,6 +455,57 @@ def buy_credits():
 
 def support():
     return dict(message="Module Support en construction")
+
+
+
+def stripe_webhook():
+    import json
+    import stripe
+    """
+    Écoute les événements Stripe.
+    Si checkout.session.completed -> Ajoute les crédits au wallet.
+    """
+    payload = request.body.read()
+    sig_header = request.env.http_stripe_signature
+    event = None
+
+    # 1. Vérification de sécurité (Est-ce vraiment Stripe ?)
+    # Pour le moment, en local, on ne vérifie pas le 'endpoint_secret' strict 
+    # car on va utiliser le CLI. En prod, il faudra le configurer.
+    try:
+        event = stripe.Event.construct_from(
+            json.loads(payload), 
+            stripe.api_key
+        )
+    except ValueError as e:
+        raise HTTP(400, "Invalid payload")
+    except stripe.error.SignatureVerificationError as e:
+        raise HTTP(400, "Invalid signature")
+
+    # 2. Traitement de l'événement
+    if event['type'] == 'checkout.session.completed':
+        session = event['data']['object']
+        
+        # Récupération des infos critiques stockées dans les métadonnées
+        metadata = session.get('metadata', {})
+        user_id = metadata.get('user_id')
+        credits_to_add = int(metadata.get('credits_amount', 0))
+        pack_name = metadata.get('pack_name', 'Inconnu')
+        
+        # 3. Livraison des Crédits (via notre logique wallet)
+        if user_id and credits_to_add > 0:
+            # On ajoute les crédits !
+            wallet_add_credits(
+                user_id=user_id, 
+                amount=credits_to_add, 
+                description=f"Achat Stripe: {pack_name.capitalize()}"
+            )
+            
+            print(f"💰 SUCCÈS: {credits_to_add} crédits ajoutés pour User {user_id}")
+
+    # 4. Réponse obligatoire pour Stripe (sinon il réessaie pendant 3 jours)
+    return "Received"
+
 
 
 

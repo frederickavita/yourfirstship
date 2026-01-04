@@ -82,6 +82,13 @@
     </div>
 </div>
 
+<div id="toast-notification" class="fixed bottom-6 right-6 bg-slate-900 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-4 transform translate-y-32 transition-transform duration-300 z-50">
+    <div class="flex items-center gap-2">
+        <i data-lucide="check-circle" class="h-5 w-5 text-green-400"></i>
+        <span class="font-bold">Paiement réussi !</span>
+    </div>
+</div>
+
 <script type="text/python">
 from browser import document, html, window, ajax
 import json
@@ -127,7 +134,28 @@ def init():
         row <= html.TD(amt_str, Class=f"px-6 py-4 text-right {amt_cls}")
         
         tbody <= row
+    # 4. Init Lucide Icons
+    qs = window.location.search
+    if "payment=success" in qs:
+        # On affiche le Toast (déjà présent dans le HTML dashboard/layout)
+        toast = document['toast-notification']
+        # On change le texte et l'icône
+        toast.select_one('span').text = "Paiement réussi ! Moteurs ravitaillés."
+        toast.select_one('i').className = "text-green-400 h-5 w-5" # Icône verte
+        
+        # Animation d'entrée
+        toast.style.transform = "translateY(0)"
+        
+        # On cache après 5 secondes
+        def hide_toast():
+            toast.style.transform = "translateY(8rem)"
+            # Nettoyer l'URL pour ne pas réafficher le toast si on refresh
+            window.history.replaceState({}, "", window.location.pathname)
+            
+        timer.set_timeout(hide_toast, 5000)
 
+    elif "payment=cancel" in qs:
+        window.alert("Paiement annulé. Aucun montant n'a été débité.")
     if hasattr(window, 'lucide'): window.lucide.createIcons()
 
 def on_checkout_success(req):

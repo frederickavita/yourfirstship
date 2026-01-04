@@ -1,4 +1,7 @@
 # --- 3. TABLE PROJETS (Mise à jour avec project_uid) ---
+import uuid
+import datetime
+
 def generate_ship_id():
     return f"ship_{uuid.uuid4().hex[:8]}"
 
