@@ -186,8 +186,84 @@ def google_callback():
 
 def dashboard():
     if not auth.user:
-        redirect(URL('default', 'connect', args=['login']))
-    return dict()
+        redirect(URL('default', 'connect'))
+     # Récupère les projets de l'utilisateur connecté
+    import json
+    rows = db(db.projects.owner_id == auth.user.id).select(orderby=~db.projects.modified_on)
+    
+    projects_list = []
+    
+    for row in rows:
+        date_str = str(prettydate(row.modified_on, T)) 
+        
+        projects_list.append({
+            # CHANGED: row.uid -> row.project_uid
+            "id": row.project_uid,                  
+            "title": row.title,             
+            "status": row.status,           
+            "last_updated": date_str,
+            "last_action": row.last_action, 
+            "health_score": row.health_score
+        })
+    
+    projects_json = json.dumps(projects_list)
+    
+    return dict(
+        user=auth.user,
+        projects_json=projects_json,
+    )
+
+
+def treasury():
+    # --- MOCK DATA (À remplacer par vos appels DB / Stripe) ---
+    import json
+    # Simulation d'un utilisateur "Creator"
+    subscription = {
+        "plan_name": "Creator", # "Curious", "Creator", "Agency"
+        "price": 39,
+        "currency": "€",
+        "interval": "month",
+        "status": "active",
+        "renewal_date": (request.now + datetime.timedelta(days=12)).strftime("%d %b, %Y"),
+        "card_last4": "4242",
+        "card_brand": "Visa"
+    }
+    
+    # Simulation de la consommation (Le "Fuel")
+    usage = {
+        "credits_total": 500, # 500 pour Creator, 2500 pour Agency
+        "credits_used": 342,
+        "credits_remaining": 158,
+        # L'IA a analysé la tendance :
+        "ai_prediction": "Cruising speed detected. Fuel sufficient for ~8 days.",
+        "ai_status": "optimal" # optimal, warning, critical
+    }
+    
+    # Si plan gratuit, on change la logique d'affichage
+    if subscription['plan_name'] == 'Curious':
+        usage['credits_total'] = '∞'
+        usage['ai_prediction'] = "Demo Mode (Public). No limits, no export."
+
+    # Historique factures
+    invoices = [
+        {"id": "inv_1A2B3C", "date": "01 Jan, 2026", "amount": "39.00€", "status": "Paid", "pdf_url": "#"},
+        {"id": "inv_9X8Y7Z", "date": "01 Dec, 2025", "amount": "39.00€", "status": "Paid", "pdf_url": "#"},
+        {"id": "inv_TopUp1", "date": "15 Nov, 2025", "amount": "10.00€", "status": "Paid", "pdf_url": "#", "desc": "Booster Pack (250)"}
+    ]
+
+    # Sérialisation
+    data_json = json.dumps({
+        "sub": subscription,
+        "usage": usage,
+        "invoices": invoices
+    })
+
+    return dict(user=auth.user, 
+                data_json=data_json)
+
+
+def support():
+    return dict(message="Module Support en construction")
 
 
 
