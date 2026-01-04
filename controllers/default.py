@@ -214,6 +214,34 @@ def dashboard():
     )
 
 
+def populate_fake_data():
+    if not auth.user: return "Connectez-vous d'abord"
+    
+    # Nettoyage (Optionnel, pour éviter les doublons en dev)
+    # db(db.projects.owner_id == auth.user.id).delete()
+    
+    # Création projet 1 (Déployé)
+    db.projects.insert(
+        title="Dental CRM SaaS",
+        status="deployed",
+        last_action="Stripe webhook configured",
+        owner_id=auth.user.id,
+        health_score=98
+        # modified_on est auto, mais on peut le forcer si besoin pour tester les dates
+    )
+    
+    # Création projet 2 (Draft)
+    db.projects.insert(
+        title="Dog Walking Marketplace",
+        status="draft",
+        last_action="Database schema generated",
+        owner_id=auth.user.id,
+        health_score=45
+    )
+    
+    return "Données fictives générées ! Allez sur /dashboard"
+
+
 def treasury():
     # --- MOCK DATA (À remplacer par vos appels DB / Stripe) ---
     import json
