@@ -5,7 +5,7 @@ db.define_table('support_tickets',
     Field('owner_id', 'reference auth_user', default=auth.user_id),
     Field('project_ref', 'string'), # ID du projet concerné (ex: ship_a1b2...)
     Field('subject', 'string', requires=IS_NOT_EMPTY()),
-    Field('status', 'string', default='open', requires=IS_IN_SET(['open', 'resolved', 'escalated'])),
+    Field('status', 'string', default='open', requires=IS_IN_SET(['open', 'resolved', 'escalated', 'answered'])),
     Field('last_activity', 'datetime', default=request.now),
     Field('created_on', 'datetime', default=request.now),
     auth.signature

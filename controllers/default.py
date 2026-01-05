@@ -567,31 +567,36 @@ def create_ticket():
     # L'admin répondra via l'interface d'administration (appadmin ou autre).
     
     return json.dumps({'status': 'success', 'ticket_id': ticket_id})
-
 @auth.requires_login()
 def get_ticket_messages():
-    """
-    AJAX: Récupère la conversation.
-    """
     import json
     t_id = request.vars.ticket_id
     
-    # Sécurité
     ticket = db(db.support_tickets.id == t_id).select().first()
-    if not ticket or ticket.owner_id != auth.user.id:
-        return json.dumps({'error': 'Unauthorized'})
-    if ticket.status == 'answered':
-        ticket.update_record(status='open')    
+    
+    # Sécurité standard
+    if not ticket:
+        return json.dumps({'error': 'Not found'})
+
+    # --- CORRECTION ICI ---
+    # On marque comme "Lu" (Open) SEULEMENT si :
+    # 1. Le statut est "Answered"
+    # 2. ET c'est le PROPRIÉTAIRE du ticket (le client) qui regarde
+    
+    is_owner = (auth.user.id == ticket.owner_id)
+    
+    if ticket.status == 'answered' and is_owner:
+        ticket.update_record(status='open')
+    # ----------------------
+        
     messages = db(db.support_messages.ticket_id == t_id).select(orderby=db.support_messages.created_on)
     
     msgs_list = []
     for m in messages:
-        # On formate pour le frontend
-        sender_class = 'user' if m.sender_type == 'user' else 'human' # 'human' pour le support
-        
+        sender_class = 'user' if m.sender_type == 'user' else 'human'
         msgs_list.append({
             'sender': sender_class, 
-            'content': m.message_content,
+            'content': m.message_content, 
             'time': m.created_on.strftime("%H:%M")
         })
         
@@ -687,7 +692,7 @@ def admin_reply():
     ticket_id = request.vars.ticket_id
     content = request.vars.content
     action = request.vars.action # 'reply' ou 'close'
-    
+    print(content, action, ticket_id)
     if action == 'close':
         db(db.support_tickets.id == ticket_id).update(status='resolved')
         # On ajoute un petit message système de clôture
@@ -700,13 +705,14 @@ def admin_reply():
     
     # Si c'est une réponse
     if content:
+        print("Admin replying to ticket......................................")
         db.support_messages.insert(
-            ticket_id=ticket_id,
+            ticket_id=int(ticket_id),
             sender_type='human', # C'est toi ! (Bulle Blanche)
             message_content=content
         )
         # On rouvre le ticket si le client avait répondu et qu'on répond
-        db(db.support_tickets.id == ticket_id).update(
+        db(db.support_tickets.id == int(ticket_id)).update(
             last_activity=request.now,
             status='answered'
         )
