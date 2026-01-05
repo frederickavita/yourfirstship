@@ -848,6 +848,86 @@ def stripe_webhook():
     return 'success'
 
 
+# controllers/default.py
+
+@auth.requires_login()
+def profile():
+    """
+    Page de profil (Captain's Quarters).
+    Affiche les infos user et l'historique de sécurité.
+    """
+    import json
+    
+    # 1. Récupération de l'historique de connexion (via auth_event)
+    # Web2py enregistre automatiquement les logins si configuré
+    logs = db(db.auth_event.user_id == auth.user.id).select(
+        orderby=~db.auth_event.time_stamp, 
+        limitby=(0, 5)
+    )
+    utilisateur = db(db.auth_user.id == auth.user.id).select().first()
+    print(utilisateur.first_name)
+    security_log = []
+    for log in logs:
+        security_log.append({
+            'event': log.description,
+            'ip': log.client_ip,
+            'date': log.time_stamp.strftime("%d %b, %H:%M")
+        })
+        
+    # 2. Données Utilisateur pour le JS
+    user_data = {
+        'first_name': utilisateur.first_name,
+        'last_name': utilisateur.last_name,
+        'email': utilisateur.email,
+        'joined': utilisateur.created_at.strftime("%B %Y")
+    }
+
+    return dict(
+        user_json=json.dumps(user_data),
+        logs_json=json.dumps(security_log),
+        utilisateur=utilisateur
+    )
+
+@auth.requires_login()
+def update_profile_field():
+    """
+    AJAX: Sauvegarde un seul champ (Auto-save).
+    """
+    import json
+    field = request.vars.field
+    value = request.vars.value
+    
+    # Sécurité : On n'autorise que certains champs
+    allowed_fields = ['first_name', 'last_name']
+    
+    if field not in allowed_fields:
+        return json.dumps({'status': 'error', 'message': 'Field not allowed'})
+        
+    if not value or len(value.strip()) == 0:
+        return json.dumps({'status': 'error', 'message': 'Cannot be empty'})
+
+    # Mise à jour DB
+    db(db.auth_user.id == auth.user.id).update(**{field: value})
+    
+    # Mise à jour Session (pour que le header change tout de suite au prochain reload)
+    auth.user[field] = value
+    
+    return json.dumps({'status': 'success'})
+
+@auth.requires_login()
+def nuke_account():
+    """
+    DANGER ZONE: Supprime le compte et tout ce qui va avec.
+    """
+    import json
+    
+    # Web2py gère la suppression en cascade si les tables sont bien définies
+    # Sinon, on supprime manuellement l'user, le reste suivra ou restera orphelin
+    db(db.auth_user.id == auth.user.id).delete()
+    
+    auth.logout()
+    return json.dumps({'status': 'success', 'redirect': URL('default', 'index')})
+
 
 def logout():
     if session.custom_token:
