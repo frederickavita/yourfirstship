@@ -508,8 +508,211 @@ def buy_credits():
         import json
         return json.dumps({'error': str(e)})
 
+# controllers/default.py
+
+# ... (Le code précédent pour dashboard, treasury, etc. reste inchangé) ...
+
+# --- SECTION SUPPORT HUMAIN ---
+
+@auth.requires_login()
 def support():
-    return dict(message="Module Support en construction")
+    """
+    Page principale du Support (The Uplink).
+    """
+    import json
+    
+    # Récupérer l'historique
+    user_tickets = db(db.support_tickets.owner_id == auth.user.id).select(
+        orderby=~db.support_tickets.last_activity
+    )
+    
+    tickets_list = []
+    for t in user_tickets:
+        tickets_list.append({
+            'id': t.id,
+            'subject': t.subject,
+            'status': t.status, # 'open', 'resolved', etc.
+            'date': t.created_on.strftime("%d %b"),
+            'project': t.project_ref or "General"
+        })
+        
+    return dict(tickets_json=json.dumps(tickets_list))
+
+@auth.requires_login()
+def create_ticket():
+    """
+    AJAX: Crée un ticket Humain.
+    """
+    import json
+    
+    subject = request.vars.subject or "Technical Issue"
+    message = request.vars.message or ""
+    project_id = request.vars.project_id or "General"
+    
+    # 1. Création Ticket
+    ticket_id = db.support_tickets.insert(
+        subject=subject,
+        project_ref=project_id,
+        status='open' # Reste ouvert en attente d'un humain
+    )
+    
+    # 2. Message Utilisateur
+    db.support_messages.insert(
+        ticket_id=ticket_id,
+        sender_type='user',
+        message_content=message
+    )
+    
+    # PAS DE RÉPONSE AUTOMATIQUE ICI.
+    # L'admin répondra via l'interface d'administration (appadmin ou autre).
+    
+    return json.dumps({'status': 'success', 'ticket_id': ticket_id})
+
+@auth.requires_login()
+def get_ticket_messages():
+    """
+    AJAX: Récupère la conversation.
+    """
+    import json
+    t_id = request.vars.ticket_id
+    
+    # Sécurité
+    ticket = db(db.support_tickets.id == t_id).select().first()
+    if not ticket or ticket.owner_id != auth.user.id:
+        return json.dumps({'error': 'Unauthorized'})
+    if ticket.status == 'answered':
+        ticket.update_record(status='open')    
+    messages = db(db.support_messages.ticket_id == t_id).select(orderby=db.support_messages.created_on)
+    
+    msgs_list = []
+    for m in messages:
+        # On formate pour le frontend
+        sender_class = 'user' if m.sender_type == 'user' else 'human' # 'human' pour le support
+        
+        msgs_list.append({
+            'sender': sender_class, 
+            'content': m.message_content,
+            'time': m.created_on.strftime("%H:%M")
+        })
+        
+    return json.dumps({'messages': msgs_list, 'ticket_status': ticket.status})
+
+
+@auth.requires_login()
+def reply_to_ticket():
+    """
+    AJAX: Permet de répondre à un ticket.
+    ASTUCE DEV: Si le message commence par '/admin', on le poste en tant que Support.
+    """
+    import json
+    
+    ticket_id = request.vars.ticket_id
+    content = request.vars.content
+    
+    if not content or not ticket_id:
+        return json.dumps({'status': 'error'})
+
+    # --- LE CHEAT CODE ADMIN ---
+    if content.startswith('/admin'):
+        sender = 'human' # Le Support
+        clean_content = content.replace('/admin', '').strip() # On enlève la commande
+    else:
+        sender = 'user'  # L'utilisateur normal
+        clean_content = content
+    
+    # Enregistrement
+    db.support_messages.insert(
+        ticket_id=ticket_id,
+        sender_type=sender,
+        message_content=clean_content # Attention au nom de colonne qu'on a corrigé !
+    )
+    
+    # On met à jour la date de dernière activité du ticket
+    db(db.support_tickets.id == ticket_id).update(last_activity=request.now)
+    
+    return json.dumps({'status': 'success'})
+
+
+# controllers/default.py
+
+@auth.requires_login()
+def admin_uplink():
+    """
+    BACK-OFFICE : Vue réservée à l'Administrateur (Toi).
+    Affiche TOUS les tickets de TOUT LE MONDE.
+    """
+    # SÉCURITÉ : Seul l'utilisateur ID 1 (Toi) ou un membre du groupe admin peut voir ça
+    # Pour l'instant, on fait simple : ID 1
+    if auth.user.id != 1:
+        redirect(URL('default', 'index'))
+        
+    import json
+    
+    # On récupère TOUS les tickets, du plus récent au plus vieux
+    # On fait une jointure pour avoir le Prénom/Nom du client
+    rows = db(db.support_tickets.owner_id == db.auth_user.id).select(
+        db.support_tickets.ALL,
+        db.auth_user.first_name,
+        db.auth_user.last_name,
+        db.auth_user.email,
+        orderby=~db.support_tickets.last_activity
+    )
+    
+    all_tickets = []
+    for row in rows:
+        t = row.support_tickets
+        u = row.auth_user
+        
+        all_tickets.append({
+            'id': t.id,
+            'subject': t.subject,
+            'status': t.status,
+            'date': t.created_on.strftime("%d/%m %H:%M"),
+            'client_name': f"{u.first_name} {u.last_name}", # On veut savoir QUI parle
+            'client_email': u.email
+        })
+        
+    return dict(tickets_json=json.dumps(all_tickets))
+
+@auth.requires_login()
+def admin_reply():
+    """
+    AJAX: Réponse officielle du Support (Toi).
+    """
+    import json
+    
+    # Sécurité Admin
+    if auth.user.id != 1: return json.dumps({'status': 'error'})
+    
+    ticket_id = request.vars.ticket_id
+    content = request.vars.content
+    action = request.vars.action # 'reply' ou 'close'
+    
+    if action == 'close':
+        db(db.support_tickets.id == ticket_id).update(status='resolved')
+        # On ajoute un petit message système de clôture
+        db.support_messages.insert(
+            ticket_id=ticket_id,
+            sender_type='system',
+            message_content="Ticket marked as RESOLVED by Support."
+        )
+        return json.dumps({'status': 'closed'})
+    
+    # Si c'est une réponse
+    if content:
+        db.support_messages.insert(
+            ticket_id=ticket_id,
+            sender_type='human', # C'est toi ! (Bulle Blanche)
+            message_content=content
+        )
+        # On rouvre le ticket si le client avait répondu et qu'on répond
+        db(db.support_tickets.id == ticket_id).update(
+            last_activity=request.now,
+            status='answered'
+        )
+        
+    return json.dumps({'status': 'success'})
+
 
 def stripe_webhook():
     import json

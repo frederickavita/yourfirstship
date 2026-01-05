@@ -1,0 +1,182 @@
+{{extend 'malayout.html'}}
+
+<script id="admin-tickets" type="application/json">
+    {{=XML(tickets_json)}}
+</script>
+
+<div class="flex h-screen bg-slate-900 font-sans text-slate-100 overflow-hidden">
+
+    <div class="w-96 bg-slate-900 border-r border-slate-800 flex flex-col">
+        <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-950">
+            <h2 class="font-bold text-slate-100 flex items-center gap-2">
+                <i data-lucide="shield-alert" class="h-5 w-5 text-red-500"></i>
+                ADMIN CONSOLE
+            </h2>
+            <span class="text-[10px] bg-red-900 text-red-100 px-2 py-1 rounded-full animate-pulse">LIVE</span>
+        </div>
+        <div class="flex-1 overflow-y-auto" id="admin-ticket-list">
+            </div>
+    </div>
+
+    <div class="flex-1 flex flex-col bg-slate-900 relative">
+        
+        <div id="admin-empty" class="flex-1 flex flex-col items-center justify-center text-slate-500">
+            <i data-lucide="radar" class="h-16 w-16 mb-4 opacity-20"></i>
+            <p>Scanning frequencies...</p>
+            <p class="text-xs">Select a distress signal.</p>
+        </div>
+
+        <div id="admin-chat" class="hidden flex-1 flex flex-col h-full bg-slate-800/50">
+            
+            <div class="h-16 bg-slate-900 border-b border-slate-800 flex items-center px-6 justify-between shrink-0">
+                <div>
+                    <h3 class="font-bold text-white text-lg flex items-center gap-2">
+                        <span id="t-subject">Subject</span>
+                        <span id="t-status" class="text-[10px] px-2 py-0.5 rounded bg-slate-700">STATUS</span>
+                    </h3>
+                    <p class="text-xs text-slate-400">Client: <span id="t-client" class="text-indigo-400 font-bold">Name</span></p>
+                </div>
+                <button id="btn-close-ticket" class="bg-slate-800 hover:bg-green-900 text-slate-300 hover:text-green-400 border border-slate-700 px-4 py-2 rounded text-xs font-bold transition flex items-center gap-2">
+                    <i data-lucide="check" class="h-4 w-4"></i> Mark Resolved
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-6 space-y-6" id="admin-messages"></div>
+
+            <div class="p-4 bg-slate-900 border-t border-slate-800 shrink-0">
+                <div class="flex gap-2">
+                    <textarea id="admin-reply-input" rows="2" placeholder="Reply as Support Engineer..." class="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-sm text-white focus:ring-2 focus:ring-indigo-500 outline-none resize-none"></textarea>
+                    <button id="btn-admin-send" class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 rounded-lg font-bold">
+                        Send
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/python">
+from browser import document, html, window, ajax, timer
+import json
+
+URLS = {
+    'get_msgs': "{{=URL('default', 'get_ticket_messages')}}",
+    'reply': "{{=URL('default', 'admin_reply')}}"
+}
+
+app_state = {
+    'tickets': [],
+    'current_id': None
+}
+
+def init():
+    try:
+        app_state['tickets'] = json.loads(document['admin-tickets'].text)
+    except:
+        app_state['tickets'] = []
+
+    document['btn-admin-send'].bind('click', handle_reply)
+    document['btn-close-ticket'].bind('click', handle_close)
+    
+    render_list()
+    if hasattr(window, 'lucide'): window.lucide.createIcons()
+
+def render_list():
+    container = document['admin-ticket-list']
+    container.clear()
+    
+    for t in app_state['tickets']:
+        is_active = (t['id'] == app_state['current_id'])
+        bg_cls = "bg-slate-800 border-l-4 border-indigo-500" if is_active else "hover:bg-slate-800 border-l-4 border-transparent"
+        
+        item = html.DIV(Class=f"p-4 cursor-pointer transition border-b border-slate-800 {bg_cls}")
+        
+        # Ligne 1 : Sujet + Date
+        h = html.DIV(Class="flex justify-between mb-1")
+        h <= html.SPAN(t['subject'], Class="font-bold text-sm text-white truncate w-2/3")
+        h <= html.SPAN(t['date'], Class="text-[10px] text-slate-500")
+        item <= h
+        
+        # Ligne 2 : Client + Statut
+        f = html.DIV(Class="flex justify-between items-center")
+        f <= html.SPAN(t['client_name'], Class="text-xs text-indigo-400 font-medium")
+        
+        # Badge Statut
+        s_col = "text-green-400" if t['status'] == 'resolved' else "text-amber-400"
+        f <= html.SPAN(t['status'], Class=f"text-[10px] uppercase font-bold {s_col}")
+        
+        item <= f
+        
+        item.bind('click', lambda ev, tid=t['id']: load_ticket(tid))
+        container <= item
+
+def load_ticket(tid):
+    app_state['current_id'] = tid
+    render_list() # refresh active state
+    
+    document['admin-empty'].classList.add('hidden')
+    document['admin-chat'].classList.remove('hidden')
+    
+    # Update Header Info
+    t_data = next((t for t in app_state['tickets'] if t['id'] == tid), None)
+    if t_data:
+        document['t-subject'].text = f"#{tid} - {t_data['subject']}"
+        document['t-client'].text = f"{t_data['client_name']} ({t_data['client_email']})"
+        document['t-status'].text = t_data['status']
+
+    # Fetch messages
+    req = ajax.ajax()
+    req.bind('complete', render_chat)
+    req.open('POST', URLS['get_msgs'], True)
+    req.set_header('content-type', 'application/x-www-form-urlencoded')
+    req.send({'ticket_id': tid})
+
+def render_chat(req):
+    data = json.loads(req.text)
+    container = document['admin-messages']
+    container.clear()
+    
+    for m in data['messages']:
+        # LOGIQUE INVERSÉE : Ici "user" est à gauche (le client), "human" (Toi) est à droite
+        is_me = (m['sender'] == 'human' or m['sender'] == 'ai') 
+        
+        wrapper = html.DIV(Class="flex w-full mb-4")
+        
+        if is_me:
+            wrapper.classList.add("justify-end")
+            bubble = html.DIV(Class="bg-indigo-600 text-white rounded-2xl rounded-tr-sm px-4 py-2 max-w-[80%]")
+            meta = html.DIV(f"SUPPORT • {m['time']}", Class="text-[9px] text-indigo-200 mb-1 text-right")
+        else:
+            wrapper.classList.add("justify-start")
+            bubble = html.DIV(Class="bg-slate-700 text-slate-200 rounded-2xl rounded-tl-sm px-4 py-2 max-w-[80%]")
+            meta = html.DIV(f"CLIENT • {m['time']}", Class="text-[9px] text-slate-400 mb-1")
+            
+        content = html.DIV(m['content'], Class="text-sm whitespace-pre-wrap")
+        
+        bubble <= meta
+        bubble <= content
+        wrapper <= bubble
+        container <= wrapper
+        
+    container.scrollTop = container.scrollHeight
+
+def handle_reply(ev):
+    content = document['admin-reply-input'].value.strip()
+    if not content: return
+    
+    send_admin_action(content, 'reply')
+    document['admin-reply-input'].value = ""
+
+def handle_close(ev):
+    if window.confirm("Close this ticket?"):
+        send_admin_action("", "close")
+
+def send_admin_action(content, action):
+    req = ajax.ajax()
+    req.bind('complete', lambda r: load_ticket(app_state['current_id']))
+    req.open('POST', URLS['reply'], True)
+    req.set_header('content-type', 'application/x-www-form-urlencoded')
+    req.send({'ticket_id': app_state['current_id'], 'content': content, 'action': action})
+
+init()
+</script>
