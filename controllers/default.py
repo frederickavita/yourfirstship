@@ -46,7 +46,6 @@ def connect():
         # Changement effectif (Nouveau mot de passe + Confirm)
         # Web2py vérifie la clé 'key' dans l'URL automatiquement ici
         form = auth.reset_password()
-        print(form)
     else:
         redirect(URL('default', 'connect', args=['login']))
     
@@ -895,6 +894,23 @@ def profile():
     )
 
 @auth.requires_login()
+def security():
+    """
+    Page dédiée au changement de mot de passe et sécurité.
+    Garde le layout de l'application.
+    """
+    # Génère le formulaire standard
+    form = auth.change_password()
+    
+    # On personnalise un peu le style du formulaire Web2py pour Tailwind
+    if form:
+        form['_class'] = 'space-y-6 max-w-lg' # Espacement vertical
+        # On peut rediriger vers le profil après succès
+    return dict(form=form)
+
+
+
+@auth.requires_login()
 def update_profile_field():
     """
     AJAX: Sauvegarde un seul champ (Auto-save).
@@ -920,19 +936,29 @@ def update_profile_field():
     
     return json.dumps({'status': 'success'})
 
+
 @auth.requires_login()
 def nuke_account():
     """
-    DANGER ZONE: Supprime le compte et tout ce qui va avec.
+    DANGER ZONE: Soft Delete.
+    L'utilisateur ne pourra plus se connecter, mais ses données restent pour l'historique.
     """
     import json
     
-    # Web2py gère la suppression en cascade si les tables sont bien définies
-    # Sinon, on supprime manuellement l'user, le reste suivra ou restera orphelin
-    db(db.auth_user.id == auth.user.id).delete()
+    # 1. SOFT DELETE
+    # status='deleted' : Pour tes stats (nécessite la modif du modèle étape 1)
+    # registration_key='blocked' : C'est LA sécurité Web2py. Un user avec cette clé ne peut pas se loguer.
+    db(db.auth_user.id == auth.user.id).update(
+        status='deleted',
+        registration_key='blocked' 
+    )
     
+    # 2. Déconnexion immédiate
     auth.logout()
-    return json.dumps({'status': 'success', 'redirect': URL('default', 'index')})
+    
+    # 3. Redirection vers l'accueil
+    return json.dumps({'status': 'success', 'redirect': URL('default', 'home')})
+
 
 
 def logout():

@@ -78,9 +78,9 @@
                                 <p class="text-sm font-bold text-slate-700">Access Code</p>
                                 <p class="text-xs text-slate-500">Last changed: Unknown</p>
                             </div>
-                            <a href="{{=URL('default', 'connect', args=['change_password'])}}" class="text-xs bg-white border border-slate-300 text-slate-600 px-3 py-1.5 rounded font-bold hover:bg-slate-50 transition">
-                                Reset Password
-                            </a>
+                           <a href="{{=URL('default', 'security')}}" class="text-xs bg-white border border-slate-300 text-slate-600 px-3 py-1.5 rounded font-bold hover:bg-slate-50 transition flex items-center gap-2">
+    <i data-lucide="key" class="h-3 w-3"></i> Reset Password
+</a>
                         </div>
 
                         <div>
@@ -224,7 +224,7 @@ def on_nuke_complete(req):
     try:
         res = json.loads(req.text)
         if res['status'] == 'success':
-            window.location.href = res['redirect']
+            document['logout'].click()
     except:
         window.alert("Scuttle failed. Hull too strong.")
 

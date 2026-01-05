@@ -128,7 +128,7 @@ auth.settings.extra_fields["auth_user"] = [
     Field('stripe_customer_id', 'string', writable=False, readable=False),
     Field('google_id', 'string', writable=False, readable=False),
     Field('public_id', 'string', default=lambda: f"acc_{secrets.token_hex(12)}", writable=False, readable=False),
-    Field('status', 'string', default='active', requires=IS_IN_SET(['active', 'inactive', 'suspended', 'pending_verification']), writable=False, readable=False),
+    Field('status', 'string', default='active', requires=IS_IN_SET(['active', 'inactive', 'suspended', 'pending_verification', 'deleted']), writable=False, readable=False),
     Field('failed_login_attempts', 'integer', default=0),
     Field('last_login_at', 'datetime'),
     # Timestamps standards
@@ -209,6 +209,7 @@ auth.settings.registration_requires_verification = False
 auth.settings.registration_requires_approval = False
 auth.settings.reset_password_requires_verification = True
 auth.settings.login_next = URL('default', 'dashboard')
+auth.settings.change_password_next = URL('profile')
 auth.settings.register_next = URL('default', 'dashboard')
 auth.settings.logout_next = URL('default', 'connect', args=['login'])
 auth.settings.login_onaccept.append(record_login_session) 
