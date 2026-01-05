@@ -35,20 +35,20 @@
 
     <div class="flex-1 flex flex-col overflow-hidden relative">
         {{ page_title = "Fuel & Credits" }}
-    {{include 'header.html'}}
+        {{include 'header.html'}}
 
         <main class="flex-1 overflow-y-auto p-6 bg-slate-50">
             
             <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 mb-6 relative overflow-hidden">
                 <div class="flex justify-between items-end mb-4 relative z-10">
                     <div>
-                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Solde Actuel</p>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Current Balance</p>
                         <h2 class="text-4xl font-black text-slate-900" id="balance-display">0</h2>
-                        <p class="text-indigo-500 font-bold text-xs mt-1">Crédits Disponibles</p>
+                        <p class="text-indigo-500 font-bold text-xs mt-1">Available Credits</p>
                     </div>
                     <div class="text-right">
                         <div class="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
-                            <p class="text-[10px] text-slate-500 font-bold uppercase">Autonomie Estimée</p>
+                            <p class="text-[10px] text-slate-500 font-bold uppercase">Estimated Range</p>
                             <p class="text-xs font-medium text-slate-700 mt-1" id="prediction-text">Calculating...</p>
                         </div>
                     </div>
@@ -58,13 +58,15 @@
                 </div>
             </div>
 
-            <h3 class="text-sm font-bold text-slate-800 mb-3 uppercase tracking-wide">Recharger le Moteur</h3>
+            <h3 class="text-sm font-bold text-slate-800 mb-3 uppercase tracking-wide">Refuel Reactor</h3>
+            
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 group cursor-pointer" onclick="buyPack('starter')">
+    
+                <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 group">
                     <div class="flex justify-between items-start">
                         <div>
                             <h4 class="font-bold text-sm text-slate-700">Starter Pack</h4>
-                            <p class="text-indigo-600 font-bold text-xs">+ 1,000 Crédits</p>
+                            <p class="text-indigo-600 font-bold text-xs">+ 1,000 Credits</p>
                         </div>
                         <div class="h-8 w-8 bg-slate-50 rounded-full flex items-center justify-center group-hover:bg-indigo-50 group-hover:text-indigo-600 transition">
                             <i data-lucide="battery" class="h-4 w-4"></i>
@@ -72,16 +74,18 @@
                     </div>
                     <div class="mt-3 flex justify-between items-center">
                         <p class="text-xl font-bold">10$</p>
-                        <button class="px-3 py-1 rounded bg-slate-50 border border-slate-200 text-xs font-bold text-slate-600 group-hover:border-indigo-200 group-hover:text-indigo-600 transition">Acheter</button>
+                        <button id="btn-starter" onclick="buyPack('starter')" class="px-4 py-1.5 rounded bg-slate-50 border border-slate-200 text-xs font-bold text-slate-600 hover:border-indigo-200 hover:text-indigo-600 transition flex items-center gap-2 justify-center min-w-[80px]">
+                            Buy
+                        </button>
                     </div>
                 </div>
 
-                 <div class="bg-slate-900 p-4 rounded-lg border border-slate-800 shadow-lg transform scale-105 relative overflow-hidden cursor-pointer" onclick="buyPack('builder')">
+                <div class="bg-slate-900 p-4 rounded-lg border border-slate-800 shadow-lg transform scale-105 relative overflow-hidden">
                     <div class="absolute top-0 right-0 bg-indigo-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg uppercase">Best</div>
                     <div class="flex justify-between items-start">
                         <div>
                             <h4 class="font-bold text-sm text-white">Builder Pack</h4>
-                            <p class="text-green-400 font-bold text-xs">+ 5,000 Crédits</p>
+                            <p class="text-green-400 font-bold text-xs">+ 5,000 Credits</p>
                         </div>
                         <div class="h-8 w-8 bg-slate-800 rounded-full flex items-center justify-center text-indigo-400">
                             <i data-lucide="battery-charging" class="h-4 w-4"></i>
@@ -89,15 +93,17 @@
                     </div>
                     <div class="mt-3 flex justify-between items-center">
                         <p class="text-xl font-bold text-white">39$</p>
-                        <button class="px-3 py-1 rounded bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition shadow-lg shadow-indigo-900/50">Acheter</button>
+                        <button id="btn-builder" onclick="buyPack('builder')" class="px-4 py-1.5 rounded bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition shadow-lg shadow-indigo-900/50 flex items-center gap-2 justify-center min-w-[80px]">
+                            Buy
+                        </button>
                     </div>
                 </div>
 
-                <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 group cursor-pointer" onclick="buyPack('agency')">
+                <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 group">
                     <div class="flex justify-between items-start">
                         <div>
                             <h4 class="font-bold text-sm text-slate-700">Agency Pack</h4>
-                            <p class="text-purple-600 font-bold text-xs">+ 20,000 Crédits</p>
+                            <p class="text-purple-600 font-bold text-xs">+ 20,000 Credits</p>
                         </div>
                         <div class="h-8 w-8 bg-slate-50 rounded-full flex items-center justify-center group-hover:bg-purple-50 group-hover:text-purple-600 transition">
                             <i data-lucide="battery-full" class="h-4 w-4"></i>
@@ -105,17 +111,19 @@
                     </div>
                     <div class="mt-3 flex justify-between items-center">
                         <p class="text-xl font-bold">129$</p>
-                        <button class="px-3 py-1 rounded bg-slate-50 border border-slate-200 text-xs font-bold text-slate-600 group-hover:border-purple-200 group-hover:text-purple-600 transition">Acheter</button>
+                        <button id="btn-agency" onclick="buyPack('agency')" class="px-4 py-1.5 rounded bg-slate-50 border border-slate-200 text-xs font-bold text-slate-600 hover:border-purple-200 hover:text-purple-600 transition flex items-center gap-2 justify-center min-w-[80px]">
+                            Buy
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <h3 class="text-sm font-bold text-slate-800 mb-3 uppercase tracking-wide">Historique</h3>
+            <h3 class="text-sm font-bold text-slate-800 mb-3 uppercase tracking-wide">History</h3>
             
             <div class="bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col h-96">
                 <div class="px-4 py-3 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center shrink-0">
-                    <span class="text-xs font-bold text-slate-500 uppercase">Dernières opérations</span>
-                    <button class="text-[10px] text-indigo-500 font-bold hover:underline">Tout voir</button>
+                    <span class="text-xs font-bold text-slate-500 uppercase">Recent Transactions</span>
+                    <button class="text-[10px] text-indigo-500 font-bold hover:underline">View All</button>
                 </div>
 
                 <div class="overflow-y-auto flex-1 p-0 custom-scrollbar">
@@ -196,7 +204,7 @@
 <div id="toast-notification" class="fixed bottom-6 right-6 bg-slate-900 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-4 transform translate-y-32 transition-transform duration-300 z-50">
     <div class="flex items-center gap-2">
         <i data-lucide="check-circle" class="h-5 w-5 text-green-400"></i>
-        <span class="font-bold">Paiement réussi !</span>
+        <span class="font-bold">Payment successful!</span>
     </div>
 </div>
 
@@ -250,11 +258,9 @@ def render_history(history):
         # 4. BOUTON IMPRIMER
         print_cell = html.TD(Class="px-4 py-3 text-right w-12")
         
-        # On affiche le bouton seulement si c'est un achat positif (Pack)
         if is_positive: 
-            btn_print = html.BUTTON(Class="text-indigo-400 hover:text-indigo-600 p-2 rounded hover:bg-indigo-50 transition", Title="Télécharger Facture")
+            btn_print = html.BUTTON(Class="text-indigo-400 hover:text-indigo-600 p-2 rounded hover:bg-indigo-50 transition", Title="Download Invoice")
             btn_print <= html.I(**{'data-lucide': 'printer', 'class': 'h-4 w-4'})
-            # IMPORTANT: On passe 'item' qui contient maintenant 'ref', 'address', etc.
             btn_print.bind('click', lambda ev, i=item: print_invoice(i))
             print_cell <= btn_print
         
@@ -265,39 +271,49 @@ def render_history(history):
         window.lucide.createIcons()
 
 def print_invoice(item):
-    """
-    Remplit le template avec les données reçues du contrôleur
-    puis lance l'impression.
-    """
-    # 1. Mapping des données JSON -> HTML IDs
-    # On utilise .get('', '...') pour éviter les crashs si une donnée manque
     document['inv-date'].text = item.get('full_date', item['date'])
     document['inv-ref'].text = item.get('ref', 'REF-???')
-    
     document['inv-client-name'].text = item.get('billing_name', 'Client')
     document['inv-client-address'].text = item.get('billing_address', '')
-    
     document['inv-pack'].text = item.get('pack', item['desc'])
     document['inv-amount'].text = item.get('display_amount', str(item['amount']))
-    
     document['inv-tax'].text = item.get('tax', '0.00')
     document['inv-total'].text = item.get('total', str(item['amount']))
-    
-    # 2. Lancer l'impression
-    # Le CSS @media print s'occupe de cacher le dashboard et d'afficher #invoice-template
     window.print()
 
 def handle_toast():
     qs = window.location.search
     if "payment=success" in qs:
-        show_toast("Paiement réussi !", "check-circle", "text-green-400")
+        # Vert pour le succès
+        show_toast("Payment successful!", "text-green-500")
+        clean_url()
     elif "payment=cancel" in qs:
-        window.alert("Paiement annulé.")
+        # Orange/Amber pour l'annulation (Bien mieux que l'alerte !)
+        show_toast("Payment cancelled.", "text-amber-500")
+        clean_url()
 
-def show_toast(msg, icon, color):
+def clean_url():
+    new_url = window.location.pathname
+    window.history.replaceState({}, '', new_url)
+
+def show_toast(msg, color):
+    """
+    Affiche le toast avec la bonne couleur.
+    Note: On ne change pas l'icône (forme) car Lucide l'a déjà transformée en SVG,
+    mais on change sa couleur, ce qui suffit pour indiquer l'état.
+    """
     toast = document['toast-notification']
     toast.select_one('span').text = msg
-    toast.select_one('i').className = f"{color} h-5 w-5"
+    
+    # Astuce : Lucide remplace <i> par <svg>, donc on cherche le SVG
+    # S'il n'est pas encore là (rare), on cherche le i
+    icon = toast.select_one('svg') or toast.select_one('i')
+    
+    if icon:
+        # On force la couleur demandée + taille fixe
+        # "class" est un mot réservé en Python, on utilise attrs['class'] ou className
+        icon.attrs['class'] = f"h-5 w-5 {color}"
+        
     toast.style.transform = "translateY(0)"
     timer.set_timeout(lambda: setattr(toast.style, 'transform', "translateY(8rem)"), 5000)
 
@@ -306,15 +322,63 @@ def on_checkout_success(req):
         data = json.loads(req.text)
         window.location.href = data['url']
     except:
-        window.alert("Erreur Checkout")
+        # Rouge pour l'erreur technique
+        show_toast("Checkout Error", "text-red-500")
 
 def buy_pack_click(pack_id):
-    document.body.style.cursor = "wait"
+    # 1. On récupère le bouton spécifique grâce à son ID
+    btn_id = f"btn-{pack_id}"
+    if btn_id in document:
+        btn = document[btn_id]
+        
+        # 2. On fige la largeur pour éviter que le bouton ne change de taille
+        # (optionnel mais plus joli)
+        current_width = btn.offsetWidth
+        btn.style.width = f"{current_width}px"
+        
+        # 3. On injecte le spinner SVG
+        # On utilise 'text-current' pour que le spinner prenne la couleur du texte (blanc ou gris)
+        btn.html = """
+        <svg class="animate-spin h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        """
+        
+        # 4. On désactive le bouton pour éviter le double-clic
+        btn.disabled = True
+        btn.classList.add("cursor-not-allowed", "opacity-75")
+
+    # 5. On lance la requête AJAX habituelle
     req = ajax.ajax()
-    req.bind('complete', on_checkout_success)
+    req.bind('complete', lambda r: on_checkout_complete(r, pack_id)) # J'ai changé le handler pour gérer le retour
     req.open('POST', "{{=URL('default', 'buy_credits')}}", True)
     req.set_header('content-type', 'application/x-www-form-urlencoded')
     req.send({'pack': pack_id})
+
+# Nouvelle fonction intermédiaire pour gérer le cas d'erreur et réactiver le bouton
+def on_checkout_complete(req, pack_id):
+    try:
+        data = json.loads(req.text)
+        if 'url' in data:
+            window.location.href = data['url']
+        else:
+            # Cas d'erreur géré par le backend
+            reset_button(pack_id)
+            show_toast(data.get('error', 'Error'), "text-red-500")
+    except:
+        reset_button(pack_id)
+        show_toast("Checkout Error", "text-red-500")
+
+def reset_button(pack_id):
+    # En cas d'erreur, on remet le bouton comme avant
+    btn_id = f"btn-{pack_id}"
+    if btn_id in document:
+        btn = document[btn_id]
+        btn.text = "Acheter"
+        btn.disabled = False
+        btn.classList.remove("cursor-not-allowed", "opacity-75")
+        btn.style.width = "" # Reset width
 
 window.buyPack = buy_pack_click
 init()

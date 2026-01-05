@@ -32,6 +32,15 @@
                     boxShadow: {
                         'soft': '0 4px 10px rgba(0,0,0,0.05)', /* Source: .dashboard-preview box-shadow */
                         'glow': '0 0 15px rgba(74, 144, 226, 0.3)',
+                    },
+                    animation: {
+                        'fade-out': 'fadeOut 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeOut: {
+                            '0%': { opacity: '1' },
+                            '100%': { opacity: '0', visibility: 'hidden' },
+                        }
                     }
                 }
             }
@@ -54,16 +63,86 @@
             100% { transform: translateY(0px); }
         }
         .animate-float { animation: float 6s ease-in-out infinite; }
+        
+        /* Loader transition class */
+        .loader-hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
     </style>
 </head>
 
 {{if auth.user:}}
-<body onload="brython()" class="antialiased flex flex-col min-h-screen">
-{{else:}}
-<body class="antialiased flex flex-col min-h-screen">   
+<body onload="brython()" class="antialiased flex flex-col min-h-screen overflow-hidden"> {{else:}}
+<body class="antialiased flex flex-col min-h-screen overflow-hidden">   
 {{pass}}    
 
-{{include}}
+    <div id="global-loader" class="fixed inset-0 z-[9999] bg-[#f9fafa] flex flex-col items-center justify-center transition-all duration-700 ease-out">
+        <div class="relative flex items-center justify-center ">
+            <div class="h-16 w-16 rounded-full border-4 border-slate-200 border-t-indigo-600 animate-spin"></div>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <i data-lucide="rocket" class="h-6 w-6 text-indigo-600"></i>
+            </div>
+        </div>
+        <p class="mt-4 text-xs font-bold text-slate-400 tracking-widest uppercase animate-pulse">System Check...</p>
+    </div>
+    {{include}}
+
+    <script>
+        window.addEventListener('load', function() {
+            const loader = document.getElementById('global-loader');
+            const body = document.body;
+            
+            // On laisse un tout petit délai pour que l'oeil voit le logo (effet psy)
+            setTimeout(() => {
+                loader.classList.add('loader-hidden');
+                body.classList.remove('overflow-hidden'); // Réactive le scroll
+                
+                // On initialise les icônes Lucide si elles ne sont pas encore là
+                if(typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            }, 500); // 0.5 seconde de délai minimum
+        });
+    </script>
+
+
+{{if response.flash and request.function != 'connect':}}
+<div id="flash-toast" class="fixed bottom-6 right-6 z-[10000] bg-slate-900 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 animate-bounce-in min-w-[300px] border border-slate-700">
+    <div class="h-8 w-8 rounded-full bg-indigo-600 flex items-center justify-center shrink-0">
+        <i data-lucide="bell" class="h-4 w-4 text-white"></i>
+    </div>
+    <div class="flex-1">
+        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">System Message</h4>
+        <p class="text-sm font-medium">{{=response.flash}}</p>
+    </div>
+    <button onclick="document.getElementById('flash-toast').remove()" class="text-slate-500 hover:text-white transition">
+        <i data-lucide="x" class="h-4 w-4"></i>
+    </button>
+</div>
+
+<script>
+    // Disparition auto après 5 secondes
+    setTimeout(() => {
+        const toast = document.getElementById('flash-toast');
+        if(toast) {
+            toast.style.transition = "all 0.5s ease";
+            toast.style.opacity = "0";
+            toast.style.transform = "translateY(20px)";
+            setTimeout(() => toast.remove(), 500);
+        }
+    }, 5000);
+</script>
+
+<style>
+    @keyframes slideInUp {
+        from { transform: translateY(100%); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    .animate-bounce-in { animation: slideInUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+</style>
+{{pass}}
 
 </body>
 

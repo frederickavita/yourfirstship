@@ -15,21 +15,21 @@
         {{ page_title = "Captain's Log" }}
         {{include 'header.html'}}
 
-        <main class="flex-1 overflow-y-auto p-8 bg-slate-50 scroll-smooth">
+        <main class="flex-1 overflow-y-auto p-8 bg-slate-50 scroll-smooth relative">
             
             <div class="max-w-4xl mx-auto">
                 
                 <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm flex items-center gap-6 mb-8">
                     <div class="h-20 w-20 rounded-full bg-indigo-600 text-white flex items-center justify-center text-2xl font-bold shadow-lg shadow-indigo-200">
-                        {{=utilisateur.first_name[0]}}
+                        {{=auth.user.first_name[0]}}
                     </div>
                     <div>
-                        <h2 class="text-2xl font-bold text-slate-800">{{=utilisateur.first_name}} {{=utilisateur.last_name}}</h2>
+                        <h2 class="text-2xl font-bold text-slate-800">{{=auth.user.first_name}} {{=auth.user.last_name}}</h2>
                         <div class="flex items-center gap-2 text-sm text-slate-500 mt-1">
                             <i data-lucide="award" class="h-4 w-4 text-amber-500"></i>
                             <span>Fleet Commander</span>
                             <span class="mx-2">•</span>
-                            <span>Member since {{=utilisateur.created_at.strftime("%B %Y")}}</span>
+                            <span>Member since {{=auth.user.created_at.strftime("%B %Y")}}</span>
                         </div>
                     </div>
                 </div>
@@ -46,8 +46,7 @@
                             <input type="text" id="inp-first_name" 
                                    class="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none"
                                    placeholder="Your First Name">
-                            <div id="status-first_name" class="absolute right-3 top-8 text-xs font-bold transition-opacity opacity-0">
-                                </div>
+                            <div id="status-first_name" class="absolute right-3 top-8 text-xs font-bold transition-opacity opacity-0"></div>
                         </div>
 
                         <div class="relative group">
@@ -78,9 +77,9 @@
                                 <p class="text-sm font-bold text-slate-700">Access Code</p>
                                 <p class="text-xs text-slate-500">Last changed: Unknown</p>
                             </div>
-                           <a href="{{=URL('default', 'security')}}" class="text-xs bg-white border border-slate-300 text-slate-600 px-3 py-1.5 rounded font-bold hover:bg-slate-50 transition flex items-center gap-2">
-    <i data-lucide="key" class="h-3 w-3"></i> Reset Password
-</a>
+                            <a href="{{=URL('default', 'security')}}" class="text-xs bg-white border border-slate-300 text-slate-600 px-3 py-1.5 rounded font-bold hover:bg-slate-50 transition flex items-center gap-2">
+                                <i data-lucide="key" class="h-3 w-3"></i> Reset Password
+                            </a>
                         </div>
 
                         <div>
@@ -100,7 +99,7 @@
                             <h4 class="font-bold text-red-900 text-sm">Scuttle Ship (Delete Account)</h4>
                             <p class="text-xs text-red-700 mt-1">This action is irreversible. All projects, credits, and data will be incinerated.</p>
                         </div>
-                        <button id="btn-nuke" class="bg-white border border-red-200 text-red-600 hover:bg-red-600 hover:text-white px-4 py-2 rounded-lg text-xs font-bold transition shadow-sm whitespace-nowrap">
+                        <button id="btn-trigger-nuke" class="bg-white border border-red-200 text-red-600 hover:bg-red-600 hover:text-white px-4 py-2 rounded-lg text-xs font-bold transition shadow-sm whitespace-nowrap">
                             Confirm Scuttle
                         </button>
                     </div>
@@ -108,6 +107,40 @@
 
             </div>
         </main>
+    </div>
+</div>
+
+<div id="modal-nuke" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"></div>
+    
+    <div class="relative top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full border border-red-100 animate-in fade-in zoom-in duration-300">
+        
+        <div class="flex flex-col items-center text-center">
+            <div class="h-12 w-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-4">
+                <i data-lucide="alert-triangle" class="h-6 w-6"></i>
+            </div>
+            
+            <h3 class="text-lg font-bold text-slate-900">Final Warning</h3>
+            <p class="text-sm text-slate-500 mt-2 mb-6">
+                Are you sure you want to scuttle the ship? This will delete your account and all data <strong>permanently</strong>.
+            </p>
+            
+            <div class="flex gap-3 w-full">
+                <button id="btn-cancel-nuke" class="flex-1 px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-lg hover:bg-slate-200 transition text-sm">
+                    Cancel
+                </button>
+                <button id="btn-confirm-nuke" class="flex-1 px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition shadow-lg shadow-red-200 text-sm">
+                    Yes, Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="toast-notification" class="fixed bottom-6 right-6 bg-slate-900 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-4 transform translate-y-32 transition-transform duration-300 z-[60]">
+    <div class="flex items-center gap-2">
+        <i data-lucide="info" class="h-5 w-5"></i>
+        <span class="font-bold">Notification</span>
     </div>
 </div>
 
@@ -138,58 +171,48 @@ def init():
     document['inp-last_name'].value = app_state['user'].get('last_name', '')
     document['disp-email'].text = app_state['user'].get('email', '')
 
-    # Bind Events (Auto-Save on Blur)
+    # Bind Events
     document['inp-first_name'].bind('blur', lambda ev: handle_save(ev, 'first_name'))
     document['inp-last_name'].bind('blur', lambda ev: handle_save(ev, 'last_name'))
     
-    # Bind Danger
-    document['btn-nuke'].bind('click', handle_nuke)
+    # MODAL BINDINGS
+    document['btn-trigger-nuke'].bind('click', open_modal)
+    document['btn-cancel-nuke'].bind('click', close_modal)
+    document['btn-confirm-nuke'].bind('click', real_nuke)
 
     render_logs()
     if hasattr(window, 'lucide'): window.lucide.createIcons()
 
 def render_logs():
     container = document['logs-container']
-    
     if not app_state['logs']:
         container <= html.DIV("No logs available.", Class="p-4 text-xs text-slate-400 italic")
         return
-
     for log in app_state['logs']:
         row = html.DIV(Class="flex justify-between items-center p-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition")
-        
         left = html.DIV(Class="flex items-center gap-3")
         left <= html.I(**{'data-lucide': 'monitor', 'class': 'h-4 w-4 text-slate-300'})
-        
         txt = html.DIV()
         txt <= html.DIV(log['event'], Class="text-xs font-bold text-slate-700")
         txt <= html.DIV(f"IP: {log['ip']}", Class="text-[10px] text-slate-400 font-mono")
         left <= txt
-        
         row <= left
         row <= html.DIV(log['date'], Class="text-[10px] text-slate-400 bg-slate-100 px-2 py-1 rounded")
-        
         container <= row
 
 def handle_save(ev, field_name):
-    """
-    Déclenche la sauvegarde AJAX quand on quitte le champ.
-    """
     inp = ev.target
     val = inp.value.strip()
     status_div = document[f"status-{field_name}"]
     
-    # Validation basique
     if not val:
         inp.classList.add('border-red-300')
         return
 
-    # Feedback Visuel "Saving..."
     status_div.text = "Saving..."
     status_div.classList.remove('text-green-600', 'opacity-0')
     status_div.classList.add('text-slate-400', 'opacity-100')
 
-    # AJAX Request
     req = ajax.ajax()
     req.bind('complete', lambda r: on_save_complete(r, status_div))
     req.open('POST', URLS['update'], True)
@@ -200,12 +223,9 @@ def on_save_complete(req, status_div):
     try:
         res = json.loads(req.text)
         if res['status'] == 'success':
-            # Feedback "Saved"
             status_div.text = "Saved"
             status_div.classList.remove('text-slate-400')
             status_div.classList.add('text-green-600')
-            
-            # Disparition après 2 sec
             timer.set_timeout(lambda: status_div.classList.add('opacity-0'), 2000)
         else:
             status_div.text = "Error"
@@ -213,20 +233,55 @@ def on_save_complete(req, status_div):
     except:
         status_div.text = "Error"
 
-def handle_nuke(ev):
-    if window.confirm("⚠️ FINAL WARNING ⚠️\n\nAre you sure you want to scuttle the ship? This will delete your account permanently."):
-        req = ajax.ajax()
-        req.bind('complete', on_nuke_complete)
-        req.open('POST', URLS['nuke'], True)
-        req.send()
+# --- GESTION DE LA MODALE ---
+
+def open_modal(ev):
+    # Affiche la modale en retirant 'hidden'
+    document['modal-nuke'].classList.remove('hidden')
+
+def close_modal(ev):
+    # Cache la modale
+    document['modal-nuke'].classList.add('hidden')
+
+def real_nuke(ev):
+    # Change le texte du bouton pour montrer que ça charge
+    btn = document['btn-confirm-nuke']
+    btn.text = "Scuttling..."
+    btn.disabled = True
+    
+    req = ajax.ajax()
+    req.bind('complete', on_nuke_complete)
+    req.open('POST', URLS['nuke'], True)
+    req.send()
 
 def on_nuke_complete(req):
     try:
         res = json.loads(req.text)
         if res['status'] == 'success':
-            document['logout'].click()
+            # Redirection propre
+            window.location.href = res['redirect']
+        else:
+            close_modal(None)
+            show_toast("Error: " + res.get('message', 'Failed'), "text-red-500")
     except:
-        window.alert("Scuttle failed. Hull too strong.")
+        close_modal(None)
+        show_toast("Scuttle failed. Hull too strong.", "text-red-500")
+        # Reset button
+        btn = document['btn-confirm-nuke']
+        btn.text = "Yes, Delete"
+        btn.disabled = False
+
+def show_toast(msg, color_class):
+    toast = document['toast-notification']
+    toast.select_one('span').text = msg
+    
+    # Change icon color if needed
+    icon = toast.select_one('i') or toast.select_one('svg')
+    if icon:
+        icon.attrs['class'] = f"h-5 w-5 {color_class}"
+        
+    toast.style.transform = "translateY(0)"
+    timer.set_timeout(lambda: setattr(toast.style, 'transform', "translateY(8rem)"), 5000)
 
 init()
 </script>

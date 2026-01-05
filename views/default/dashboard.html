@@ -197,9 +197,11 @@ def on_creation_complete(req):
     try:
         data = json.loads(req.text)
         if data.get('status') == 'error':
-            window.alert(data['message'])
+            show_toast(data['message']) # Alert replaced by Toast
             if "Fuel" in data['message']:
                 window.location.href = URLS['treasury']
+            
+            reset_launchpad()
             return
 
         document['narrative-text'].text = "Ready. Ship Launched."
@@ -208,7 +210,7 @@ def on_creation_complete(req):
         
     except Exception as e:
         print(e)
-        window.alert("Critical error connecting to HQ.")
+        show_toast("Critical error connecting to HQ.") # Alert replaced
         reset_launchpad()
 
 def finalize_creation_ui(new_project):
@@ -236,7 +238,7 @@ def handle_deploy(ev):
     pid = btn.attrs.get('data-pid')
 
     if not pid:
-        window.alert("Erreur: ID projet introuvable sur le bouton")
+        show_toast("Error: Project ID missing") # Translated
         return
 
     btn.text = "..."
@@ -250,7 +252,7 @@ def on_deploy_complete(req, pid):
     try:
         data = json.loads(req.text)
         if data['status'] == 'error':
-            window.alert(data['message'])
+            show_toast(data['message']) # Alert replaced
             if "fuel" in data['message'].lower():
                 window.location.href = URLS['treasury']
             return
@@ -265,7 +267,7 @@ def on_deploy_complete(req, pid):
         
     except Exception as e:
         print(e)
-        window.alert("Comms error.")
+        show_toast("Comms error.") # Translated
 
 def set_tab(ev, tab_name):
     app_state['current_tab'] = tab_name
@@ -280,7 +282,7 @@ def render_tabs():
     
     for tab_id, label, icon in tabs:
         is_active = (app_state['current_tab'] == tab_id)
-        base_cls = "flex items-center gap-2 pb-2 text-xs font-medium transition-colors border-b-2 cursor-pointer" # pb-3->pb-2, text-sm->text-xs
+        base_cls = "flex items-center gap-2 pb-2 text-xs font-medium transition-colors border-b-2 cursor-pointer" 
         active_cls = "border-indigo-600 text-indigo-600"
         inactive_cls = "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
         
@@ -350,7 +352,7 @@ def handle_archive(ev):
             break
             
     app_state['open_menu_id'] = None
-    render_tabs()     
+    render_tabs()    
     render_projects()
 
 def handle_undo(ev):
@@ -390,7 +392,7 @@ def render_projects():
     if not to_show:
         render_empty_state(container, current_tab)
     else:
-        grid = html.DIV(Class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 projects-grid animate-fade-in") # gap-6->gap-4
+        grid = html.DIV(Class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 projects-grid animate-fade-in") 
         for p in to_show:
             grid <= create_no_image_card(p)
         container <= grid
@@ -404,7 +406,6 @@ def render_empty_state(container, tab):
 
 
 def create_no_image_card(p):
-    # Padding réduit p-6 -> p-4
     card = html.DIV(Class="group bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-indigo-300 transition-all duration-300 flex flex-col overflow-hidden relative")
     
     if p['status'] == 'deployed':
@@ -420,40 +421,37 @@ def create_no_image_card(p):
         status_text = "Draft"
         status_cls = "text-amber-600 bg-amber-50"
 
-    header_strip = html.DIV(Class=f"h-1.5 w-full {bg_color}") # h-2 -> h-1.5
+    header_strip = html.DIV(Class=f"h-1.5 w-full {bg_color}") 
     card <= header_strip
 
-    body = html.DIV(Class="p-4 flex-1 flex flex-col") # p-6 -> p-4 (PLUS COMPACT)
+    body = html.DIV(Class="p-4 flex-1 flex flex-col") 
     
-    # 2. LIGNE DU HAUT
+    # TOP ROW
     top_row = html.DIV(Class="flex items-start gap-3 mb-3")
     
-    # Icône réduite h-12->h-10
     icon_box = html.DIV(Class=f"h-10 w-10 rounded-lg {bg_color} bg-opacity-10 flex items-center justify-center shrink-0")
     icon_box <= html.I(**{'data-lucide': 'rocket', 'class': f"h-5 w-5 {bg_color.replace('bg-', 'text-')}"})
     top_row <= icon_box
     
     title_col = html.DIV(Class="flex-1 min-w-0")
-    # Titre réduit text-lg -> text-sm
     title_col <= html.H3(p['title'], Class="font-bold text-sm text-slate-800 truncate group-hover:text-indigo-600 transition-colors")
     title_col <= html.SPAN(status_text, Class=f"text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded mt-0.5 inline-block {status_cls}")
     top_row <= title_col
     
     body <= top_row
 
-    # 3. ZONE DES BOUTONS
+    # ACTIONS ROW
     actions_row = html.DIV(Class="flex items-center justify-end gap-2 mt-1")
 
     if p['status'] == 'archived':
-        lbl_arch = "Restaurer"
+        lbl_arch = "Restore" # Translated
         cls_arch = "bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border-indigo-200"
         ico_arch = "refresh-ccw"
     else:
-        lbl_arch = "Archiver"
+        lbl_arch = "Archive" # Translated
         cls_arch = "bg-slate-100 text-slate-600 hover:bg-slate-200 border-slate-200"
         ico_arch = "archive"
 
-    # Boutons plus petits py-1 -> py-0.5
     btn_arch = html.BUTTON(Class=f"{cls_arch} px-2.5 py-0.5 rounded-md text-[10px] font-bold border transition flex items-center gap-1")
     btn_arch <= html.I(**{'data-lucide': ico_arch, 'class': 'h-3 w-3'})
     btn_arch <= lbl_arch
@@ -483,7 +481,7 @@ def create_no_image_card(p):
 
     body <= actions_row
 
-    # 4. PROGRÈS & META
+    # PROGRESS & META
     progress_label = html.DIV(Class="flex justify-between text-[10px] text-slate-500 mb-1 mt-3")
     progress_label <= html.SPAN("Integrity")
     progress_label <= html.SPAN("100%")

@@ -105,18 +105,18 @@ def google_callback():
     logger = logging.getLogger("web2py.app.yourfirstship")
     # 1) Erreur utilisateur (annule)
     if request.vars.get('error'):
-        session.flash = 'Connexion Google annulée.'
+        session.flash = 'Google sign-in cancelled.'
         return redirect(URL('default', 'connect', args='login'))
 
     # 2) Anti-CSRF state
     if not session.get('oauth_state') or request.vars.get('state') != session.oauth_state:
-        session.flash = 'Jeton de state invalide.'
+        session.flash = 'Invalid state token.'
         return redirect(URL('default', 'connect', args='login'))
 
     # 3) Code présent ?
     code = request.vars.get('code')
     if not code:
-        session.flash = 'Code manquant.'
+        session.flash = 'Authorization code missing.'
         return redirect(URL('default', 'connect', args='login'))
 
     # 4) Échange code -> token
@@ -136,12 +136,12 @@ def google_callback():
         token_payload = json.loads(resp.read().decode('utf-8'))
     except Exception as e:
         logger.error('Token exchange failed: %s', e)
-        session.flash = 'Échec échange de jeton.'
+        session.flash = 'Token exchange failed.'
         return redirect(URL('default', 'connect', args='login'))
 
     access_token = token_payload.get('access_token')
     if not access_token:
-        session.flash = 'Jeton d’accès absent.'
+        session.flash = 'Access token missing.'
         return redirect(URL('default', 'connect', args='login'))
 
     session.token = access_token  # si tu veux le réutiliser ailleurs
@@ -154,7 +154,7 @@ def google_callback():
         data = json.loads(uresp.read().decode('utf-8'))
     except Exception as e:
         logger.error('Userinfo failed: %s', e)
-        session.flash = 'Lecture du profil Google impossible.'
+        session.flash = 'Unable to read Google profile.'
         return redirect(URL('default', 'connect', args='login'))
 
     profile = dict(
@@ -173,7 +173,7 @@ def google_callback():
     # 7) Création/connexion utilisateur web2py
     user = auth.get_or_create_user(profile)   # crée si inexistant
     if not user:
-        session.flash = 'Création/connexion utilisateur impossible.'
+        session.flash = 'Unable to create or log in user.'
         return redirect(URL('default', 'connect', args='login'))
     
     auth.login_user(user)
@@ -341,7 +341,7 @@ def create_invoice_record(amount, pack_name, stripe_id="manual"):
         stripe_payment_intent = stripe_id,
         billing_name = f"{auth.user.first_name} {auth.user.last_name}",
         # Idéalement, récupérez l'adresse depuis le profil user ou Stripe
-        billing_address = "Adresse client..." 
+        billing_address = "Client Address..."
     )
     
     # 2. Génération de la référence propre (INV-2026-000X)
@@ -403,7 +403,7 @@ def treasury():
         
         # Fallback si le nom/adresse n'était pas dans la facture
         b_name = row.billing_name or f"{auth.user.first_name} {auth.user.last_name}"
-        b_address = row.billing_address or "Adresse non renseignée"
+        b_address = row.billing_address or "Address not provided"
 
         history.append({
             # A. Données légères pour le tableau Dashboard
@@ -704,7 +704,6 @@ def admin_reply():
     
     # Si c'est une réponse
     if content:
-        print("Admin replying to ticket......................................")
         db.support_messages.insert(
             ticket_id=int(ticket_id),
             sender_type='human', # C'est toi ! (Bulle Blanche)
