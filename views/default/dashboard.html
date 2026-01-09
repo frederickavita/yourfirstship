@@ -4,109 +4,368 @@
     {{=XML(projects_json)}}
 </script>
 
-<div class="flex h-screen bg-slate-50 font-sans text-slate-900 overflow-hidden">
+<style>
+    .animate-in { animation: fadeInUp 0.6s ease-out forwards; }
+    .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    
+    /* Animation "Loot" pour le nouvel item */
+    @keyframes slideInRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    .new-item-anim { animation: slideInRight 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    
+    .card-choice:hover { border-color: #6366f1; transform: translateY(-2px); }
+    #console-logs-container::-webkit-scrollbar { width: 0px; background: transparent; }
+
+
+    /* --- Styles pour le module Casting --- */
+    .role-tab { cursor: pointer; color: #64748b; border-bottom: 2px solid transparent; white-space: nowrap; }
+    .role-tab:hover { color: #1e293b; }
+    .role-tab.active { background-color: #f8fafc; border-bottom: 2px solid #4f46e5; color: #4f46e5; }
+</style>
+
+<div class="flex h-screen bg-[#F8FAFC] font-sans text-slate-900 overflow-hidden">
 
 {{include 'sidebar.html'}}
+
     <div class="flex-1 flex flex-col overflow-hidden relative">
- {{ page_title = "Mission Control" }}       
-{{include 'header.html'}}
-        <main class="flex-1 overflow-y-auto p-6 bg-slate-50 relative scroll-smooth">
+        {{ page_title = "The Studio" }}       
+        {{include 'header.html'}}
+
+        <main class="flex-1 overflow-y-auto p-4 md:p-8 relative scroll-smooth bg-[#F8FAFC]">
             
-            <div class="max-w-4xl mx-auto mb-10 pt-2"> <h2 class="text-xl font-bold text-slate-800 mb-1">Captain, what are we building today?</h2>
-                <p class="text-xs text-slate-500 mb-6">Describe your vision. AI handles the architecture.</p>
-
-                <div class="relative group z-10">
-                    <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
-                    
-                    <div class="relative bg-white rounded-xl p-1.5 shadow-xl border border-slate-100 transition-all duration-300" id="launchpad-container">
-                        
-                        <textarea id="launchpad-input" rows="2" 
-                                  class="w-full resize-none border-none focus:ring-0 text-slate-700 placeholder-slate-400 text-sm p-3 bg-transparent" 
-                                  placeholder="I want a SaaS for [Target Audience] that allows them to [Core Feature]..."></textarea>
-                        
-                        <div class="flex flex-col sm:flex-row justify-between items-center px-2 pb-1 mt-1 border-t border-slate-50 pt-2 gap-4">
-                            
-                            <div class="flex flex-wrap gap-2" id="modifiers-container">
-                                <button class="modifier-btn bg-slate-100 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 px-2.5 py-0.5 rounded-full text-[10px] font-bold transition flex items-center gap-1 border border-transparent hover:border-indigo-100" data-add=" + SaaS Platform">
-                                    <i data-lucide="plus" class="h-3 w-3"></i> SaaS
-                                </button>
-                                <button class="modifier-btn bg-slate-100 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 px-2.5 py-0.5 rounded-full text-[10px] font-bold transition flex items-center gap-1 border border-transparent hover:border-indigo-100" data-add=" + Admin Dashboard">
-                                    <i data-lucide="plus" class="h-3 w-3"></i> Admin
-                                </button>
-                                <button class="modifier-btn bg-slate-100 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 px-2.5 py-0.5 rounded-full text-[10px] font-bold transition flex items-center gap-1 border border-transparent hover:border-indigo-100" data-add=" + Mobile App">
-                                    <i data-lucide="plus" class="h-3 w-3"></i> Mobile
-                                </button>
-                                 <button class="modifier-btn bg-slate-100 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 px-2.5 py-0.5 rounded-full text-[10px] font-bold transition flex items-center gap-1 border border-transparent hover:border-indigo-100" data-add=" + Stripe Payments">
-                                    <i data-lucide="plus" class="h-3 w-3"></i> Stripe
-                                </button>
-                            </div>
-
-                            <button id="ignite-btn" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2 text-xs">
-                                <i data-lucide="flame" class="h-3 w-3"></i> Ignite Engines
-                            </button>
-                        </div>
-                    </div>
+            <div class="max-w-3xl mx-auto mb-12 mt-4 animate-in slide-in-from-bottom-4 duration-700">
+                <div class="text-center mb-6">
+                    <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">
+                        Quel problème vous empêche de dormir ?
+                    </h1>
+                    <p class="text-slate-500 text-xs">Ne parlez pas technique. Parlez douleur.</p>
                 </div>
 
-                <div id="narrative-feedback" class="hidden mt-4 bg-slate-900 rounded-xl p-4 border border-slate-800 shadow-2xl relative overflow-hidden animate-in fade-in slide-in-from-top-4 duration-500">
-                     <div class="absolute top-0 left-0 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-300 ease-out" id="narrative-progress" style="width: 0%"></div>
-
-                     <div class="flex items-center gap-3">
-                         <div class="h-8 w-8 rounded-full bg-indigo-500/20 flex items-center justify-center relative">
-                             <div class="absolute inset-0 rounded-full bg-indigo-500 opacity-20 animate-ping"></div>
-                             <i data-lucide="cpu" class="h-4 w-4 text-indigo-400 relative z-10"></i>
-                         </div>
-                         <div>
-                             <h4 class="text-indigo-400 font-mono text-[10px] font-bold uppercase tracking-widest mb-0.5">System Status</h4>
-                             <p class="text-slate-200 font-mono text-xs tracking-wide" id="narrative-text">Initializing sequence...</p>
-                         </div>
-                     </div>
+                <div class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden relative group">
+                    <div class="p-1">
+                        <textarea id="launchpad-input" rows="4" 
+                            class="w-full resize-none border-none focus:ring-0 text-slate-800 placeholder-slate-300 text-lg p-5 bg-transparent leading-relaxed" 
+                            placeholder="Ex: Je perds mes factures et je ne peux jamais relancer mes clients..."></textarea>
+                    </div>
+                    <div class="h-px w-full bg-slate-50"></div>
+                    <div class="p-4 bg-slate-50/50">
+                        <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-3">Pas inspiré ? Cliquez pour rédiger :</p>
+                        <div id="ghost-chips-container" class="flex flex-col gap-2"></div>
+                    </div>
+                    <div class="p-3 bg-white border-t border-slate-100 flex justify-end">
+                        <button id="ignite-btn" class="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-xl font-bold shadow-lg hover:shadow-indigo-500/30 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2 text-sm">
+                            <span>ENTRÉE</span> <i data-lucide="arrow-right" class="h-4 w-4"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-
-            <div class="flex flex-wrap items-center gap-6 border-b border-slate-200 mb-6" id="tabs-container">
-                </div>
-
+            <div class="flex flex-wrap items-center gap-6 border-b border-slate-200 mb-6" id="tabs-container"></div>
             <div id="skeleton-loader" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {{for i in range(3):}}
-                <div class="bg-white rounded-xl border border-slate-200 p-4 h-48 animate-pulse flex flex-col gap-3">
-                    <div class="flex justify-between">
-                        <div class="h-10 w-10 bg-slate-200 rounded-lg"></div>
-                        <div class="h-5 w-20 bg-slate-200 rounded"></div>
-                    </div>
-                    <div class="h-5 bg-slate-200 rounded w-3/4 mt-2"></div>
-                    <div class="h-3 bg-slate-200 rounded w-full"></div>
-                    <div class="h-3 bg-slate-200 rounded w-1/2"></div>
-                </div>
-                {{pass}}
+                {{for i in range(3):}}<div class="bg-white rounded-xl border border-slate-200 p-4 h-48 animate-pulse"></div>{{pass}}
             </div>
-
-            <div id="project-container" class="hidden"></div>
+            <div id="project-container" class="hidden pb-20"></div>
 
         </main>
     </div>
 </div>
 
-<div id="toast-notification" class="fixed bottom-6 right-6 bg-slate-900 text-white px-4 py-3 rounded-lg shadow-2xl flex items-center gap-3 transform translate-y-32 transition-transform duration-300 z-50">
-    <div class="flex items-center gap-2">
-        <i data-lucide="archive" class="h-4 w-4 text-amber-400"></i>
-        <span class="font-bold text-sm">Action successful.</span>
+<div id="console-overlay" class="hidden fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-sm flex items-center justify-center p-4 fade-in">
+    <div class="w-full max-w-2xl bg-[#0F172A] rounded-lg shadow-2xl border border-slate-800 overflow-hidden font-mono relative">
+        <div class="bg-slate-900/50 p-6 border-b border-slate-800">
+            <h3 class="text-slate-500 text-[10px] uppercase tracking-[0.2em] mb-3">CONTEXTE ANALYSÉ</h3>
+            <p id="console-user-input" class="text-white italic text-lg leading-relaxed border-l-2 border-indigo-500 pl-4 opacity-80">"..."</p>
+        </div>
+        <div class="p-6 h-64 overflow-y-auto bg-[#020617]" id="console-logs-container"></div>
+        <div class="h-1 w-full bg-slate-900">
+            <div id="console-progress-bar" class="h-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)] transition-all duration-200" style="width: 0%"></div>
+        </div>
     </div>
-    <button id="undo-btn" class="text-indigo-300 font-bold hover:text-white underline text-xs">Undo</button>
 </div>
 
+<div id="triage-overlay" class="hidden fixed inset-0 z-[100] bg-slate-50 flex flex-col items-center justify-center p-4 fade-in overflow-y-auto">
+    <div class="max-w-2xl w-full">
+        <div class="bg-slate-900 text-white p-6 rounded-t-xl shadow-lg mb-6">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="h-2 w-2 rounded-full bg-amber-500 animate-pulse"></div>
+                <h3 class="text-xs font-mono uppercase tracking-widest text-amber-400">ANALYSE TERMINÉE</h3>
+            </div>
+            <p class="text-lg font-medium">J'ai détecté <span class="text-amber-400 font-bold">3 problèmes distincts</span>.</p>
+            <p class="text-sm text-slate-400 mt-1">Conseil : Pour réussir, ne construisons pas tout à la fois. Choisissons la priorité n°1.</p>
+        </div>
+        <h2 class="text-center text-xl font-extrabold text-slate-800 mb-6 tracking-tight">QUELLE BATAILLE MENONS-NOUS AUJOURD'HUI ?</h2>
+        <div id="triage-cards-container" class="space-y-4"></div>
+    </div>
+</div>
+
+<div id="strategy-overlay" class="hidden fixed inset-0 z-[100] bg-slate-50 flex flex-col items-center justify-center p-4 fade-in">
+    <div class="max-w-4xl w-full">
+        <div class="bg-slate-900 text-white p-4 rounded-xl shadow-lg mb-8 mx-auto max-w-2xl">
+            <div class="flex items-center gap-3 mb-1">
+                <div class="h-2 w-2 rounded-full bg-indigo-500 animate-pulse"></div>
+                <h3 class="text-xs font-mono uppercase tracking-widest text-indigo-400">DÉCISION ARCHITECTURALE</h3>
+            </div>
+            <p id="strategy-context-text" class="text-base text-slate-200">...</p>
+        </div>
+        <h2 id="strategy-question" class="text-center text-2xl font-extrabold text-slate-800 mb-8 tracking-tight">COMMENT VOULEZ-VOUS GÉRER LES CONFLITS ?</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="strategy-cards-container"></div>
+    </div>
+</div>
+
+<div id="inventory-overlay" class="hidden fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-4 fade-in">
+    <div class="max-w-xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden relative">
+        
+        <div class="bg-slate-50 p-6 border-b border-slate-100 flex justify-between items-center">
+            <div>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">PROJET EN COURS</h3>
+                <h2 class="text-xl font-black text-slate-800">SAC À DOS TECHNIQUE</h2>
+            </div>
+            <div class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold">V 0.1</div>
+        </div>
+
+        <div class="p-6 space-y-4" id="inventory-list">
+            </div>
+
+        <div class="bg-slate-900 p-4 border-t border-b border-slate-800">
+            <div class="font-mono text-xs space-y-1">
+                <p class="text-slate-400">> Choix enregistré : <span id="console-choice-record" class="text-white font-bold">...</span></p>
+                <p class="text-slate-400">> Code généré : <span id="console-code-gen" class="text-emerald-400">...</span></p>
+                <p class="text-slate-500">> Architecture mise à jour.</p>
+            </div>
+        </div>
+
+        <div class="p-6 bg-white">
+            <p class="text-center text-xs text-slate-400 mb-4 font-bold uppercase tracking-wide">Avez-vous un autre problème à régler ?</p>
+            <button id="inventory-action-btn" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-indigo-600 transition-all flex items-center justify-center gap-2 shadow-lg">
+                </button>
+        </div>
+
+    </div>
+</div>
+
+
+<div id="casting-overlay" class="hidden fixed inset-0 z-[100] bg-slate-50 flex flex-col items-center justify-center p-4 fade-in">
+    
+    <div class="max-w-3xl w-full bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col h-[80vh]">
+        
+        <div class="bg-white border-b border-slate-100 p-4 pb-0 flex justify-between items-center shadow-sm z-10">
+            <div class="flex gap-6 overflow-x-auto no-scrollbar" id="casting-roles-tabs">
+                </div>
+            
+            <button id="add-role-btn" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold px-3 py-2 rounded-lg transition-colors flex items-center gap-1 mb-2">
+                <i data-lucide="plus" class="h-3 w-3"></i> Rôle
+            </button>
+        </div>
+
+        <div class="bg-slate-50 px-6 py-3 border-b border-slate-100 flex justify-between items-center">
+            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest">
+                🔻 FOCUS SUR : <span id="current-role-name" class="text-indigo-600">Chargement...</span>
+            </h3>
+            <div class="text-[10px] text-slate-400 font-mono bg-slate-200 px-2 py-1 rounded">MODE: DÉFINITION</div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-6 space-y-3 bg-slate-50/50" id="casting-specs-list">
+            </div>
+
+        <div class="p-6 bg-white border-t border-slate-100 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-20">
+            <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-2">
+                👇 Une règle oubliée ? (Langage Naturel)
+            </p>
+            
+            <div class="flex gap-2 mb-6">
+                <input type="text" id="casting-input" 
+                    class="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder-slate-300" 
+                    placeholder='Ex: "Ils doivent aussi pouvoir m&apos;appeler en cas de pépin..."'>
+                
+                <button id="casting-add-btn" class="bg-slate-900 text-white px-4 rounded-lg font-bold hover:bg-indigo-600 transition-colors shadow-lg">
+                    <i data-lucide="plus" class="h-5 w-5"></i>
+                </button>
+            </div>
+
+            <button id="casting-next-btn" class="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg text-sm flex items-center justify-center gap-2 transform active:scale-[0.98]">
+                VALIDER CE RÔLE ET CONTINUER <i data-lucide="arrow-right" class="h-4 w-4"></i>
+            </button>
+        </div>
+
+    </div>
+</div>
+
+
+<div id="chassis-overlay" class="hidden fixed inset-0 z-[100] bg-slate-50 flex flex-col items-center justify-center p-4 fade-in overflow-y-auto">
+    
+    <div class="max-w-4xl w-full">
+        
+        <div class="bg-slate-900 text-white p-6 rounded-xl shadow-lg mb-8 mx-auto max-w-3xl border border-slate-700">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="h-2.5 w-2.5 rounded-full bg-cyan-400 animate-pulse"></div>
+                <h3 class="text-xs font-mono uppercase tracking-widest text-cyan-400">ANALYSE ARCHITECTURALE</h3>
+            </div>
+            <div id="chassis-analysis-log" class="space-y-1 font-mono text-sm text-slate-300">
+                <p>> Analyse des acteurs en cours...</p>
+            </div>
+        </div>
+
+        <h2 class="text-center text-2xl font-extrabold text-slate-800 mb-2 tracking-tight">QUEL MOTEUR POUR VOTRE APPLICATION ?</h2>
+        <p class="text-center text-slate-500 text-sm mb-8">(L'IA a sélectionné le véhicule adapté à vos besoins)</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8" id="chassis-cards-container">
+            </div>
+
+        <div class="bg-indigo-50 border-l-4 border-indigo-500 p-6 rounded-r-xl max-w-3xl mx-auto shadow-sm">
+            <h4 class="font-bold text-indigo-900 text-sm uppercase mb-2 flex items-center gap-2">
+                <i data-lucide="info" class="h-4 w-4"></i> POURQUOI CE CHOIX ?
+            </h4>
+            <p id="chassis-reason-text" class="text-indigo-800 text-sm leading-relaxed italic">
+                Chargement de l'argumentaire...
+            </p>
+        </div>
+
+        <div class="mt-8 text-center">
+            <button id="chassis-install-btn" class="bg-slate-900 text-white px-8 py-4 rounded-xl font-bold hover:bg-emerald-600 transition-all shadow-xl transform hover:-translate-y-1 flex items-center gap-3 mx-auto text-sm">
+                <span id="chassis-btn-text">INSTALLER LE CHÂSSIS</span> 
+                <i data-lucide="download-cloud" class="h-5 w-5"></i>
+            </button>
+        </div>
+
+    </div>
+</div>
+
+
+<div id="sitemap-overlay" class="hidden fixed inset-0 z-[100] bg-slate-50 flex flex-col items-center justify-center p-4 fade-in overflow-y-auto">
+    
+    <div class="max-w-5xl w-full">
+        
+        <div class="bg-slate-900 text-white p-6 rounded-xl shadow-lg mb-8 border-l-4 border-indigo-500">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="h-2.5 w-2.5 rounded-full bg-indigo-400 animate-pulse"></div>
+                <h3 class="text-xs font-mono uppercase tracking-widest text-indigo-400">GÉNÉRATION DU PLAN</h3>
+            </div>
+            <div id="sitemap-console-log" class="font-mono text-xs text-slate-300 space-y-1">
+                <p>> Calcul des routes...</p>
+            </div>
+        </div>
+
+        <h2 class="text-center text-2xl font-extrabold text-slate-800 mb-8 tracking-tight">PLAN DE CIRCULATION (SITEMAP)</h2>
+
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-8 mb-8 relative overflow-hidden">
+            
+            <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(#4f46e5 1px, transparent 1px); background-size: 20px 20px;"></div>
+
+            <div class="flex justify-center mb-12 relative z-10">
+                <div class="bg-slate-800 text-white px-6 py-3 rounded-lg font-bold shadow-lg border-2 border-slate-700 flex flex-col items-center">
+                    <span>🔐 LOGIN / AUTH</span>
+                    <span class="text-[10px] text-slate-400 font-normal mt-1">(Porte Commune)</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-12 relative z-10">
+                
+                <div class="flex flex-col items-center border-r border-dashed border-slate-300 pr-6">
+                    <h3 class="font-bold text-indigo-600 mb-6 flex items-center gap-2">
+                        <i data-lucide="smartphone" class="h-5 w-5"></i> ZONE MOBILE (App)
+                    </h3>
+                    <div id="sitemap-mobile-tree" class="flex flex-col items-center gap-4 w-full">
+                        </div>
+                </div>
+
+                <div class="flex flex-col items-center pl-6">
+                    <h3 class="font-bold text-slate-600 mb-6 flex items-center gap-2">
+                        <i data-lucide="monitor" class="h-5 w-5"></i> ZONE ADMIN (Desktop)
+                    </h3>
+                    <div id="sitemap-desktop-tree" class="w-full flex flex-col items-center gap-4">
+                        </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-6 items-center justify-between bg-slate-100 p-6 rounded-xl border border-slate-200">
+            <div class="text-xs text-slate-500 space-y-1">
+                <p class="font-bold text-slate-700 mb-2">DÉTAILS TECHNIQUES :</p>
+                <p>🔒 Route <span class="font-mono bg-white px-1 rounded">/admin</span> protégée (Middleware Guard).</p>
+                <p>🌍 Route <span class="font-mono bg-white px-1 rounded">/app</span> accessible Offline (Service Worker).</p>
+            </div>
+            
+            <button id="sitemap-validate-btn" class="bg-emerald-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-emerald-700 transition-all shadow-lg flex items-center gap-2 text-sm transform hover:-translate-y-1">
+                VALIDER L'ARCHITECTURE <i data-lucide="check-circle" class="h-5 w-5"></i>
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<div id="toast-notification" class="fixed bottom-6 right-6 bg-slate-900 text-white px-4 py-3 rounded-lg shadow-2xl flex items-center gap-3 transform translate-y-32 transition-transform duration-300 z-[110]">
+    <div class="flex items-center gap-2"><i data-lucide="archive" class="h-4 w-4 text-amber-400"></i><span class="font-bold text-sm toast-msg">Action successful.</span></div>
+    <button id="undo-btn" class="text-indigo-300 font-bold hover:text-white underline text-xs">Undo</button>
+</div>
 
 <script type="text/python">
 from browser import document, html, window, ajax, timer
 import json
 
-# --- CONFIG ---
-URLS = {
-    'holodeck': "{{=URL('the_holodeck')}}",
-    'create': "{{=URL('default', 'create_project')}}",
-    'deploy': "{{=URL('default', 'toggle_deploy')}}",
-    'treasury': "{{=URL('treasury')}}"
+# --- DATA ---
+GHOST_DATA = [
+  {"id": 1, "icon": "🌪️", "short_label": "Le Chaos Total", "long_phrase": "C'est le chaos. Je perds les factures, mes chauffeurs sont tout le temps en retard et je ne sais même pas combien j'ai gagné ce mois-ci..."},
+  {"id": 2, "icon": "😡", "short_label": "Clients Furieux", "long_phrase": "Mes clients hurlent au téléphone car ils ne reçoivent jamais la confirmation de leur commande."},
+  {"id": 3, "icon": "📉", "short_label": "Pilotage à l'aveugle", "long_phrase": "Je perds le contrôle du suivi du chiffre d'affaires, je ne sais pas qui vend quoi."}
+]
+
+TRIAGE_DATA = [
+    {"id": "finance", "level": "🔴 URGENCE FINANCIÈRE", "quote": "\"Je perds les factures...\"", "objective": "Module de Facturation & Preuve", "action": "COMMENCER PAR ÇA", "color": "rose"},
+    {"id": "logistics", "level": "🟠 OPTIMISATION LOGISTIQUE", "quote": "\"Chauffeurs en retard...\"", "objective": "Module Tracking GPS", "action": "METTRE EN ATTENTE", "color": "orange"},
+    {"id": "dashboard", "level": "🟡 TABLEAU DE BORD", "quote": "\"Suivi du chiffre d'affaires...\"", "objective": "Dashboard Admin", "action": "METTRE EN ATTENTE", "color": "amber"}
+]
+
+STRATEGY_DATA = {
+    "finance": {
+        "context": "Sujet : Sécurisation des Factures. Recommandation : Architecture 'Zero Trust'.",
+        "question": "COMMENT VOULEZ-VOUS GÉRER LES PREUVES ?",
+        "options": [
+            {"id": "diplomacy", "title": "🤝 DIPLOMATIE", "desc": "Le chauffeur déclare le montant. On le croit.", "tech": "Simple Input", "rec": False},
+            {"id": "fortress", "title": "🛡️ FORTERESSE", "desc": "Photo obligatoire du chèque/espèces.", "tech": "OCR (Scan auto) + Validation", "rec": True}
+        ]
+    }
+}
+
+
+# --- DONNÉES SIMULÉES POUR LE CASTING (RBAC) ---
+CASTING_DATA = {
+    "roles": ["Admin (Moi)", "Coursiers", "Clients"],
+    "specs": {
+        "Admin (Moi)": [
+            {"id": "US_001", "type": "FEATURE", "text": "Je veux voir toutes les factures en temps réel."},
+            {"id": "US_002", "type": "FEATURE", "text": "Je veux pouvoir bannir un coursier suspect."}
+        ],
+        "Coursiers": [
+            {"id": "US_101", "type": "FEATURE", "text": "Je veux uploader une photo de livraison pour prouver mon travail."},
+            {"id": "US_102", "type": "RESTRICTION", "text": "Je ne peux PAS voir le chiffre d'affaires global de l'entreprise."}
+        ],
+        "Clients": [
+            {"id": "US_201", "type": "FEATURE", "text": "Je veux recevoir un email de confirmation instantané."}
+        ]
+    }
+}
+
+
+# --- DONNÉES CHÂSSIS (TECH STACK) ---
+CHASSIS_OPTIONS = {
+    "SPA": {
+        "id": "SPA",
+        "title": "TOUR DE CONTRÔLE",
+        "subtitle": "(SPA - React Standard)",
+        "icon": "🖥️",
+        "pros": ["Idéal PC Bureau", "UX Fluide"],
+        "cons": ["Connexion requise", "Pas de caméra native"]
+    },
+    "PWA": {
+        "id": "PWA",
+        "title": "LE 4x4 TOUT-TERRAIN",
+        "subtitle": "(PWA - Mobile First)",
+        "icon": "📱",
+        "pros": ["Idéal Mobile", "Mode Hors-Ligne ✅", "Caméra & GPS ✅"],
+        "cons": []
+    }
 }
 
 # --- STATE ---
@@ -116,9 +375,99 @@ app_state = {
     'current_tab': 'active', 
     'last_archived_id': None,
     'open_menu_id': None,
-    'modifiers': []
+    'backlog': [],
+    'current_pain_id': None,
+    # --- NOUVEAU ---
+    'active_role': 'Admin (Moi)' 
 }
 
+
+# --- ⚙️ LOGIQUE DU CHÂSSIS (ALGORITHME) ---
+
+def render_chassis_screen():
+    # 1. ANALYSE (COMPUTATIONAL THINKING)
+    # On scanne les rôles définis dans l'étape Casting
+    roles = CASTING_DATA['roles']
+    
+    # Indicateurs (Flags)
+    has_mobile_actors = any(r in ["Coursiers", "Chauffeurs", "Livreurs"] for r in roles)
+    has_offline_risk = True # Simulé pour le contexte "Livraison"
+    
+    # 2. DÉCISION (SCORING)
+    recommendation = "SPA" # Par défaut
+    reason = "Usage standard bureau."
+    
+    if has_mobile_actors:
+        recommendation = "PWA"
+        reason = f"Marc, vos {', '.join(roles[1:])} sont sur la route. Si le réseau coupe dans un sous-sol, le 4x4 (PWA) gardera la photo en mémoire. C'est non-négociable."
+    
+    # 3. RENDU VISUEL (Mise à jour de l'UI)
+    
+    # A. La Console d'Analyse
+    log_div = document['chassis-analysis-log']
+    log_div.clear()
+    log_div <= html.P(f"> Analyse des acteurs : {len(roles)} rôles détectés...", Class="text-slate-400")
+    if has_mobile_actors:
+        log_div <= html.P(f"> Acteurs mobiles détectés ({', '.join(roles[1:])}).", Class="text-amber-400")
+        log_div <= html.P("> Contrainte : Mode Hors-Ligne requis.", Class="text-slate-300")
+    log_div <= html.P(f"> Conclusion : Architecture '{recommendation}' sélectionnée.", Class="text-emerald-400 font-bold")
+
+    # B. Le Bloc "Pourquoi ?"
+    document['chassis-reason-text'].text = reason
+    
+    # C. Les Cartes (Génération dynamique)
+    container = document['chassis-cards-container']
+    container.clear()
+    
+    for key, opt in CHASSIS_OPTIONS.items():
+        is_winner = (key == recommendation)
+        
+        # Style de base
+        cls = "relative bg-white border-2 rounded-2xl p-6 transition-all duration-500 flex flex-col"
+        
+        if is_winner:
+            # Style du Vainqueur (Vert, Pulsation, Actif)
+            cls += " border-emerald-500 shadow-xl scale-105 ring-4 ring-emerald-50 ring-offset-2 cursor-pointer z-10"
+            badge = html.DIV("✅ RECOMMANDÉ (99%)", Class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-emerald-500 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-md animate-pulse")
+        else:
+            # Style du Perdant (Grisé, Inactif)
+            cls += " border-slate-100 opacity-50 grayscale cursor-not-allowed hover:opacity-50"
+            badge = html.DIV("❌ INADAPTÉ", Class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-slate-200 text-slate-500 text-[10px] font-bold px-3 py-1 rounded-full")
+            
+        card = html.DIV(Class=cls)
+        card <= badge
+        
+        # Header Carte
+        card <= html.DIV(opt['icon'], Class="text-4xl mb-4 text-center")
+        card <= html.H3(opt['title'], Class="text-lg font-black text-slate-800 text-center uppercase")
+        card <= html.P(opt['subtitle'], Class="text-xs text-slate-400 text-center font-mono mb-6")
+        
+        # Liste des Features
+        ul = html.UL(Class="space-y-2 text-sm flex-1")
+        for feat in opt['pros']:
+            ul <= html.LI("✨ " + feat, Class="text-slate-700 font-medium")
+        for feat in opt['cons']:
+            ul <= html.LI("⚠️ " + feat, Class="text-red-400")
+        card <= ul
+        
+        # Clic sur la carte gagnante (Optionnel car le bouton en bas fait le job)
+        if is_winner:
+            card.bind('click', lambda ev: handle_chassis_install())
+            
+        container <= card
+    
+    # D. Mise à jour du bouton d'action
+    document['chassis-btn-text'].text = f"INSTALLER LE CHÂSSIS {recommendation}"
+    # On lie le bouton d'installation
+    document['chassis-install-btn'].unbind('click') # Reset pour éviter les doublons
+    document['chassis-install-btn'].bind('click', lambda ev: handle_chassis_install())
+
+def handle_chassis_install():
+    # Au lieu de recharger la page, on passe à l'étape suivante
+    document['chassis-overlay'].classList.add('hidden')
+    render_sitemap_screen() # <--- ON LANCE LE SQUELETTE
+    document['sitemap-overlay'].classList.remove('hidden')
+   
 def init():
     try:
         app_state['projects'] = json.loads(document['initial-data'].text)
@@ -127,120 +476,235 @@ def init():
 
     document['undo-btn'].bind('click', handle_undo)
     document.bind('click', handle_global_click)
-
     document['ignite-btn'].bind('click', handle_ignite)
-    for btn in document.select('.modifier-btn'):
-        btn.bind('click', handle_modifier)
+    document['inventory-action-btn'].bind('click', handle_inventory_action)
+    document['add-role-btn'].bind('click', handle_add_role_click)
+    document['casting-add-btn'].bind('click', handle_casting_add)
+    document['casting-input'].bind('keypress', lambda ev: handle_casting_add(ev) if ev.keyCode == 13 else None)
+    document['casting-next-btn'].bind('click', handle_casting_next)
+    
 
+    render_ghost_chips()
     render_tabs()
+    hide_all_overlays()
     timer.set_timeout(finalize_loading, 100)
+
+def hide_all_overlays():
+    document['console-overlay'].classList.add('hidden')
+    document['triage-overlay'].classList.add('hidden')
+    document['strategy-overlay'].classList.add('hidden')
+    document['inventory-overlay'].classList.add('hidden')
 
 def finalize_loading():
     document['skeleton-loader'].classList.add('hidden')
-    c = document['project-container']
-    c.classList.remove('hidden')
-    c.classList.add('animate-fade-in')
+    document['project-container'].classList.remove('hidden')
     render_projects()
 
-def handle_modifier(ev):
-    btn = ev.currentTarget
-    tag = btn.attrs.get('data-add', '').strip()
-    
-    if tag in app_state['modifiers']:
-        app_state['modifiers'].remove(tag)
-        btn.classList.remove('bg-indigo-100', 'text-indigo-700', 'border-indigo-200')
-        btn.classList.add('bg-slate-100', 'text-slate-600')
-    else:
-        app_state['modifiers'].append(tag)
-        btn.classList.remove('bg-slate-100', 'text-slate-600')
-        btn.classList.add('bg-indigo-100', 'text-indigo-700', 'border-indigo-200')
+# --- GHOSTWRITER ---
+def render_ghost_chips():
+    container = document['ghost-chips-container']
+    container.clear()
+    for item in GHOST_DATA:
+        chip = html.DIV(Class="group cursor-pointer bg-white border border-slate-200 hover:border-indigo-300 hover:shadow-md p-3 rounded-xl flex items-center gap-4 transition-all duration-200")
+        icon = html.DIV(item['icon'], Class="text-xl bg-slate-50 h-10 w-10 flex items-center justify-center rounded-full group-hover:bg-indigo-50 transition-colors")
+        content = html.DIV(Class="flex-1")
+        content <= html.H5(item['short_label'], Class="font-bold text-slate-700 text-sm group-hover:text-indigo-700")
+        chip <= icon
+        chip <= content
+        chip.bind('click', lambda ev, txt=item['long_phrase']: apply_ghost_text(txt))
+        container <= chip
 
+def apply_ghost_text(text):
+    inp = document['launchpad-input']
+    inp.value = text
+    inp.focus()
+    inp.classList.add('bg-indigo-50')
+    timer.set_timeout(lambda: inp.classList.remove('bg-indigo-50'), 400)
+
+# --- CONSOLE NARRATIVE ---
 def handle_ignite(ev):
     prompt = document['launchpad-input'].value.strip()
-    
-    if not prompt:
-        document['launchpad-input'].classList.add('ring-2', 'ring-red-500')
-        timer.set_timeout(lambda: document['launchpad-input'].classList.remove('ring-2', 'ring-red-500'), 1000)
-        return
+    if not prompt: return
+    document['launchpad-input'].blur()
+    document['console-user-input'].text = f'"{prompt}"'
+    document['console-overlay'].classList.remove('hidden')
+    document['console-logs-container'].clear()
+    is_chaos = "chaos" in prompt.lower() or "tout" in prompt.lower()
+    scenario = generate_smart_logs(prompt, is_chaos)
+    play_console_sequence(0, scenario, is_chaos)
 
-    document['launchpad-input'].disabled = True
-    document['ignite-btn'].disabled = True
-    document['ignite-btn'].classList.add('opacity-50', 'cursor-not-allowed')
-    document['ignite-btn'].text = "Igniting..."
-    
-    fb = document['narrative-feedback']
-    fb.classList.remove('hidden')
-    
-    run_narrative_sequence(0)
+def generate_smart_logs(text, is_chaos):
+    logs = []
+    logs.append({"msg": "> Initialisation...", "color": "text-slate-500", "delay": 10})
+    if is_chaos:
+        logs.append({"msg": "> Détection : MULTIPLES INTENTIONS 🔴", "color": "text-red-400 font-bold", "delay": 40})
+        logs.append({"msg": "> Tri des priorités requis...", "color": "text-white", "delay": 60})
+        logs.append({"msg": "> Activation du module TRIAGE.", "color": "text-amber-400 blink", "delay": 90})
+    else:
+        logs.append({"msg": "> Détection : INTENTION UNIQUE 🔵", "color": "text-blue-400", "delay": 40})
+        logs.append({"msg": "> Génération de la stratégie...", "color": "text-green-400", "delay": 90})
+    return logs
 
-    req = ajax.ajax()
-    req.bind('complete', on_creation_complete)
-    req.open('POST', URLS['create'], True)
-    req.set_header('content-type', 'application/x-www-form-urlencoded')
-    req.send({'prompt': prompt, 'modifiers[]': app_state['modifiers']})
+def play_console_sequence(idx, scenario, is_chaos):
+    if idx < len(scenario):
+        step = scenario[idx]
+        container = document['console-logs-container']
+        line = html.DIV(Class=f"mb-2 font-mono text-xs opacity-0 {step['color']}")
+        line.html = step['msg']
+        container <= line
+        timer.set_timeout(lambda: line.classList.remove('opacity-0'), 50)
+        document['console-progress-bar'].style.width = f"{step['delay']}%"
+        timer.set_timeout(lambda: play_console_sequence(idx + 1, scenario, is_chaos), 600)
+    else:
+        timer.set_timeout(lambda: route_after_console(is_chaos), 1000)
 
-def run_narrative_sequence(step_idx):
-    steps = [
-        ("Analysis confirmed. Intent detected.", 20),
-        ("Allocating credits...", 40),
-        ("Drafting database schema...", 60),
-        ("Compiling modules...", 80),
-        ("Finalizing environment...", 90)
-    ]
-    if step_idx < len(steps):
-        text, percent = steps[step_idx]
-        document['narrative-text'].text = text
-        document['narrative-progress'].style.width = f"{percent}%"
-        timer.set_timeout(lambda: run_narrative_sequence(step_idx + 1), 500)
+def route_after_console(is_chaos):
+    document['console-overlay'].classList.add('hidden')
+    if is_chaos:
+        # On initialise le Backlog avec toutes les tâches possibles
+        app_state['backlog'] = [t['id'] for t in TRIAGE_DATA]
+        render_triage_screen()
+        document['triage-overlay'].classList.remove('hidden')
+    else:
+        # Cas simple
+        app_state['backlog'] = []
+        render_strategy_screen("finance")
+        document['strategy-overlay'].classList.remove('hidden')
 
-def on_creation_complete(req):
-    try:
-        data = json.loads(req.text)
-        if data.get('status') == 'error':
-            show_toast(data['message']) # Alert replaced by Toast
-            if "Fuel" in data['message']:
-                window.location.href = URLS['treasury']
-            
-            reset_launchpad()
-            return
-
-        document['narrative-text'].text = "Ready. Ship Launched."
-        document['narrative-progress'].style.width = "100%"
-        timer.set_timeout(lambda: finalize_creation_ui(data['project']), 800)
+# --- TRIAGE ---
+def render_triage_screen():
+    container = document['triage-cards-container']
+    container.clear()
+    for item in TRIAGE_DATA:
+        # On n'affiche que ce qui est dans le backlog (au début tout y est)
+        if item['id'] not in app_state['backlog']: continue
         
-    except Exception as e:
-        print(e)
-        show_toast("Critical error connecting to HQ.") # Alert replaced
-        reset_launchpad()
+        card = html.DIV(Class="bg-white border-2 border-slate-100 rounded-xl p-5 hover:border-indigo-400 hover:shadow-xl transition-all cursor-pointer group relative overflow-hidden")
+        card <= html.DIV(Class=f"absolute left-0 top-0 bottom-0 w-2 bg-{item['color']}-500")
+        content = html.DIV(Class="pl-4")
+        header = html.DIV(Class="flex justify-between items-center mb-2")
+        header <= html.H4(item['level'], Class=f"font-bold text-{item['color']}-600 text-sm tracking-wide")
+        badge_cls = f"bg-{item['color']}-100 text-{item['color']}-700" if item['action'] == "COMMENCER PAR ÇA" else "bg-slate-100 text-slate-500"
+        header <= html.SPAN(item['action'], Class=f"text-[10px] font-bold px-2 py-1 rounded-full {badge_cls}")
+        content <= header
+        content <= html.P(item['quote'], Class="text-slate-400 italic text-xs mb-2")
+        content <= html.P(f"> Objectif : {item['objective']}", Class="text-slate-800 font-bold text-base")
+        card <= content
+        card.bind('click', lambda ev, pid=item['id']: select_priority(pid))
+        container <= card
 
-def finalize_creation_ui(new_project):
-    app_state['projects'].insert(0, new_project)
-    reset_launchpad()
-    render_projects()
-    show_toast(f"Ship '{new_project['title']}' initialized!")
+def select_priority(pid):
+    app_state['current_pain_id'] = pid
+    # On retire l'élémént choisi du backlog
+    if pid in app_state['backlog']:
+        app_state['backlog'].remove(pid)
+        
+    document['triage-overlay'].classList.add('hidden')
+    render_strategy_screen(pid)
+    document['strategy-overlay'].classList.remove('hidden')
 
-def reset_launchpad():
-    document['launchpad-input'].value = ""
-    document['launchpad-input'].disabled = False
-    document['ignite-btn'].disabled = False
-    document['ignite-btn'].classList.remove('opacity-50', 'cursor-not-allowed')
-    document['ignite-btn'].text = "Ignite Engines"
-    document['narrative-feedback'].classList.add('hidden')
-    document['narrative-progress'].style.width = "0%"
-    app_state['modifiers'] = []
-    for btn in document.select('.modifier-btn'):
-        btn.classList.remove('bg-indigo-100', 'text-indigo-700', 'border-indigo-200')
-        btn.classList.add('bg-slate-100', 'text-slate-600')
+# --- STRATÉGIE ---
+def render_strategy_screen(pid):
+    data = STRATEGY_DATA.get(pid, STRATEGY_DATA['finance']) # Fallback
+    document['strategy-context-text'].text = data['context']
+    document['strategy-question'].text = data['question']
+    container = document['strategy-cards-container']
+    container.clear()
+    
+    for opt in data['options']:
+        cls = "bg-white border-2 border-slate-200 rounded-2xl p-6 cursor-pointer transition-all hover:border-indigo-500 hover:shadow-2xl relative flex flex-col h-full card-choice"
+        if opt['rec']: cls += " ring-2 ring-emerald-400 ring-offset-2"
+        card = html.DIV(Class=cls)
+        if opt['rec']:
+            card <= html.DIV("⭐ RECOMMANDÉ", Class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-emerald-500 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-md")
+        card <= html.H3(opt['title'], Class="text-xl font-black text-slate-800 mb-2 text-center")
+        card <= html.P(opt['desc'], Class="text-slate-600 text-sm text-center mb-6 flex-1 italic")
+        tech_box = html.DIV(Class="bg-slate-50 p-3 rounded-lg border border-slate-100 mt-auto")
+        tech_box <= html.P("IMPACT TECHNIQUE :", Class="text-[10px] font-bold text-slate-400 uppercase mb-1")
+        tech_box <= html.P(f"> {opt['tech']}", Class="text-xs font-mono text-indigo-600 font-bold")
+        card <= tech_box
+        btn = html.BUTTON("CHOISIR", Class="w-full mt-4 bg-slate-900 text-white py-3 rounded-lg font-bold text-xs hover:bg-indigo-600 transition-colors")
+        card <= btn
+        
+        # On passe l'option choisie
+        card.bind('click', lambda ev, o=opt: finalize_strategy(o))
+        container <= card
 
+def finalize_strategy(chosen_option):
+    # Transition vers l'Inventaire
+    document['strategy-overlay'].classList.add('hidden')
+    render_inventory_screen(chosen_option)
+    document['inventory-overlay'].classList.remove('hidden')
+
+# --- 4. L'ANCRAGE (INVENTAIRE) - NOUVEAU ! ---
+def render_inventory_screen(chosen_option):
+    container = document['inventory-list']
+    container.clear()
+    
+    # 1. Mise à jour de la console interne
+    document['console-choice-record'].text = f"OPTION {chosen_option['title']}"
+    document['console-code-gen'].text = f"Implémentation {chosen_option['tech']}..."
+    
+    # 2. Construction de la liste des items
+    # Item Statique (Standard)
+    static_item = html.DIV(Class="flex items-center gap-4 p-3 bg-slate-50 rounded-lg border border-slate-100 opacity-60")
+    static_item <= html.DIV("📦", Class="text-2xl")
+    static_item <= html.DIV(html.H4("Module de Base (CRUD)", Class="font-bold text-sm text-slate-700") + html.P("Gestion standard des données", Class="text-xs text-slate-500"))
+    container <= static_item
+    
+    # Item Dynamique (Le Loot)
+    dynamic_item = html.DIV(Class="flex items-center gap-4 p-4 bg-white rounded-lg border-l-4 border-indigo-500 shadow-md new-item-anim")
+    dynamic_item <= html.DIV("🛡️" if "FORTERESSE" in chosen_option['title'] else "✅", Class="text-2xl")
+    
+    text_div = html.DIV()
+    title_row = html.DIV(Class="flex items-center gap-2")
+    title_row <= html.H4(chosen_option['tech'], Class="font-bold text-sm text-indigo-900")
+    title_row <= html.SPAN("NOUVEAU !", Class="bg-yellow-300 text-yellow-900 text-[9px] font-bold px-1.5 rounded animate-pulse")
+    text_div <= title_row
+    text_div <= html.P(chosen_option['desc'], Class="text-xs text-slate-600")
+    dynamic_item <= text_div
+    
+    container <= dynamic_item
+    
+    # 3. Gestion du Bouton Footer (Routing Backlog)
+    btn = document['inventory-action-btn']
+    if len(app_state['backlog']) > 0:
+        # S'il reste des douleurs
+        next_pain = app_state['backlog'][0] # On prend le prochain ID
+        btn.text = f"OUI, TRAITONS LE PROBLÈME SUIVANT >>"
+        btn.classList.add("bg-indigo-600")
+        btn.classList.remove("bg-slate-900")
+        # On stocke l'action "loop"
+        btn.attrs['data-action'] = "loop"
+    else:
+        # Si tout est fini
+        btn.text = "NON, PASSONS AU CASTING (FIN) >>"
+        btn.classList.add("bg-slate-900")
+        btn.classList.remove("bg-indigo-600")
+        # On stocke l'action "finish"
+        btn.attrs['data-action'] = "finish"
+
+def handle_inventory_action(ev):
+    action = ev.currentTarget.attrs.get('data-action')
+    document['inventory-overlay'].classList.add('hidden')
+    
+    if action == "loop":
+        # Retour au Triage (S'il y a d'autres douleurs)
+        render_triage_screen()
+        document['triage-overlay'].classList.remove('hidden')
+    else:
+        # --> NOUVEAU : Vers le Casting !
+        render_casting_screen()
+        document['casting-overlay'].classList.remove('hidden')
+
+
+
+# --- OLD GRID LOGIC (INTACTE) ---
 def handle_deploy(ev):
     ev.stopPropagation()
     btn = ev.currentTarget 
     pid = btn.attrs.get('data-pid')
-
-    if not pid:
-        show_toast("Error: Project ID missing") # Translated
-        return
-
+    if not pid: return
     btn.text = "..."
     req = ajax.ajax()
     req.bind('complete', lambda r: on_deploy_complete(r, pid)) 
@@ -252,67 +716,154 @@ def on_deploy_complete(req, pid):
     try:
         data = json.loads(req.text)
         if data['status'] == 'error':
-            show_toast(data['message']) # Alert replaced
-            if "fuel" in data['message'].lower():
-                window.location.href = URLS['treasury']
+            show_toast(data['message'])
             return
-            
         for p in app_state['projects']:
             if p['id'] == pid:
                 p['status'] = data['new_status']
                 break
-        
         show_toast(data['message'])
         render_projects() 
-        
-    except Exception as e:
-        print(e)
-        show_toast("Comms error.") # Translated
+    except:
+        show_toast("Erreur comms.")
 
 def set_tab(ev, tab_name):
     app_state['current_tab'] = tab_name
     render_tabs()    
     render_projects() 
 
+
+# --- 🗺️ LOGIQUE DU SQUELETTE (SITEMAP GENERATOR) ---
+
+def render_sitemap_screen():
+    # 1. Mise à jour de la Console Narrative
+    log = document['sitemap-console-log']
+    log.clear()
+    
+    roles = CASTING_DATA['roles']
+    has_mobile_role = len(roles) > 1 # On suppose que tout rôle autre que Admin est mobile pour l'instant
+    
+    # Simulation de réflexion IA
+    log <= html.P("> Analyse des permissions RBAC...", Class="text-slate-400")
+    if has_mobile_role:
+        log <= html.P(f"> Génération du flux mobile pour : {', '.join(roles[1:])}", Class="text-indigo-400")
+    log <= html.P("> Construction du Dashboard Admin...", Class="text-slate-400")
+    log <= html.P("> Application du Middleware de sécurité...", Class="text-emerald-400 font-bold")
+
+    # 2. Génération de l'Arbre MOBILE (Gauche)
+    mobile_container = document['sitemap-mobile-tree']
+    mobile_container.clear()
+    
+    if has_mobile_role:
+        # Pattern Linéaire : Liste -> Détail -> Action
+        steps = [
+            {"label": "MA TOURNÉE", "sub": "Liste des tâches", "icon": "📋"},
+            {"label": "DÉTAIL MISSION", "sub": "Info & GPS", "icon": "📍"},
+            {"label": "PREUVE", "sub": "Caméra / Signature", "icon": "📸"},
+            {"label": "SUCCÈS", "sub": "Confirmation", "icon": "✅"}
+        ]
+        
+        for i, step in enumerate(steps):
+            # La Boîte
+            node = create_sitemap_node(step['label'], step['sub'], step['icon'], "mobile")
+            mobile_container <= node
+            
+            # La Flèche (sauf pour le dernier)
+            if i < len(steps) - 1:
+                mobile_container <= html.DIV("↓", Class="text-slate-300 font-bold text-xl")
+    else:
+        mobile_container <= html.DIV("Aucun rôle mobile détecté.", Class="text-slate-300 italic text-sm border-2 border-dashed border-slate-200 p-4 rounded-lg")
+
+    # 3. Génération de l'Arbre DESKTOP (Droite)
+    desktop_container = document['sitemap-desktop-tree']
+    desktop_container.clear()
+    
+    # Pattern Étoile (Hub)
+    hub = create_sitemap_node("DASHBOARD", "Vue d'ensemble", "📊", "desktop")
+    desktop_container <= hub
+    
+    # Les Branches du Hub
+    branches_div = html.DIV(Class="flex gap-4 mt-4")
+    
+    # On déduit les pages admin depuis les douleurs initiales (simulé)
+    admin_pages = [
+        {"label": "ÉQUIPE", "icon": "👥"},
+        {"label": "FINANCES", "icon": "💰"},
+        {"label": "PARAMÈTRES", "icon": "⚙️"}
+    ]
+    
+    for page in admin_pages:
+        branch = html.DIV(Class="flex flex-col items-center")
+        branch <= html.DIV("|", Class="text-slate-300 font-bold h-4 mb-1") # Connecteur vertical
+        branch <= create_sitemap_node(page['label'], "", page['icon'], "desktop_sub")
+        branches_div <= branch
+        
+    desktop_container <= branches_div
+    
+    # 4. Binding du bouton validation
+    document['sitemap-validate-btn'].bind('click', handle_validate_architecture)
+
+def create_sitemap_node(label, sub, icon, type):
+    """Helper pour dessiner une belle boîte dans le sitemap"""
+    
+    # Style de base
+    cls = "flex flex-col items-center justify-center p-3 rounded-lg shadow-sm border-2 transition-all hover:scale-105 cursor-default bg-white z-20 "
+    
+    if type == "mobile":
+        cls += "border-indigo-100 w-48"
+    elif type == "desktop":
+        cls += "border-slate-600 bg-slate-50 w-48"
+    else: # desktop sub
+        cls += "border-slate-100 w-24 text-[10px]"
+
+    box = html.DIV(Class=cls)
+    
+    # Contenu
+    if type == "desktop_sub":
+        box <= html.DIV(icon, Class="text-lg")
+        box <= html.DIV(label, Class="font-bold text-slate-700 mt-1")
+    else:
+        box <= html.DIV(icon, Class="text-2xl mb-1")
+        box <= html.DIV(label, Class="font-bold text-slate-800 text-sm")
+        if sub:
+            box <= html.DIV(sub, Class="text-[10px] text-slate-400 uppercase font-mono")
+            
+    return box
+
+def handle_validate_architecture(ev):
+    # C'est la FIN de la Phase 1 !
+    alert("🎉 FÉLICITATIONS !\n\nL'Architecture est validée.\nLe Blueprint technique est généré.\n\n(Fin de la simulation Phase 1)")
+    # Ici, on redirigerait normalement vers la Phase 2 (Design)
+    window.location.reload()
+
+
+
 def render_tabs():
     container = document['tabs-container']
     container.clear()
-    
-    tabs = [('active', 'Active Fleet', 'ship'), ('archived', 'Dry Dock (Archives)', 'archive')]
-    
+    tabs = [('active', 'Active Fleet', 'ship'), ('archived', 'Dry Dock', 'archive')]
     for tab_id, label, icon in tabs:
         is_active = (app_state['current_tab'] == tab_id)
         base_cls = "flex items-center gap-2 pb-2 text-xs font-medium transition-colors border-b-2 cursor-pointer" 
         active_cls = "border-indigo-600 text-indigo-600"
         inactive_cls = "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
-        
         btn = html.DIV(Class=f"{base_cls} {active_cls if is_active else inactive_cls}")
         btn <= html.I(**{'data-lucide': icon, 'class': 'h-3.5 w-3.5'})
         btn <= label
-        
         count = len([p for p in app_state['projects'] if (p['status'] == 'archived') == (tab_id == 'archived')])
         btn <= html.SPAN(str(count), Class="bg-slate-100 text-slate-600 py-0.5 px-1.5 rounded-full text-[10px] ml-1")
-
         btn.bind('click', lambda ev, t=tab_id: set_tab(ev, t))
         container <= btn
 
-    # SEARCH INPUT COMPACT
     search_wrapper = html.DIV(Class="ml-auto relative group")
     icon_div = html.DIV(Class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none")
-    icon_div <= html.I(**{'data-lucide': 'search', 'class': 'h-3.5 w-3.5 text-slate-400 group-focus-within:text-indigo-500 transition-colors'})
+    icon_div <= html.I(**{'data-lucide': 'search', 'class': 'h-3.5 w-3.5 text-slate-400'})
     search_wrapper <= icon_div
-    
-    search_inp = html.INPUT(Type="text", Id="project-search-input", 
-        Class="block w-48 pl-8 pr-2 py-1.5 border border-slate-200 rounded-lg text-xs bg-slate-50 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all",
-        Placeholder="Filter fleet...")
-    
+    search_inp = html.INPUT(Type="text", Id="project-search-input", Class="block w-48 pl-8 pr-2 py-1.5 border border-slate-200 rounded-lg text-xs bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500", Placeholder="Filter fleet...")
     search_inp.bind('input', handle_search)
-    if app_state['filter_text']:
-        search_inp.value = app_state['filter_text']
-        
+    if app_state['filter_text']: search_inp.value = app_state['filter_text']
     search_wrapper <= search_inp
     container <= search_wrapper
-        
     if hasattr(window, 'lucide'): window.lucide.createIcons()
 
 def handle_search(ev):
@@ -341,16 +892,14 @@ def handle_archive(ev):
     ev.stopPropagation()
     btn = ev.currentTarget
     pid = btn.attrs.get('data-pid')
-    
     for p in app_state['projects']:
         if str(p['id']) == str(pid):
             new_status = 'archived' if p['status'] != 'archived' else 'draft'
             p['status'] = new_status
             app_state['last_archived_id'] = p['id']
-            msg = "Project sent to Dry Dock." if new_status == 'archived' else "Project restored."
+            msg = "Project archived." if new_status == 'archived' else "Project restored."
             show_toast(msg)
             break
-            
     app_state['open_menu_id'] = None
     render_tabs()    
     render_projects()
@@ -368,7 +917,7 @@ def handle_undo(ev):
 
 def show_toast(msg):
     t = document['toast-notification']
-    t.select_one('span').text = msg
+    t.select_one('.toast-msg').text = msg
     t.style.transform = "translateY(0)"
     timer.set_timeout(hide_toast, 5000)
 
@@ -404,7 +953,7 @@ def render_empty_state(container, tab):
     wrapper <= html.H3(msg, Class="text-sm font-bold text-slate-500")
     container <= wrapper
 
-
+    
 def create_no_image_card(p):
     card = html.DIV(Class="group bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-indigo-300 transition-all duration-300 flex flex-col overflow-hidden relative")
     
@@ -426,9 +975,7 @@ def create_no_image_card(p):
 
     body = html.DIV(Class="p-4 flex-1 flex flex-col") 
     
-    # TOP ROW
     top_row = html.DIV(Class="flex items-start gap-3 mb-3")
-    
     icon_box = html.DIV(Class=f"h-10 w-10 rounded-lg {bg_color} bg-opacity-10 flex items-center justify-center shrink-0")
     icon_box <= html.I(**{'data-lucide': 'rocket', 'class': f"h-5 w-5 {bg_color.replace('bg-', 'text-')}"})
     top_row <= icon_box
@@ -437,18 +984,34 @@ def create_no_image_card(p):
     title_col <= html.H3(p['title'], Class="font-bold text-sm text-slate-800 truncate group-hover:text-indigo-600 transition-colors")
     title_col <= html.SPAN(status_text, Class=f"text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded mt-0.5 inline-block {status_cls}")
     top_row <= title_col
-    
     body <= top_row
 
-    # ACTIONS ROW
+    # --- 👇 INSÉRER LE NOUVEAU BLOC ICI 👇 ---
+    metrics_row = html.DIV(Class="flex items-center border-y border-slate-100 py-2 my-2 bg-slate-50/50")
+
+    # Utilisateurs
+    u_box = html.DIV(Class="flex-1 text-center border-r border-slate-200")
+    u_box <= html.DIV("UTILISATEURS TOTAUX", Class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-0.5")
+    u_box <= html.DIV("12 Coursiers", Class="text-[10px] font-bold text-slate-700")
+
+    # Stockage
+    s_box = html.DIV(Class="flex-1 text-center")
+    s_box <= html.DIV("💾 STOCKAGE UTILISÉ", Class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-0.5")
+    s_box <= html.DIV("450 Mo / 1 Go", Class="text-[10px] font-bold text-indigo-600")
+
+    metrics_row <= u_box
+    metrics_row <= s_box
+    body <= metrics_row
+    # --- 👆 FIN DU NOUVEAU BLOC 👆 ---
+
     actions_row = html.DIV(Class="flex items-center justify-end gap-2 mt-1")
 
     if p['status'] == 'archived':
-        lbl_arch = "Restore" # Translated
+        lbl_arch = "Restore"
         cls_arch = "bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border-indigo-200"
         ico_arch = "refresh-ccw"
     else:
-        lbl_arch = "Archive" # Translated
+        lbl_arch = "Archive"
         cls_arch = "bg-slate-100 text-slate-600 hover:bg-slate-200 border-slate-200"
         ico_arch = "archive"
 
@@ -457,7 +1020,6 @@ def create_no_image_card(p):
     btn_arch <= lbl_arch
     btn_arch.attrs['data-pid'] = str(p['id'])
     btn_arch.bind('click', handle_archive)
-    
     actions_row <= btn_arch
 
     if p['status'] == 'deployed':
@@ -471,7 +1033,6 @@ def create_no_image_card(p):
     
     btn_deploy.attrs['data-pid'] = str(p['id'])
     btn_deploy.bind('click', handle_deploy)
-    
     actions_row <= btn_deploy
 
     menu_btn = html.BUTTON(Class="text-slate-400 hover:text-slate-600 p-0.5 rounded hover:bg-slate-100 transition dropdown-btn ml-1")
@@ -481,7 +1042,7 @@ def create_no_image_card(p):
 
     body <= actions_row
 
-    # PROGRESS & META
+    # (J'ai laissé la barre de "Integrity" en bas, mais tu peux la supprimer si ça fait trop chargé)
     progress_label = html.DIV(Class="flex justify-between text-[10px] text-slate-500 mb-1 mt-3")
     progress_label <= html.SPAN("Integrity")
     progress_label <= html.SPAN("100%")
@@ -492,16 +1053,15 @@ def create_no_image_card(p):
     body <= progress_track
 
     meta = html.DIV(Class="text-[10px] text-slate-500 flex flex-col gap-0.5 mt-auto pt-3 border-t border-slate-50")
-    meta <= html.SPAN(f"ID: {p['uid'] if 'uid' in p else 'Unknown'}")
-    meta <= html.SPAN(f"Created: {p['date'] if 'date' in p else 'Just now'}")
+    meta <= html.SPAN(f"ID: {p.get('uid', 'Unknown')}")
+    meta <= html.SPAN(f"Created: {p.get('date', 'Just now')}")
     body <= meta
 
     card <= body
 
     if app_state['open_menu_id'] == p['id']:
         dd = html.DIV(Class="absolute right-4 top-28 w-40 bg-white rounded-lg shadow-xl border border-slate-100 z-50 py-1 text-xs animate-in fade-in zoom-in-95 dropdown-menu")
-        
-        btn_open = html.A(Class="w-full text-left px-3 py-1.5 text-slate-700 hover:bg-slate-50 flex items-center gap-2", href=f"#")
+        btn_open = html.A(Class="w-full text-left px-3 py-1.5 text-slate-700 hover:bg-slate-50 flex items-center gap-2", href=URLS['holodeck'] + f"/{p['id']}")
         btn_open <= html.I(**{'data-lucide': 'external-link', 'class': 'h-3.5 w-3.5'})
         btn_open <= "Open Studio"
         
@@ -514,12 +1074,175 @@ def create_no_image_card(p):
         card <= dd
 
     return card
+# --- 🎭 LOGIQUE DU CASTING (MOTEUR D'AFFICHAGE) ---
+
+
+
+# --- LOGIQUE D'AJOUT DE RÈGLE (INCREMENTAL AI) ---
+
+def handle_casting_add(ev):
+    print("DEBUG: Tentative d'ajout de règle...") # Pour vérifier si le clic passe
+    
+    # 1. On récupère l'input
+    inp = document['casting-input']
+    text = inp.value.strip()
+    
+    # 2. Si vide, on alerte visuellement
+    if not text: 
+        print("DEBUG: Champ vide !")
+        inp.classList.add('ring-2', 'ring-red-500')
+        timer.set_timeout(lambda: inp.classList.remove('ring-2', 'ring-red-500'), 500)
+        return
+
+    # 3. On récupère le rôle actif
+    role = app_state['active_role']
+    print(f"DEBUG: Ajout pour le rôle {role}")
+    
+    # 4. On crée la nouvelle règle (Simulation IA)
+    existing_count = len(CASTING_DATA['specs'].get(role, []))
+    new_id = f"US_{str(existing_count + 100)}" 
+    
+    # Détection "Restriction" vs "Feature"
+    is_restriction = "pas" in text.lower() or "interdit" in text.lower()
+    
+    new_spec = {
+        "id": new_id,
+        "type": "RESTRICTION" if is_restriction else "FEATURE",
+        "text": text
+    }
+    
+    # 5. On sauvegarde
+    if role not in CASTING_DATA['specs']:
+        CASTING_DATA['specs'][role] = []
+        
+    CASTING_DATA['specs'][role].append(new_spec)
+    
+    # 6. On vide l'input et on rafraîchit
+    inp.value = ""
+    render_casting_specs()
+    
+    # Scroll vers le bas pour voir l'ajout
+    c = document['casting-specs-list']
+    c.scrollTop = c.scrollHeight
+    print("DEBUG: Ajout réussi !")
+
+# --- LOGIQUE D'AJOUT DE RÔLE ---
+
+def handle_add_role_click(ev):
+    # 1. DEMANDE (INPUT)
+    # Pour l'instant, on utilise une simple boite de dialogue native
+    new_role = window.prompt("Quel est le nom de ce nouvel acteur ? (ex: Comptable, Manager)")
+    
+    if not new_role or not new_role.strip(): return
+    
+    new_role = new_role.strip()
+    
+    # 2. VÉRIFICATION (SECURITÉ)
+    if new_role in CASTING_DATA['roles']:
+        alert("Ce rôle existe déjà !")
+        return
+
+    # 3. CRÉATION (DATA UPDATE)
+    # On l'ajoute à la liste des rôles
+    CASTING_DATA['roles'].append(new_role)
+    # On prépare une liste vide de règles pour lui
+    CASTING_DATA['specs'][new_role] = []
+    
+    # 4. BASCULE (SWITCH)
+    # On le sélectionne immédiatement pour que l'utilisateur puisse ajouter des règles
+    switch_role(new_role)
+    
+    # 5. RENDU (OUTPUT)
+    # switch_role appelle déjà render_casting_screen, donc l'onglet va apparaître
+
+def handle_casting_next(ev):
+    # On cherche l'index du rôle actuel
+    current_idx = CASTING_DATA['roles'].index(app_state['active_role'])
+    
+    # S'il reste des rôles à voir -> On passe au suivant
+    if current_idx < len(CASTING_DATA['roles']) - 1:
+        next_role = CASTING_DATA['roles'][current_idx + 1]
+        switch_role(next_role)
+        
+        # Petit effet visuel pour dire "C'est fait"
+        show_toast(f"Rôle {app_state['active_role']} validé !")
+        
+    else:
+        # C'EST FINI -> ON PASSE AU CHÂSSIS (ÉTAPE 6)
+        document['casting-overlay'].classList.add('hidden')
+        render_chassis_screen() # <--- L'ALGO SE LANCE ICI
+        document['chassis-overlay'].classList.remove('hidden')
+
+
+def render_casting_screen():
+    # 1. On construit les Onglets (Header)
+    tabs_container = document['casting-roles-tabs']
+    tabs_container.clear()
+    
+    for role in CASTING_DATA['roles']:
+        # Est-ce que cet onglet est actif ?
+        is_active = (role == app_state['active_role'])
+        
+        # Style conditionnel
+        cls = "role-tab px-4 py-3 text-sm font-bold cursor-pointer whitespace-nowrap transition-colors rounded-t-lg"
+        if is_active: 
+            cls += " active"
+        
+        tab = html.DIV(role, Class=cls)
+        # Au clic, on change de rôle
+        tab.bind('click', lambda ev, r=role: switch_role(r))
+        tabs_container <= tab
+        
+    # 2. On affiche le nom du rôle dans le sous-titre
+    document['current-role-name'].text = app_state['active_role']
+    
+    # 3. On remplit la liste des règles
+    render_casting_specs()
+
+def switch_role(role_name):
+    # Mise à jour de l'état
+    app_state['active_role'] = role_name
+    # On redessine tout l'écran
+    render_casting_screen()
+
+def render_casting_specs():
+    container = document['casting-specs-list']
+    container.clear()
+    
+    # On récupère les règles du rôle actif
+    role = app_state['active_role']
+    specs = CASTING_DATA['specs'].get(role, [])
+    
+    for spec in specs:
+        # Création de la ligne (Row)
+        row = html.DIV(Class="flex items-start gap-3 bg-white p-3 rounded-lg border border-slate-200 shadow-sm hover:border-indigo-300 transition-all group")
+        
+        # Icône (Feature = Vert / Restriction = Rouge)
+        if spec['type'] == 'FEATURE':
+            icon = html.DIV("✅", Class="text-lg select-none")
+        else:
+            icon = html.DIV("⛔", Class="text-lg select-none")
+        row <= icon
+        
+        # Texte
+        text_div = html.DIV(Class="flex-1")
+        # L'ID technique (ex: US_101) en petit gris
+        text_div <= html.SPAN(spec['id'], Class="text-[9px] font-mono text-slate-400 mr-2 border border-slate-100 px-1 rounded")
+        # La phrase humaine
+        text_div <= html.SPAN(spec['text'], Class="text-sm text-slate-700 font-medium")
+        row <= text_div
+        
+        # Boutons Actions (Cachés par défaut, visibles au survol via CSS group-hover)
+        actions = html.DIV(Class="opacity-0 group-hover:opacity-100 flex gap-2 transition-opacity")
+        btn_edit = html.BUTTON("✏️", Class="hover:bg-slate-100 p-1.5 rounded text-slate-400 hover:text-indigo-600 transition-colors")
+        btn_del = html.BUTTON("🗑️", Class="hover:bg-red-50 p-1.5 rounded text-slate-400 hover:text-red-500 transition-colors")
+        
+        actions <= btn_edit
+        actions <= btn_del
+        row <= actions
+        
+        container <= row
+
 
 init()
 </script>
-
-<style>
-    .animate-fade-in { animation: fadeInUp 0.5s ease-out forwards; }
-    .animate-in { animation: fadeInUp 0.5s ease-out forwards; }
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-</style>

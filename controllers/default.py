@@ -979,6 +979,382 @@ def confirmation_email_sent():
     return dict()
 
 
+# -------------------------------------------------------------------------
+# THE HOLODECK (Narrative Engine)
+# -------------------------------------------------------------------------
+
+
+@auth.requires_login()
+def studio():
+    """
+    L'Atelier de Design.
+    Ici, on ne code pas. On définit l'Intelligence des Pages.
+    """
+    return dict()
+        
+@auth.requires_login()
+def cockpit():
+    import json
+    
+    # 1. On regarde si un ID est demandé
+    project_id = request.args(0)
+
+    # --- CAS A : VUE LISTE (Pas d'ID) ---
+    if not project_id:
+        # Simulation: On récupère tous les projets de l'utilisateur
+        # Dans la vraie vie : db(db.projects.owner_id == auth.user.id).select()
+        my_projects = [
+            {"id": 1, "name": "Vélo-Express", "status": "deployed", "traffic": "1.2k/j"},
+            {"id": 2, "name": "Marketplace Bio", "status": "draft", "traffic": "0"},
+            {"id": 3, "name": "CRM Interne", "status": "deployed", "traffic": "450/j"}
+        ]
+        return dict(view_mode="list", data=json.dumps(my_projects))
+
+    # --- CAS B : VUE DÉTAIL (ID présent) ---
+    else:
+        # Simulation: On charge LE projet spécifique
+        # Dans la vraie vie : p = db.projects(project_id)
+        # if p.owner_id != auth.user.id: redirect(URL('index'))
+        
+        # Dans default.py (Fonction cockpit)
+
+        project_detail = {
+            "id": project_id,
+            "name": "Vélo-Express" if str(project_id) == "1" else f"Projet #{project_id}",
+            "status": "deployed",
+            "analytics_config": {"entity_name": "Livraisons"},
+            "stats": {
+                "traffic": {"val": 1240, "trend": "+12%"},
+                "volume": {"val": 340},
+                "health": {"val": "0.8s", "status": "Stable", "errors": 0},
+                # 👇 DÉTAIL STOCKAGE
+                "storage": {
+                    "used": 450, "total": 1000, 
+                    "breakdown": {"img": 300, "vid": 150, "doc": 10} # En Mo
+                },
+                # 👇 DÉTAIL ORIGINE (DEVICES)
+                "devices": {"mobile": 70, "desktop": 30},
+                "logs": [
+                    {"time": "14:42", "user": "User #45", "action": "Création Item", "type": "info"},
+                    {"time": "14:38", "user": "User #12", "action": "Login Mobile", "type": "mobile"},
+                    {"time": "14:15", "user": "Admin", "action": "Config mise à jour", "type": "warning"},
+                    {"time": "13:50", "user": "System", "action": "Email envoyé", "type": "info"},
+                    {"time": "13:45", "user": "System", "action": "Erreur 404", "type": "error"}
+                ]
+            },
+            # ... (db_schema reste pareil) ...
+        }
+        return dict(view_mode="detail", data=json.dumps(project_detail))
+
+
+
+
+# -------------------------------------------------------------------------
+# MODULE 26: THE STUDIO (UX-Driven Development)
+# -------------------------------------------------------------------------
+
+
+@auth.requires_login()
+def design_agent():
+    """
+    SIMULATEUR DES 9 PROMPTS DE DESIGN.
+    Exécute la méthodologie 'Design First' étape par étape.
+    """
+    import json
+    import time
+    
+    # Simulation de la réflexion (pour l'UX)
+    time.sleep(1.0)
+    
+    step = int(request.vars.step)
+    page_name = request.vars.page_name
+    
+    # Dans une vraie version, ici on appellerait GPT-4 avec tes prompts spécifiques
+    # Ici, on simule le résultat d'un Design Senior pour une page "Login".
+    
+    response = {}
+    
+    if step == 1: # TACHES & RÉACTIONS
+        response = {
+            "title": "1. Intent & Reaction",
+            "content": [
+                {"task": "S'identifier", "system": "Vérifie les crédentials, renvoie un Token"},
+                {"task": "Récupérer mot de passe", "system": "Envoie un email de reset"},
+                {"task": "S'inscrire", "system": "Redirige vers l'Onboarding"}
+            ]
+        }
+    elif step == 2: # CARTOGRAPHIE FLUX
+        response = {
+            "title": "2. Flow Mapping",
+            "content": "Start -> Saisie Email -> Saisie Password -> Click Login -> (Check API) -> Success -> Dashboard"
+        }
+    elif step == 3: # FLUX DÉTAILLÉ (DECISIONS)
+        response = {
+            "title": "3. Decision Tree",
+            "content": [
+                "IF Email unknown -> Show 'Create Account'",
+                "IF Password wrong -> Shake animation + 'Retry'",
+                "IF Success -> Redirect to Home"
+            ]
+        }
+    elif step == 4: # OPTIMISATION
+        response = {
+            "title": "4. UX Optimization",
+            "content": "Simplification: Suppression du champ 'Confirm Password' pour le login. Fusion des écrans Login/Register avec un onglet."
+        }
+    elif step == 5: # FLUX FINAL
+        response = {
+            "title": "5. Final User Flow",
+            "content": "User lands -> Tabs (Login/Sign up) -> Inputs -> Action -> Feedback -> Redirect."
+        }
+    elif step == 6: # INVENTAIRE UI
+        response = {
+            "title": "6. UI Inventory",
+            "components": [
+                {"type": "Input", "label": "Email Address", "style": "Outlined"},
+                {"type": "Input", "label": "Password", "style": "Hidden text"},
+                {"type": "Button", "label": "Access Mission Control", "style": "Primary/Large"},
+                {"type": "Link", "label": "Forgot credentials?", "style": "Subtle"}
+            ]
+        }
+    elif step == 7: # COPYWRITING
+        response = {
+            "title": "7. Copy & Tone",
+            "tone": "Professional & Secure",
+            "headlines": ["Welcome Back, Commander", "Secure Access"],
+            "microcopy": "Enter your credentials to access the fleet."
+        }
+    elif step == 8: # HIÉRARCHIE
+        response = {
+            "title": "8. Visual Hierarchy",
+            "order": [
+                "1. Logo/Brand (Reassurance)",
+                "2. Main Action Title (Context)",
+                "3. Inputs (Interaction)",
+                "4. Primary Button (Conversion)",
+                "5. Helper Links (Rescue)"
+            ]
+        }
+    elif step == 9: # UI STACK (5 ETATS)
+        response = {
+            "title": "9. The UI Stack",
+            "states": {
+                "Ideal": "Form filled, button active",
+                "Empty": "Placeholders visible, button disabled",
+                "Error": "Red border on inputs, toast message",
+                "Loading": "Button becomes spinner, inputs locked",
+                "Partial": "Email filled, password missing"
+            }
+        }
+
+    return json.dumps({'status': 'success', 'data': response})
+
+
+@auth.requires_login()
+def create_project():
+    """
+    1. Vérifie le solde (Coût: 10 crédits)
+    2. Crée le projet en base de données avec le prompt initial
+    3. Renvoie les infos pour l'affichage dynamique sur le Dashboard
+    """
+    import json
+    
+    # Configuration du coût
+    COST_AI_ACTION = 10
+
+    # 1. Récupération des données
+    prompt = request.vars.prompt
+    modifiers = request.vars.getlist('modifiers[]')
+
+    if not prompt:
+        return json.dumps({'status': 'error', 'message': 'Prompt missing'})
+
+    # 2. TENTATIVE DE PAIEMENT
+    # On utilise ta fonction globale définie dans le modèle
+    if not wallet_spend_credits(auth.user.id, COST_AI_ACTION, "New Mission: " + prompt[:20]):
+        # Le message contient "Fuel" pour que le JS redirige vers Treasury
+        return json.dumps({'status': 'error', 'message': 'Fuel insufficient! Please recharge.'})
+
+    # 3. GÉNÉRATION DU TITRE PROVISOIRE
+    # On prend les 40 premiers caractères ou le premier point
+    title = prompt.split('.')[0][:40]
+    if len(title) < 5: 
+        title = "New Undefined Ship"
+
+    # 4. CRÉATION EN BASE (Respect du schéma Narrative Engine)
+    p_id = db.projects.insert(
+        title=title,
+        description=prompt,
+        status='draft', # Statut initial obligatoire
+        last_action=f"Initialized with: {', '.join(modifiers)}" if modifiers else "Narrative Engine Started",
+        narrative_step=0, # Prêt pour le Holodeck
+        blueprint_json={'original_prompt': prompt, 'modifiers': modifiers},
+        owner_id=auth.user.id
+    )
+
+    # 5. PRÉPARATION DE LA RÉPONSE JSON
+    # On récupère le record complet pour avoir le project_uid généré automatiquement
+    project_record = db.projects(p_id)
+    
+    new_project = {
+        'id': p_id,
+        'uid': project_record.project_uid,
+        'title': title,
+        'status': 'draft',
+        'date': project_record.created_on.strftime("%d %b, %H:%M") if project_record.created_on else "Just now"
+    }
+    
+    # On renvoie le projet pour l'affichage grille ET l'URL si on veut rediriger plus tard
+    return json.dumps({
+        'status': 'success', 
+        'project': new_project,
+        'redirect': URL('the_holodeck', args=[p_id])
+    })
+
+
+
+@auth.requires_login()
+def the_holodeck():
+    """
+    Vue immersive : L'Architecte (Chat) vs Le Blueprint (Visuel).
+    """
+    p_id = request.args(0) or redirect(URL('dashboard'))
+    project = db.projects(p_id)
+    
+    # Sécurité : Vérifier que c'est bien mon projet
+    if not project or project.owner_id != auth.user.id:
+        redirect(URL('dashboard'))
+        
+    return dict(project=project)
+
+@auth.requires_login()
+def ai_narrative_engine():
+    """
+    MOTEUR CADET (SIMULATEUR)
+    Simule l'intelligence séquentielle des modules.
+    """
+    import json
+    import time
+    
+    p_id = request.vars.project_id
+    step = int(request.vars.step)
+    choice = request.vars.choice 
+    
+    project = db.projects(p_id)
+    
+    # Sécurité propriétaire
+    if project.owner_id != auth.user.id:
+        return json.dumps({'status': 'error', 'message': 'Unauthorized'})
+
+    bp = project.blueprint_json or {}
+    
+    # Simulation Latence (Thinking Time)
+    time.sleep(1.2) 
+    
+    response_data = {}
+
+    # 🟢 MODULE 1 : STORY EXTRACTOR
+    if step == 1:
+        raw_story = {
+            "trigger": "Le système actuel tombe en panne sans prévenir",
+            "pain_points": ["Découverte tardive", "Perte de temps diagnostic", "Clients mécontents"],
+            "emotions": ["Anxiété", "Urgence", "Frustration"],
+            "core_problem": "Manque de visibilité proactive",
+            "narrative": "Quand le système plante, je le découvre par mes clients... Je perds du temps à comprendre... Je veux être alerté avant eux."
+        }
+        bp['raw_story'] = raw_story
+        # Mise à jour du titre et de la description basés sur l'IA
+        project.update_record(
+            narrative_step=1, 
+            title="Proactive Guardian", 
+            description=raw_story['narrative'],
+            last_action="Story Extracted",
+            blueprint_json=bp
+        )
+        response_data = {'raw_story': raw_story}
+
+    # 🔵 MODULE 2 : PERSPECTIVE GENERATOR
+    elif step == 2:
+        perspectives = [
+            {'id': 'founder', 'who': 'Solo Founder', 'goal': 'Protect Reputation', 'emotion': 'Anxiety', 'stake': 'Brand Trust', 'desc': 'Minimalist, Mobile-First, SMS Alerts'},
+            {'id': 'ops', 'who': 'DevOps Engineer', 'goal': 'Lower MTTR', 'emotion': 'Stress', 'stake': 'Uptime', 'desc': 'Logs, Terminal, Detailed Metrics'},
+            {'id': 'support', 'who': 'Support Lead', 'goal': 'Reduce Noise', 'emotion': 'Overwhelm', 'stake': 'Satisfaction', 'desc': 'Ticketing View, Status Page'},
+            {'id': 'manager', 'who': 'IT Manager', 'goal': 'Control Costs', 'emotion': 'Uncertainty', 'stake': 'Compliance', 'desc': 'Reporting PDF, SLA Dashboard'},
+            {'id': 'ecommerce', 'who': 'E-com Director', 'goal': 'Save Revenue', 'emotion': 'Fear', 'stake': 'Lost Sales', 'desc': 'Revenue Impact View'}
+        ]
+        bp['perspectives'] = perspectives
+        project.update_record(
+            narrative_step=2, 
+            last_action="Perspectives Generated",
+            blueprint_json=bp
+        )
+        response_data = {'perspectives': perspectives}
+
+    # 🟣 MODULE 3 : PERSONA BUILDER
+    elif step == 3:
+        selected_id = choice or 'founder'
+        if selected_id == 'founder':
+            user_zero = {
+                'name': 'Thomas', 'age': 29, 'role': 'Solopreneur SaaS',
+                'context': 'Manages 3 apps alone, Bootstrapped',
+                'language': 'Direct, Urgent, No-Jargon',
+                'pain_points': ['Slack notification at 3AM missed'],
+                'quote': "I don't want graphs, I want to know if I can sleep."
+            }
+        else:
+            user_zero = {
+                'name': 'Alex', 'age': 34, 'role': 'Tech Lead',
+                'context': 'High pressure environment',
+                'language': 'Technical, Precise',
+                'pain_points': ['Unclear logs', 'Slow diagnosis'],
+                'quote': "Just give me the root cause."
+            }   
+        bp['user_zero'] = user_zero
+        bp['selected_perspective'] = selected_id
+        
+        project.update_record(
+            narrative_step=3, 
+            last_action=f"User Zero ({user_zero['name']}) created",
+            blueprint_json=bp
+        )
+        response_data = {'user_zero': user_zero}
+
+    # 🟠 MODULE 4 : ROLE EXTRACTOR
+    elif step == 4:
+        roles = [
+            {'id': 'admin', 'name': 'Thomas (Admin)', 'type': 'Primary', 'access': 'Full Control'},
+            {'id': 'system', 'name': 'Monitoring Bot', 'type': 'System', 'access': 'API Write'},
+            {'id': 'viewer', 'name': 'End User', 'type': 'External', 'access': 'Read-Only'},
+            {'id': 'collab', 'name': 'Freelance Dev', 'type': 'Secondary', 'access': 'Logs View'}
+        ]
+        bp['roles'] = roles
+        project.update_record(
+            narrative_step=4, 
+            last_action="Roles Defined",
+            blueprint_json=bp
+        )
+        response_data = {'roles': roles}
+
+    # 🔴 MODULE 5 : SPECIFICATION GENERATOR
+    elif step == 5:
+        backlog = {
+            'Detection & Alert': ['US-01: Create HTTP Monitor', 'US-02: SMS Alerting Logic'],
+            'Triage & Diagnosis': ['US-03: Incident Timeline View', 'US-04: Acknowledge Button'],
+            'Collaboration': ['US-05: Invite Team Member', 'US-06: Public Status Page']
+        }
+        bp['specs'] = backlog
+        project.update_record(
+            narrative_step=5, 
+            last_action="Blueprint Ready",
+            blueprint_json=bp
+        )
+        response_data = {'specs': backlog}
+
+    return json.dumps({'status': 'success', 'data': response_data, 'step': step})
+
+
+
+
 # ---- API (example) -----
 @auth.requires_login()
 def api_get_user_email():

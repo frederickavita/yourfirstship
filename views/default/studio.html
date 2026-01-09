@@ -1,0 +1,1223 @@
+{{extend 'malayout.html'}}
+
+<style>
+    /* Override global pour le mode Studio sombre */
+    body { background-color: #0f172a; color: #e2e8f0; }
+    
+    /* Scrollbars fines */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #1e293b; }
+    ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+    
+    /* Animations */
+    .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    
+    .phone-frame {
+        box-shadow: 0 0 0 12px #1e293b, 0 0 0 14px #334155, 0 20px 50px rgba(0,0,0,0.5);
+    }
+    
+    /* Etats des onglets */
+    .tab-active { border-bottom: 2px solid #6366f1; color: #fff; }
+    .tab-inactive { color: #64748b; }
+    .tab-inactive:hover { color: #94a3b8; }
+
+/* --- Styles Spécifiques pour le Compagnon --- */
+    .comp-tab-active { 
+        background-color: #1e293b; /* Slate-800 */
+        color: white; 
+        border-bottom: 2px solid #6366f1; /* Indigo-500 */
+    }
+    .comp-tab-inactive { 
+        background-color: transparent; 
+        color: #64748b; /* Slate-500 */
+        border-bottom: 2px solid transparent; 
+    }
+    .comp-tab-inactive:hover { 
+        background-color: #1e293b; 
+        color: #94a3b8; 
+    }
+
+
+
+    /* --- Styles du Navigateur (Sitemap) --- */
+    .nav-header { 
+        display: flex; justify-content: space-between; align-items: center; 
+        padding: 12px 16px; border-bottom: 1px solid #1e293b; 
+        background-color: #0f172a;
+    }
+    
+    .nav-folder {
+        padding: 8px 12px; cursor: pointer; color: #94a3b8; font-weight: bold; font-size: 11px;
+        display: flex; align-items: center; gap: 6px; user-select: none;
+        transition: color 0.2s;
+    }
+    .nav-folder:hover { color: #e2e8f0; }
+
+    .nav-item {
+        padding: 8px 12px 8px 32px; /* Indentation pour les pages */
+        cursor: pointer; font-size: 12px; color: #cbd5e1;
+        display: flex; justify-content: space-between; align-items: center;
+        border-left: 2px solid transparent; margin-bottom: 2px;
+    }
+    .nav-item:hover { background-color: #1e293b; }
+
+    /* L'État Actif (Selection) */
+    .nav-active {
+        background-color: #1e293b; /* Gris/Bleu foncé */
+        border-left: 2px solid #6366f1; /* Bordure Indigo */
+        color: white;
+        font-weight: 600;
+    }
+    
+    .status-icon { font-size: 10px; margin-right: 6px; }
+
+
+    /* Animation Skeleton Loader */
+    @keyframes pulse-gray {
+        0%, 100% { opacity: 1; background-color: #334155; }
+        50% { opacity: .5; background-color: #475569; }
+    }
+    .skeleton {
+        animation: pulse-gray 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        border-radius: 4px;
+    }
+
+</style>
+
+<div class="flex h-screen font-sans overflow-hidden bg-[#0F172A] text-slate-300">
+
+ <aside class="w-64 flex flex-col border-r border-slate-800 bg-[#0B1120]">
+        
+        <div class="p-4 border-b border-slate-800 bg-[#0B1120]">
+            <div class="flex items-center gap-2 mb-1">
+                <div class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                <span class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">EN LIGNE</span>
+            </div>
+            <h1 class="font-black text-white text-md tracking-tight">VÉLO-EXPRESS</h1>
+        </div>
+
+        <div class="nav-header">
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                <i data-lucide="folder-open" class="h-3 w-3"></i> NAVIGATEUR
+            </span>
+            <div class="flex gap-2">
+                <button class="text-slate-500 hover:text-white transition-colors" title="Rechercher">
+                    <i data-lucide="search" class="h-3.5 w-3.5"></i>
+                </button>
+                <button class="text-slate-500 hover:text-white transition-colors" title="Nouvelle Page">
+                    <i data-lucide="plus-square" class="h-3.5 w-3.5"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto" id="nav-tree">
+            </div>
+
+       
+
+
+<div id="companion-panel" class=" h-1/2 border-t border-slate-800 flex flex-col bg-[#0F172A]">
+            
+            <div class="flex border-b border-slate-800 text-[10px] font-bold uppercase tracking-widest cursor-pointer">
+                <div id="tab-chat" class="flex-1 p-3 text-center comp-tab-active transition-colors">
+                    💬 Chat
+                </div>
+                <div id="tab-history" class="flex-1 p-3 text-center comp-tab-inactive transition-colors">
+                    🕒 Time Machine
+                </div>
+            </div>
+            
+            <div id="chat-view" class="flex-1 flex flex-col relative">
+                <div id="chat-messages" class="flex-1 overflow-y-auto p-3 space-y-3 text-xs">
+                    <div class="bg-slate-800 p-2 rounded-lg rounded-tl-none text-slate-300 border border-slate-700">
+                        🤖 Je suis prêt. On modifie quoi ?<br>
+                        <span class="text-[10px] text-slate-500 italic">Essayez: "Mets le bouton en rouge"</span>
+                    </div>
+                </div>
+                <div class="p-2 border-t border-slate-800 bg-[#0B1120]">
+                    <div class="relative">
+                        <input id="chat-input" type="text" class="w-full bg-slate-900 border border-slate-700 rounded p-3 pr-10 text-xs text-white focus:outline-none focus:border-indigo-500 transition-colors" placeholder="Instructions...">
+                        <button id="chat-send-btn" class="absolute right-2 top-2 text-indigo-500 hover:text-white">
+                            <i data-lucide="arrow-up-circle" class="h-5 w-5"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="history-view" class="hidden flex-1 overflow-y-auto p-3 space-y-4 bg-[#0F172A]">
+                </div>
+        </div>
+
+    </aside>
+
+    <main class="flex-1 flex flex-col relative overflow-hidden">
+        
+       <header class="h-14 border-b border-slate-800 bg-[#0B1120] flex items-center justify-between px-6">
+           <div class="flex items-center gap-6">
+                <h2 id="current-page-title" class="font-bold text-white text-sm tracking-wide">P05_PREUVE</h2>
+                
+                <div class="flex bg-slate-900 rounded-lg p-1 border border-slate-700">
+                    
+                    <button id="btn-mode-design" class="px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all bg-indigo-600 text-white shadow-lg flex items-center gap-2">
+                        <i data-lucide="pen-tool" class="h-3 w-3"></i> Design
+                    </button>
+                    
+                    <button id="btn-mode-code" class="px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all text-slate-500 hover:text-white flex items-center gap-2">
+                        <i data-lucide="code-2" class="h-3 w-3"></i> Code
+                    </button>
+
+                    <button id="btn-open-settings" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white p-2 rounded-lg border border-slate-700 transition-colors mr-2" title="Réglages du Projet">
+    <i data-lucide="settings" class="h-4 w-4"></i>
+</button>
+                    
+                </div>
+            </div>
+            
+            <div class="flex gap-4">
+                <button id="action-btn-reject" class="text-red-400 text-xs font-bold hover:text-white transition-colors">❌ REJETER</button>
+                
+                <button id="action-btn-main" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2 rounded transition-colors flex items-center gap-2">
+                    <i data-lucide="check" class="h-3 w-3"></i> <span>VALIDER ET CODER</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 flex overflow-hidden">
+
+
+          <div id="factory-editor" class="flex-1 border-r border-slate-800 flex flex-col bg-[#0F172A]">
+                
+                <div class="flex border-b border-slate-800 shrink-0 overflow-x-auto">
+                    <button id="btn-spec-logic" class="flex-1 px-4 py-3 text-xs font-bold text-white border-b-2 border-indigo-500 bg-slate-800/50 transition-colors whitespace-nowrap">🧠 LOGIQUE</button>
+                    <button id="btn-spec-structure" class="flex-1 px-4 py-3 text-xs font-bold text-slate-500 border-b-2 border-transparent hover:text-slate-300 transition-colors whitespace-nowrap">🧱 STRUCTURE</button>
+                    <button id="btn-spec-content" class="flex-1 px-4 py-3 text-xs font-bold text-slate-500 border-b-2 border-transparent hover:text-slate-300 transition-colors whitespace-nowrap">✍️ CONTENU</button>
+                    <button id="btn-spec-simulation" class="flex-1 px-4 py-3 text-xs font-bold text-slate-500 border-b-2 border-transparent hover:text-slate-300 transition-colors whitespace-nowrap">🎮 SIMULATION</button>
+                </div>
+
+                <div id="factory-content-area" class="p-6 overflow-y-auto space-y-6 flex-1">
+                    </div>
+            </div>
+        <div id="ide-workbench" class="hidden flex-1 border-r border-slate-800 flex flex-col bg-[#1E1E1E]">
+                
+                <div class="flex border-b border-slate-800 bg-[#0B1120] text-[10px] font-mono tracking-widest">
+                    <button id="wb-tab-visual" class="flex-1 px-4 py-3 text-white border-b-2 border-emerald-500 hover:bg-slate-800 transition-colors flex items-center justify-center gap-2">
+                        <i data-lucide="eye" class="h-3 w-3"></i> VISUEL
+                    </button>
+                    <button id="wb-tab-db" class="flex-1 px-4 py-3 text-slate-500 border-b-2 border-transparent hover:text-white hover:bg-slate-800 transition-colors flex items-center justify-center gap-2">
+                        <i data-lucide="database" class="h-3 w-3"></i> BDD
+                    </button>
+                    <button id="wb-tab-api" class="flex-1 px-4 py-3 text-slate-500 border-b-2 border-transparent hover:text-white hover:bg-slate-800 transition-colors flex items-center justify-center gap-2">
+                        <i data-lucide="plug" class="h-3 w-3"></i> API
+                    </button>
+                    <button id="wb-tab-code" class="flex-1 px-4 py-3 text-slate-500 border-b-2 border-transparent hover:text-white hover:bg-slate-800 transition-colors flex items-center justify-center gap-2">
+                        <i data-lucide="code" class="h-3 w-3"></i> CODE
+                    </button>
+                </div>
+
+                <div id="wb-view-visual" class="flex-1 bg-[#1e1e1e] flex items-center justify-center p-4">
+                    <div class="text-center space-y-2">
+                        <i data-lucide="monitor-smartphone" class="h-12 w-12 text-slate-600 mx-auto"></i>
+                        <p class="text-slate-500 text-xs">Aperçu synchronisé disponible<br>dans le panneau de droite →</p>
+                    </div>
+                </div>
+
+                <div id="wb-view-db" class="hidden flex-1 p-8 overflow-y-auto">
+                    <div class="max-w-2xl mx-auto bg-[#252526] rounded-lg border border-[#3E3E42] shadow-xl">
+                        <div class="p-4 border-b border-[#3E3E42] flex justify-between items-center">
+                            <h3 class="font-bold text-slate-200 text-sm flex items-center gap-2"><i data-lucide="table" class="h-4 w-4 text-emerald-500"></i> TABLE : <span class="font-mono text-emerald-400">proofs</span></h3>
+                            <span class="text-[10px] bg-slate-700 text-slate-300 px-2 py-1 rounded">PostgreSQL</span>
+                        </div>
+                        <div class="p-0">
+                            <table class="w-full text-left text-xs font-mono">
+                                <thead class="bg-[#1E1E1E] text-slate-500">
+                                    <tr>
+                                        <th class="p-3 border-b border-[#3E3E42]">CHAMP</th>
+                                        <th class="p-3 border-b border-[#3E3E42]">TYPE</th>
+                                        <th class="p-3 border-b border-[#3E3E42]">NOTES</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="db-rows-container" class="text-slate-300"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="wb-view-api" class="hidden flex-1 p-8 overflow-y-auto space-y-4">
+                    <h3 class="text-xs font-bold text-slate-500 uppercase mb-4">Endpoints générés :</h3>
+                    <div id="api-cards-container" class="space-y-4 max-w-2xl mx-auto"></div>
+                </div>
+
+                <div id="wb-view-code" class="hidden flex-1 flex flex-col bg-[#1E1E1E]">
+                    <div class="h-full overflow-y-auto p-4 font-mono text-xs leading-relaxed text-slate-300" id="code-editor-content"></div>
+                </div>
+
+            </div>
+
+
+
+    
+
+    
+
+        <div id="sim-panel"  class="w-[400px] bg-[#0B1120] flex flex-col items-center justify-center relative p-8 border-l border-slate-800 shrink-0 transition-all duration-500 ease-in-out">
+                
+                <div class="absolute top-4 left-0 w-full px-6 flex justify-between items-center">
+                    <div class="text-xs font-bold text-slate-500 tracking-widest uppercase flex items-center gap-2">
+                        <i data-lucide="play-circle" class="h-3 w-3"></i> APERÇU
+                    </div>
+                    
+                    <div class="flex bg-slate-900 rounded p-1 border border-slate-700">
+                        <button id="btn-sim-mobile" class="p-1.5 rounded text-white bg-indigo-600 transition-colors" title="Vue Mobile">
+                            <i data-lucide="smartphone" class="h-3.5 w-3.5"></i>
+                        </button>
+                        <button id="btn-sim-desktop" class="p-1.5 rounded text-slate-500 hover:text-white transition-colors" title="Vue Bureau">
+                            <i data-lucide="monitor" class="h-3.5 w-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div  style="margin-top:40px;" id="sim-frame" class="w-[320px] h-[640px] bg-black rounded-[40px] overflow-hidden relative border-4 border-slate-700 shadow-2xl transition-all duration-500">
+                    
+                    <div id="sim-header-mobile" class="h-6 bg-black/20 absolute top-0 w-full z-30 flex justify-between px-4 items-center text-[10px] text-white font-bold transition-opacity">
+                        <span>14:30</span>
+                        <div class="flex gap-1"><span>📡 4G</span> <span>🔋 100%</span></div>
+                    </div>
+
+                    <div id="sim-header-desktop" class="hidden h-6 bg-[#e5e7eb] absolute top-0 w-full z-30 flex items-center px-2 gap-2 border-b border-slate-300">
+                        <div class="flex gap-1">
+                            <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                            <div class="w-2 h-2 rounded-full bg-amber-500"></div>
+                            <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                        </div>
+                        <div class="flex-1 bg-white h-4 rounded text-[8px] flex items-center px-2 text-slate-500 font-mono">
+                            https://velo-express.yourfirstship.com
+                        </div>
+                    </div>
+
+                    <div id="sandbox-content" class="h-full w-full bg-slate-900 relative text-white overflow-hidden pt-6">
+                        </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+
+<div id="deploy-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm fade-in">
+    
+    <div class="bg-[#1e293b] w-[650px] rounded-xl border border-slate-700 shadow-2xl overflow-hidden relative">
+        
+        <div class="bg-[#0f172a] p-4 border-b border-slate-700 flex justify-between items-center">
+            <h3 class="font-black text-white text-lg tracking-tight flex items-center gap-2">
+                🚀 MISE EN ORBITE <span class="text-slate-500 font-normal text-sm">| VÉLO-EXPRESS</span>
+            </h3>
+            <button id="btn-close-deploy" class="text-slate-400 hover:text-white">
+                <i data-lucide="x" class="h-5 w-5"></i>
+            </button>
+        </div>
+
+        <div class="p-8 space-y-8">
+            
+            <div class="space-y-4">
+                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest border-b border-slate-700 pb-2">1. CONFIGURATION DE L'ACCÈS</h4>
+                
+                <div class="flex items-center gap-4">
+                    <label class="text-sm text-slate-300 w-24">🔗 URL :</label>
+                    <div class="flex-1 bg-black/30 border border-slate-600 rounded px-3 py-2 font-mono text-sm text-emerald-400">
+                        https://<span id="deploy-slug" class="text-white font-bold">velo-express</span>.yourfirstship.com
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-4">
+                    <label class="text-sm text-slate-300 w-24 mt-2">🛡️ ACCÈS :</label>
+                    <div class="flex-1 space-y-3">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="visibility" value="public" class="accent-indigo-500">
+                            <span class="text-sm text-slate-300">🌍 PUBLIC (Accès libre)</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="visibility" value="private" checked class="accent-indigo-500">
+                            <span class="text-sm text-white font-bold">🔒 PRIVÉ (Mot de passe)</span>
+                        </label>
+                        
+                        <div class="ml-6 flex items-center gap-2">
+                            <input type="text" id="deploy-password" value="ship_2024_secure" readonly class="bg-slate-800 border border-slate-600 rounded px-3 py-1 text-xs text-slate-300 w-40 text-center font-mono">
+                            <button id="btn-regen-pass" class="text-slate-500 hover:text-white" title="Générer un nouveau mot de passe">
+                                <i data-lucide="refresh-cw" class="h-3 w-3"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest border-b border-slate-700 pb-2">2. POINTS D'ENTRÉE</h4>
+                
+                <div id="deploy-distribution-area">
+                    </div>
+            </div>
+
+        </div>
+
+        <div class="bg-[#0f172a] p-4 border-t border-slate-700 flex justify-end">
+            <button id="btn-final-launch" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
+                <i data-lucide="rocket" class="h-4 w-4"></i> LANCER LA PRODUCTION
+            </button>
+        </div>
+
+    </div>
+</div>
+
+
+<div id="settings-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black/90 backdrop-blur-md fade-in">
+    
+    <div class="bg-[#0f172a] w-[700px] h-[80vh] rounded-xl border border-slate-700 shadow-2xl flex flex-col overflow-hidden">
+        
+        <div class="bg-[#1e293b] p-4 border-b border-slate-700 flex justify-between items-center shrink-0">
+            <h3 class="font-bold text-white text-lg flex items-center gap-2">
+                ⚙️ CONFIGURATION DU PROJET
+            </h3>
+            <button id="btn-close-settings" class="text-slate-400 hover:text-white transition-colors">
+                <i data-lucide="x" class="h-6 w-6"></i>
+            </button>
+        </div>
+
+        <div class="flex border-b border-slate-700 bg-[#0f172a] shrink-0">
+            <button id="tab-settings-brand" class="flex-1 py-4 text-xs font-bold uppercase tracking-widest border-b-2 border-indigo-500 text-white bg-slate-800/50 transition-colors">
+                🎨 Marque & Design
+            </button>
+            <button id="tab-settings-media" class="flex-1 py-4 text-xs font-bold uppercase tracking-widest border-b-2 border-transparent text-slate-500 hover:text-slate-300 transition-colors">
+                📂 Médiathèque (Assets)
+            </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-8 relative">
+            
+            <div id="view-settings-brand" class="space-y-8">
+                
+                <div class="space-y-4">
+                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-2">1. IDENTITÉ DU PROJET</h4>
+                    
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold text-slate-300">Nom du Projet</label>
+                            <input type="text" id="brand-project-name" value="Vélo-Express" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white focus:border-indigo-500 outline-none">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold text-slate-300">Logo</label>
+                            <div class="flex items-center gap-3">
+                                <div class="h-10 w-10 bg-slate-800 rounded-full border border-slate-600 flex items-center justify-center overflow-hidden">
+                                    <span class="text-xs">🖼️</span>
+                                </div>
+                                <button class="text-xs text-indigo-400 hover:text-white underline">Changer le logo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-2">2. DESIGN SYSTEM</h4>
+                    
+                    <div class="space-y-3">
+                        <label class="text-xs font-bold text-slate-300">Couleur Primaire</label>
+                        <div class="flex gap-3">
+                            <button class="w-8 h-8 rounded-full bg-emerald-500 ring-2 ring-offset-2 ring-offset-[#0f172a] ring-white scale-110 transition-transform" onclick="setBrandColor('#10B981', this)"></button>
+                            <button class="w-8 h-8 rounded-full bg-blue-600 ring-offset-2 ring-offset-[#0f172a] hover:ring-2 hover:ring-slate-500 transition-transform" onclick="setBrandColor('#2563EB', this)"></button>
+                            <button class="w-8 h-8 rounded-full bg-violet-600 ring-offset-2 ring-offset-[#0f172a] hover:ring-2 hover:ring-slate-500 transition-transform" onclick="setBrandColor('#7C3AED', this)"></button>
+                            <button class="w-8 h-8 rounded-full bg-amber-500 ring-offset-2 ring-offset-[#0f172a] hover:ring-2 hover:ring-slate-500 transition-transform" onclick="setBrandColor('#F59E0B', this)"></button>
+                            <button class="w-8 h-8 rounded-full bg-rose-500 ring-offset-2 ring-offset-[#0f172a] hover:ring-2 hover:ring-slate-500 transition-transform" onclick="setBrandColor('#F43F5E', this)"></button>
+                            
+                            <div class="relative ml-2">
+                                <input type="color" id="brand-color-picker" value="#10B981" class="w-8 h-8 rounded-full overflow-hidden cursor-pointer border-none p-0 bg-transparent">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="space-y-3">
+                            <label class="text-xs font-bold text-slate-300">Typographie</label>
+                            <select id="brand-font" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white outline-none focus:border-indigo-500">
+                                <option value="Inter">Moderne (Sans-Serif)</option>
+                                <option value="Merriweather">Sérieux (Serif)</option>
+                                <option value="Fira Code">Tech (Monospace)</option>
+                            </select>
+                        </div>
+                        <div class="space-y-3">
+                            <label class="text-xs font-bold text-slate-300">Arrondi (Radius)</label>
+                            <div class="flex bg-slate-900 p-1 rounded-lg border border-slate-700">
+                                <button class="flex-1 py-1 text-[10px] text-slate-400 hover:text-white rounded transition-colors" onclick="setBrandRadius('0px')">Carré</button>
+                                <button class="flex-1 py-1 text-[10px] text-white bg-slate-700 font-bold rounded shadow transition-colors" onclick="setBrandRadius('8px')">Doux</button>
+                                <button class="flex-1 py-1 text-[10px] text-slate-400 hover:text-white rounded transition-colors" onclick="setBrandRadius('99px')">Rond</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-2">3. APERÇU TEMPS RÉEL</h4>
+                    
+                    <div id="brand-preview-box" class="bg-white rounded-xl p-6 flex flex-col items-center gap-4 transition-all duration-300">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 bg-slate-900 rounded-full"></div>
+                            <span id="preview-title" class="text-slate-900 font-bold text-lg">Vélo-Express</span>
+                        </div>
+                        <div class="w-full h-32 bg-slate-100 rounded-lg border-2 border-dashed border-slate-200 flex items-center justify-center text-slate-400 text-sm">
+                            [ Contenu de l'app ]
+                        </div>
+                        <button id="preview-btn" class="px-6 py-3 text-white font-bold shadow-lg transform hover:scale-105 transition-all">
+                            BOUTON PRINCIPAL
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="view-settings-media" class="hidden space-y-8">
+                
+                <div class="border-2 border-dashed border-slate-600 rounded-xl p-8 flex flex-col items-center justify-center text-center hover:border-indigo-500 hover:bg-indigo-500/5 transition-all cursor-pointer group">
+                    <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <i data-lucide="cloud-upload" class="h-8 w-8 text-indigo-400"></i>
+                    </div>
+                    <h4 class="text-white font-bold mb-1">Glissez vos fichiers ici</h4>
+                    <p class="text-xs text-slate-400">Images (JPG, PNG), Vidéos (MP4) - Max 50Mo</p>
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-end mb-4 border-b border-slate-800 pb-2">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest">FICHIERS DISPONIBLES (3)</h4>
+                        <span class="text-[10px] text-emerald-400 bg-emerald-900/20 px-2 py-1 rounded border border-emerald-900/50">✨ IA Auto-Tagging Actif</span>
+                    </div>
+
+                    <div id="media-grid" class="grid grid-cols-3 gap-4">
+                        </div>
+                </div>
+
+                <div class="bg-indigo-900/20 border border-indigo-500/30 p-4 rounded-lg flex gap-3">
+                    <i data-lucide="sparkles" class="h-5 w-5 text-indigo-400 shrink-0 mt-0.5"></i>
+                    <div>
+                        <h5 class="text-sm font-bold text-indigo-300">Intelligence Artificielle</h5>
+                        <p class="text-xs text-indigo-200/70 mt-1 leading-relaxed">
+                            L'IA analyse vos images lors de l'upload. Si vous demandez "Mets une photo de l'équipe", elle saura laquelle choisir grâce aux tags générés.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="bg-[#1e293b] p-4 border-t border-slate-700 flex justify-end gap-3 shrink-0">
+            <button id="btn-cancel-settings" class="text-xs font-bold text-slate-400 hover:text-white px-4 py-2 transition-colors">ANNULER</button>
+            <button id="btn-save-settings" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-6 py-2 rounded shadow-lg transition-transform hover:-translate-y-0.5 flex items-center gap-2">
+                <i data-lucide="check" class="h-3 w-3"></i> SAUVEGARDER
+            </button>
+        </div>
+
+    </div>
+</div>
+
+
+<div id="system-console" class="fixed bottom-0 left-0 w-full h-8 bg-[#020617] border-t border-slate-800 flex items-center px-4 justify-between z-[9999] font-mono text-[10px] text-slate-400 select-none shadow-2xl">
+    
+    <div class="flex items-center gap-3">
+        <span id="console-icon" class="text-emerald-500 animate-pulse">🧠</span>
+        <span id="console-message" class="text-slate-300 transition-opacity duration-500">> Système prêt. En attente d'instructions.</span>
+    </div>
+
+    <div class="flex items-center gap-4 opacity-70">
+        <span id="console-metric" class="text-emerald-500 hidden">⚡ 120ms</span>
+        <span id="console-version" class="text-slate-500">Snapshot #45</span>
+        <button class="hover:text-white transition-colors" title="Ouvrir les logs">
+            <i data-lucide="scroll-text" class="h-3 w-3"></i>
+        </button>
+    </div>
+
+</div>
+
+
+
+<script type="text/python">
+from browser import document, html, window, ajax, timer
+import datetime
+
+# --- 1. DONNÉES & ÉTAT GLOBAL (DATA) ---
+
+# État Global de la Page (Single Source of Truth)
+CURRENT_PAGE_STATE = {
+    "id": "P05_PROOF",
+    "name": "Preuve de Livraison",
+    
+    # DONNÉES HÉRITÉES & CONFIGURABLES (PHASE 2 - USINE)
+    "specs": {
+        "logic": {
+            "goal": "Prouver livraison (Photo + GPS)",
+            "workflow": ["Arrivée", "Viser", "Tap", "Succès"],
+            "edge_cases": [
+                {"if": "Offline", "then": "💾 Save to IndexedDB (Sync later)"},
+                {"if": "No Camera", "then": "📂 Fallback: Input File (Upload)"},
+                {"if": "Low GPS", "then": "⚠️ Alert: 'Rapprochez-vous (50m)'"}
+            ]
+        },
+        "structure": {
+            "inventory": [
+                {"name": "CameraViewport", "type": "HTML5 <video>", "lib": "Native"},
+                {"name": "BigTriggerButton", "type": "Button (Thumb)", "lib": "Tailwind"},
+                {"name": "FlashToggle", "type": "Button (Ghost)", "lib": "Lucide"},
+                {"name": "OverlayInfo", "type": "Text Layer", "lib": "DaisyUI"}
+            ],
+            "layers": [
+                {"z": 0, "name": "Fond Vidéo", "desc": "Fullscreen"},
+                {"z": 10, "name": "Info Client", "desc": "Top Left"},
+                {"z": 20, "name": "Action Button", "desc": "Bottom Center"}
+            ]
+        },
+        "content": {
+            "tone": "Direct / Terrain",
+            "variables": {
+                "$Header_Title": "Livraison pour : {Client}",
+                "$Success_Msg": "C'est dans la boîte !",
+                "$Error_GPS": "Signal GPS faible...",
+                "$Link_Help": "Un souci ? (Absent, Refus...)"
+            }
+        }
+    },
+
+    # CODE & VISUEL (PHASE 3 - IDE)
+    "code": {
+        "html": """<div class="h-full w-full bg-slate-900 text-white relative flex flex-col items-center justify-center">...</div>""",
+        "react": """export default function ProofPage() { ... }"""
+    },
+    "database": {
+        "table": "proofs",
+        "columns": [
+            {"name": "id", "type": "uuid", "pk": True},
+            {"name": "mission_id", "type": "int", "fk": "missions.id"},
+            {"name": "photo_url", "type": "varchar(255)"},
+            {"name": "gps_lat", "type": "float"},
+            {"name": "created_at", "type": "timestamp"}
+        ]
+    },
+    "api": [
+        {"method": "POST", "path": "/api/proofs", "desc": "Upload photo", "body": "{ photo: File }"},
+        {"method": "GET", "path": "/api/status", "desc": "Check status"}
+    ]
+}
+
+# Sitemap
+SITEMAP_TREE = [
+    {"name": "🌐 ZONE PUBLIQUE", "open": True, "pages": [{"id": "P01", "name": "Login", "status": "DONE"}]},
+    {"name": "🔒 ZONE PRIVÉE (App)", "open": True, "pages": [{"id": "P05", "name": "PREUVE DE LIVRAISON >>", "status": "DRAFT"}]}
+]
+
+STATUS_ICONS = {"DONE": "✅", "DRAFT": "✏️", "TODO": "⚪"}
+
+# Médiathèque Mock
+MEDIA_ASSETS = [
+    {"type": "img", "name": "camion.jpg", "url": "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=150&q=80", "tags": ["camion"]},
+    {"type": "img", "name": "team.png", "url": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=150&q=80", "tags": ["team"]}
+]
+
+# Données simulées de l'historique
+MOCK_HISTORY = [
+    {"time": "14:48", "action": "Mettre texte en gras", "current": True},
+    {"time": "14:45", "action": "Agrandir le bouton", "current": False},
+    {"time": "14:40", "action": "Ajout Flash toggle", "current": False},
+    {"time": "14:35", "action": "Correction marge vidéo", "current": False},
+    {"time": "14:30", "action": "Init P05_PREUVE", "current": False},
+]
+
+# État Applicatif
+app_state = {
+    'phase': 2,
+    'current_page': 'P05_PREUVE',
+    'history': [],
+    'chat_history': []
+}
+
+# --- 2. INITIALISATION ---
+
+# --- LOGIQUE DE LA CONSOLE SYSTÈME ---
+
+SNAPSHOT_VERSION = 45 # Compteur de version fictif
+
+def log_system(message, duration=None, is_error=False):
+    global SNAPSHOT_VERSION
+    
+    # 1. Récupération des éléments
+    msg_el = document['console-message']
+    metric_el = document['console-metric']
+    ver_el = document['console-version']
+    icon_el = document['console-icon']
+    
+    # 2. Mise à jour du Message
+    prefix = "> ⚠️ " if is_error else "> "
+    msg_el.text = prefix + message
+    
+    # Effet visuel : Flash de couleur
+    color_class = "text-red-400" if is_error else "text-emerald-400"
+    msg_el.classList.remove('text-slate-300')
+    msg_el.classList.add(color_class)
+    
+    # On remet la couleur normale après 1 seconde (Flash)
+    def reset_color():
+        msg_el.classList.remove(color_class)
+        msg_el.classList.add('text-slate-300')
+    timer.set_timeout(reset_color, 1000)
+
+    # 3. Mise à jour de la Métrique (Temps)
+    if duration:
+        metric_el.text = f"⚡ {duration}ms"
+        metric_el.classList.remove('hidden')
+    else:
+        metric_el.classList.add('hidden')
+
+    # 4. Incrémentation du Snapshot (Version)
+    # On simule une sauvegarde automatique
+    if not is_error:
+        SNAPSHOT_VERSION += 1
+        ver_el.text = f"Snapshot #{SNAPSHOT_VERSION}"
+        
+    # Animation de l'icône (Cerveau qui s'excite)
+    icon_el.classList.remove('animate-pulse') # Reset
+    void = icon_el.offsetWidth # Trigger reflow
+    icon_el.classList.add('animate-pulse')
+
+def init():
+    render_sitemap_nav()
+    
+
+    document['chat-input'].bind('keypress', lambda ev: handle_chat(ev) if ev.keyCode == 13 else None)
+    
+    # 👇 AJOUTER CES DEUX LIGNES 👇
+    document['tab-chat'].bind('click', lambda ev: switch_companion_tab('chat'))
+    document['tab-history'].bind('click', lambda ev: switch_companion_tab('history'))
+    # Header: Toggle Phase & Action
+    document['btn-mode-design'].bind('click', lambda ev: set_phase(2))
+    document['btn-mode-code'].bind('click', lambda ev: set_phase(3))
+    document['action-btn-main'].bind('click', handle_main_action)
+    
+    # Factory Tabs (Usine - Phase 2)
+    document['btn-spec-logic'].bind('click', lambda ev: render_factory_specs('logic'))
+    document['btn-spec-structure'].bind('click', lambda ev: render_factory_specs('structure'))
+    document['btn-spec-content'].bind('click', lambda ev: render_factory_specs('content'))
+    document['btn-spec-simulation'].bind('click', lambda ev: render_factory_specs('simulation'))    
+    # Simulateur Mobile/Desktop
+    document['btn-sim-mobile'].bind('click', lambda ev: switch_simulator_mode('mobile'))
+    document['btn-sim-desktop'].bind('click', lambda ev: switch_simulator_mode('desktop'))
+    
+    # ...
+    
+    # Workbench Tabs (IDE - Phase 3)
+    for t in ['visual', 'db', 'api', 'code']:
+        document[f'wb-tab-{t}'].bind('click', lambda ev, mode=t: switch_wb_tab(mode))
+    
+    # Settings & Deploy
+    if 'btn-open-settings' in document: document['btn-open-settings'].bind('click', open_settings_modal)
+    document['btn-close-settings'].bind('click', close_settings_modal)
+    document['tab-settings-brand'].bind('click', lambda ev: switch_settings_tab('brand'))
+    document['tab-settings-media'].bind('click', lambda ev: switch_settings_tab('media'))
+    document['btn-close-deploy'].bind('click', close_deploy_modal)
+    
+    # Chat & Companion
+    document['chat-input'].bind('keypress', lambda ev: handle_chat(ev) if ev.keyCode == 13 else None)
+    
+    # Init Views
+    render_factory_specs('logic')
+    render_visual_state("IDEAL")
+    
+    if hasattr(window, 'lucide'): window.lucide.createIcons()
+
+# --- 3. MOTEUR DE L'USINE (FACTORY SPECS) - LE CŒUR ---
+
+def render_factory_specs(tab_mode="logic"):
+    # 1. Gestion des styles d'onglets
+    tabs = ["logic", "structure", "content", "simulation"]
+    for t in tabs:
+        btn = document[f'btn-spec-{t}']
+        if t == tab_mode:
+            btn.classList.add('text-white', 'border-indigo-500', 'bg-slate-800/50')
+            btn.classList.remove('text-slate-500', 'border-transparent')
+        else:
+            btn.classList.remove('text-white', 'border-indigo-500', 'bg-slate-800/50')
+            btn.classList.add('text-slate-500', 'border-transparent')
+
+    # 2. Injection du Contenu
+    container = document['factory-content-area']
+    container.clear()
+    specs = CURRENT_PAGE_STATE['specs']
+    
+    # === ONGLET 1: LOGIQUE ===
+    if tab_mode == "logic":
+        container <= html.LABEL("🎯 OBJECTIF PRINCIPAL", Class="text-[10px] font-bold text-slate-500 uppercase tracking-widest")
+        container <= html.DIV(specs['logic']['goal'], Class="bg-emerald-900/20 text-emerald-400 p-3 rounded border border-emerald-500/30 mb-6 font-bold text-sm")
+
+        container <= html.LABEL("🌊 FLUX (Workflow)", Class="text-[10px] font-bold text-slate-500 uppercase tracking-widest")
+        flow_div = html.DIV(Class="flex gap-2 items-center text-xs text-slate-300 mb-6 overflow-x-auto pb-2")
+        for i, step in enumerate(specs['logic']['workflow']):
+            flow_div <= html.SPAN(step, Class="bg-slate-800 px-2 py-1 rounded border border-slate-700 whitespace-nowrap")
+            if i < len(specs['logic']['workflow']) - 1: flow_div <= html.SPAN("→", Class="text-slate-600")
+        container <= flow_div
+
+        container <= html.LABEL("🌳 ARBRE DE DÉCISION", Class="text-[10px] font-bold text-slate-500 uppercase tracking-widest")
+        tree_div = html.DIV(Class="space-y-2 mt-2")
+        for case in specs['logic']['edge_cases']:
+            row = html.DIV(Class="bg-slate-800/50 p-2 rounded border-l-2 border-amber-500 text-xs flex flex-col gap-1")
+            row <= html.SPAN(f"SI {case['if']}...", Class="font-bold text-amber-400 font-mono")
+            row <= html.SPAN(f"↳ ALORS : {case['then']}", Class="text-slate-400 pl-4")
+            tree_div <= row
+        container <= tree_div
+
+    # === ONGLET 2: STRUCTURE ===
+    elif tab_mode == "structure":
+        container <= html.LABEL("🧰 INVENTAIRE UI", Class="text-[10px] font-bold text-slate-500 uppercase tracking-widest")
+        inv_ul = html.UL(Class="space-y-2 mt-2 mb-6")
+        for item in specs['structure']['inventory']:
+            li = html.LI(Class="text-xs flex justify-between items-center bg-slate-800/30 p-2 rounded")
+            li <= html.SPAN(f"[1] {item['name']}", Class="text-slate-200 font-bold")
+            li <= html.SPAN(item['type'], Class="text-slate-500 font-mono text-[10px]")
+            inv_ul <= li
+        container <= inv_ul
+
+        container <= html.LABEL("🍰 HIÉRARCHIE (Z-Index)", Class="text-[10px] font-bold text-slate-500 uppercase tracking-widest")
+        stack_div = html.DIV(Class="mt-4 flex flex-col-reverse gap-1")
+        for layer in specs['structure']['layers']:
+            l_div = html.DIV(Class="relative p-2 border border-slate-700 bg-slate-800 rounded shadow-sm hover:translate-x-2 transition-transform cursor-default")
+            l_div <= html.SPAN(f"Z-{layer['z']}", Class="absolute -left-3 top-1/2 -translate-y-1/2 text-[10px] font-mono text-slate-500 bg-slate-900 px-1 rounded")
+            l_div <= html.SPAN(layer['name'], Class="ml-4 text-xs font-bold text-indigo-300")
+            l_div <= html.SPAN(f" ({layer['desc']})", Class="text-[10px] text-slate-500")
+            stack_div <= l_div
+        container <= stack_div
+
+    # === ONGLET 3: CONTENU ===
+    elif tab_mode == "content":
+        content_data = specs['content']
+        container <= html.LABEL("🗣️ SÉLECTEUR DE TON", Class="text-[10px] font-bold text-slate-500 uppercase tracking-widest")
+        select = html.SELECT(Class="w-full bg-slate-800 border border-slate-600 text-white text-xs rounded p-2 mt-2 mb-6 outline-none focus:border-indigo-500")
+        for opt in ["Direct / Terrain", "Corporatif", "Fun / Décalé"]:
+            o = html.OPTION(opt, value=opt)
+            if opt == content_data['tone']: o.selected = True
+            select <= o
+        select.bind('change', change_tone_variables)
+        container <= select
+
+        container <= html.LABEL("📝 VARIABLES ÉDITABLES", Class="text-[10px] font-bold text-slate-500 uppercase tracking-widest")
+        vars_div = html.DIV(id="content-vars-list", Class="space-y-3 mt-2")
+        render_content_variables(vars_div, content_data['variables'])
+        container <= vars_div
+
+    # === ONGLET 4: SIMULATION (Le nouveau) ===
+    elif tab_mode == "simulation":
+        container <= html.LABEL("🎮 CONTRÔLE DES ÉTATS (Storybook)", Class="text-[10px] font-bold text-slate-500 uppercase tracking-widest")
+        container <= html.P("Forcez l'application dans un état spécifique pour vérifier sa robustesse.", Class="text-xs text-slate-400 mb-6")
+        
+        states = [
+            {"val": "IDEAL", "label": "🟢 IDÉAL (Happy Path)", "desc": "Données complètes."},
+            {"val": "EMPTY", "label": "⚪ VIDE (Empty State)", "desc": "Pas de données."},
+            {"val": "LOADING", "label": "⏳ CHARGEMENT", "desc": "Latence réseau."},
+            {"val": "ERROR", "label": "🔴 ERREUR (500)", "desc": "Serveur crashé."},
+            {"val": "PARTIAL", "label": "🟠 PARTIEL", "desc": "Données manquantes."}
+        ]
+        
+        for st in states:
+            card = html.LABEL(Class="flex items-start gap-3 p-4 bg-slate-800 border border-slate-700 rounded-lg mb-3 cursor-pointer hover:bg-slate-700 hover:border-indigo-500 transition-all group")
+            inp = html.INPUT(type="radio", name="vis-state-tab", value=st['val'], Class="mt-1 accent-indigo-500")
+            # Câblage direct vers le visualiseur à droite
+            inp.bind('change', lambda ev: render_visual_state(ev.target.value))
+            
+            div_txt = html.DIV()
+            div_txt <= html.DIV(st['label'], Class="font-bold text-sm text-slate-200 group-hover:text-white")
+            div_txt <= html.DIV(st['desc'], Class="text-xs text-slate-500 group-hover:text-slate-400")
+            card <= inp
+            card <= div_txt
+            container <= card
+
+# --- 4. FONCTIONS DE RENDU VISUEL (SIMULATEUR) ---
+
+def render_visual_state(state_name):
+    if 'sandbox-content' not in document:
+        print("ERREUR : L'ID 'sandbox-content' est introuvable dans le HTML !")
+        return
+    container = document['sandbox-content']
+    container.clear()
+    
+    if state_name == "IDEAL":
+        container.html = """<div class="h-full w-full flex flex-col relative"><div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1621974138760-49633e22646c?w=400&q=80')] bg-cover opacity-60"></div><div class="z-10 mt-auto mb-20 p-6 text-center space-y-4"><h2 class="text-3xl font-black drop-shadow-xl">Boulangerie Pat</h2><p class="text-sm font-medium opacity-90 drop-shadow-md">12 Rue des Lilas, Paris</p><button class="w-20 h-20 bg-white text-indigo-600 rounded-full shadow-2xl flex items-center justify-center mx-auto hover:scale-110 transition-transform"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></button></div></div>"""
+    elif state_name == "LOADING":
+        container.html = """<div class="h-full w-full flex flex-col p-6 justify-end pb-20 bg-slate-900"><div class="skeleton w-16 h-6 mb-4 mx-auto"></div><div class="skeleton w-3/4 h-10 mb-2 mx-auto"></div><div class="skeleton w-1/2 h-4 mb-8 mx-auto"></div><div class="skeleton w-20 h-20 rounded-full mx-auto"></div></div>"""
+    elif state_name == "EMPTY":
+        container.html = """<div class="h-full w-full flex flex-col items-center justify-center bg-slate-800 p-6 text-center"><h3 class="text-xl font-bold text-slate-300">Aucune Livraison</h3><p class="text-xs text-slate-500 mt-2">Profitez-en pour prendre un café ! ☕</p></div>"""
+    elif state_name == "ERROR":
+        container.html = """<div class="h-full w-full flex flex-col items-center justify-center bg-red-950 p-6 text-center"><h3 class="text-xl font-bold text-white">Erreur Connexion</h3><p class="text-xs text-red-200 mt-2">Vérifiez votre GPS.</p><button class="mt-6 px-6 py-2 bg-white text-red-900 font-bold rounded-full text-xs hover:bg-red-100">Réessayer</button></div>"""
+    elif state_name == "PARTIAL":
+        container.html = """<div class="h-full w-full flex flex-col relative bg-slate-800"><div class="flex-1 flex items-center justify-center"><span class="text-4xl">🍞</span></div><div class="z-10 mt-auto mb-20 p-6 text-center space-y-4"><h2 class="text-3xl font-black text-white">Boulangerie Pat</h2><p class="text-xs text-amber-500 bg-amber-900/20 inline-block px-2 py-1 rounded border border-amber-500/20">⚠️ Adresse inconnue</p><div class="pt-4"><button class="w-20 h-20 bg-slate-700 text-slate-400 border-2 border-dashed border-slate-500 rounded-full flex items-center justify-center mx-auto"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></button></div></div></div>"""
+
+
+# --- LOGIQUE DU SIMULATEUR EXTENSIBLE ---
+# --- LOGIQUE DU SIMULATEUR EXTENSIBLE (CORRIGÉE) ---
+
+# --- LOGIQUE DU SIMULATEUR (TIROIR 1000PX) ---
+# --- LOGIQUE DU SIMULATEUR (VERSION AJUSTÉE 830PX) ---
+
+def switch_simulator_mode(mode):
+    panel = document['sim-panel']
+    frame = document['sim-frame']
+    
+    btn_mob = document['btn-sim-mobile']
+    btn_desk = document['btn-sim-desktop']
+    
+    header_mob = document['sim-header-mobile']
+    header_desk = document['sim-header-desktop']
+    screen_content = document['sandbox-content']
+    log_system(f"Viewport redimensionné : Mode {mode.upper()}", duration=15)
+    
+    if mode == 'desktop':
+        # --- PASSAGE EN MODE DESKTOP ---
+        
+        # 1. Élargir le Panneau (Mouvement vers la gauche)
+        # On passe de 400px à 830px (Ta valeur idéale)
+        panel.classList.replace('w-[400px]', 'w-[830px]')
+        panel.classList.add('bg-[#1e1e24]')
+        
+        # 2. Adapter le Cadre (Ecran)
+        frame.classList.replace('w-[320px]', 'w-[90%]') # Largeur 90% du tiroir
+        frame.classList.replace('h-[640px]', 'h-[85%]') 
+        frame.classList.replace('rounded-[40px]', 'rounded-lg') 
+        frame.classList.replace('border-4', 'border-8') 
+        
+        # Marge pour ne pas cacher les boutons du haut
+        frame.classList.add('mt-12') 
+        
+        # 3. Changer le Header
+        header_mob.classList.add('hidden')
+        header_desk.classList.remove('hidden')
+        
+        # 4. Ajuster le padding intérieur
+        screen_content.classList.remove('pt-6')
+        screen_content.classList.add('pt-8')
+        
+        # 5. Styles Boutons
+        btn_desk.classList.add('bg-indigo-600', 'text-white')
+        btn_desk.classList.remove('text-slate-500')
+        btn_mob.classList.remove('bg-indigo-600', 'text-white')
+        btn_mob.classList.add('text-slate-500')
+        
+    else: 
+        # --- RETOUR EN MODE MOBILE ---
+        
+        # 1. Rétrécir le Panneau
+        # CORRECTION IMPORTANTE ICI : On remplace 830px (pas 1000px) par 400px
+        panel.classList.replace('w-[830px]', 'w-[400px]')
+        panel.classList.remove('bg-[#1e1e24]')
+        
+        # 2. Restaurer le Cadre (Téléphone)
+        frame.classList.replace('w-[90%]', 'w-[320px]')
+        frame.classList.replace('h-[85%]', 'h-[640px]')
+        frame.classList.replace('rounded-lg', 'rounded-[40px]')
+        frame.classList.replace('border-8', 'border-4')
+        
+        # Enlever la marge
+        frame.classList.remove('mt-12')
+        
+        # 3. Changer le Header
+        header_mob.classList.remove('hidden')
+        header_desk.classList.add('hidden')
+        
+        # 4. Ajuster padding
+        screen_content.classList.add('pt-6')
+        screen_content.classList.remove('pt-8')
+        
+        # 5. Styles Boutons
+        btn_mob.classList.add('bg-indigo-600', 'text-white')
+        btn_mob.classList.remove('text-slate-500')
+        btn_desk.classList.remove('bg-indigo-600', 'text-white')
+        btn_desk.classList.add('text-slate-500')
+
+def render_workbench():
+    # Note: On ne touche PAS au sandbox-content ici (géré par le simulateur)
+    
+    # Rendu BDD
+    tbody = document['db-rows-container']
+    tbody.clear()
+    for col in CURRENT_PAGE_STATE['database']['columns']:
+        row = html.TR(Class="hover:bg-[#2A2A2D]")
+        icon = "🔑 " if col.get('pk') else ("🔗 " if col.get('fk') else "")
+        row <= html.TD(icon + col['name'], Class="p-3 border-b border-[#3E3E42] font-bold")
+        row <= html.TD(col['type'], Class="p-3 border-b border-[#3E3E42] text-yellow-500")
+        row <= html.TD(col.get('fk', '-'), Class="p-3 border-b border-[#3E3E42] text-slate-500 italic")
+        tbody <= row
+
+    # Rendu API
+    api_container = document['api-cards-container']
+    api_container.clear()
+    for ep in CURRENT_PAGE_STATE['api']:
+        color = "text-emerald-400 border-emerald-900/30 bg-emerald-900/10" if ep['method'] == "POST" else "text-blue-400 border-blue-900/30 bg-blue-900/10"
+        card = html.DIV(Class="bg-[#252526] border border-[#3E3E42] rounded-lg p-4 flex flex-col gap-2")
+        header = html.DIV(Class="flex items-center gap-3 font-mono text-sm")
+        header <= html.SPAN(ep['method'], Class=f"font-bold px-2 py-0.5 rounded border {color}")
+        header <= html.SPAN(ep['path'], Class="text-slate-200")
+        card <= header
+        card <= html.P(ep['desc'], Class="text-xs text-slate-500 italic pl-1")
+        api_container <= card
+
+    # Rendu Code
+    code_content = CURRENT_PAGE_STATE['code']['react'].replace('<', '&lt;').replace('>', '&gt;').replace('\n', '<br>')
+    document['code-editor-content'].html = code_content
+
+def switch_wb_tab(tab_name):
+    tabs = ['visual', 'db', 'api', 'code']
+    for t in tabs:
+        btn = document[f'wb-tab-{t}']
+        view = document[f'wb-view-{t}']
+        if t == tab_name:
+            view.classList.remove('hidden')
+            btn.classList.add('text-white', 'border-emerald-500')
+            btn.classList.remove('text-slate-500', 'border-transparent')
+        else:
+            view.classList.add('hidden')
+            btn.classList.add('text-slate-500', 'border-transparent')
+            btn.classList.remove('text-white', 'border-emerald-500')
+    names = {"visual": "Rendu Visuel", "db": "Schéma BDD", "api": "Endpoints API", "code": "Éditeur Code"}
+    log_system(f"Module chargé : {names.get(tab_name, tab_name)}")
+
+# --- 6. LOGIQUE GESTION DES PHASES (DESIGN vs CODE) ---
+
+def set_phase(phase_num):
+    app_state['phase'] = phase_num
+    btn_design, btn_code, btn_main = document['btn-mode-design'], document['btn-mode-code'], document['action-btn-main']
+    factory, ide, companion = document['factory-editor'], document['ide-workbench'], document['companion-panel']
+    
+    companion.classList.remove('hidden') # Toujours visible
+    
+    if phase_num == 2: # DESIGN
+        btn_design.classList.add('bg-indigo-600', 'text-white', 'shadow-lg')
+        btn_design.classList.remove('text-slate-500', 'hover:text-white')
+        btn_code.classList.remove('bg-emerald-600', 'text-white')
+        btn_code.classList.add('text-slate-500', 'hover:text-white')
+        
+        btn_main.select_one('span').text = "PASSER AU CODE"
+        btn_main.classList.replace('bg-emerald-600', 'bg-indigo-600')
+        
+        factory.classList.remove('hidden')
+        ide.classList.add('hidden')
+    else: # CODE
+        btn_code.classList.add('bg-emerald-600', 'text-white', 'shadow-lg')
+        btn_code.classList.remove('text-slate-500')
+        btn_design.classList.remove('bg-indigo-600', 'text-white')
+        btn_design.classList.add('text-slate-500')
+        
+        btn_main.select_one('span').text = "DÉPLOYER V1.0"
+        btn_main.classList.replace('bg-indigo-600', 'bg-emerald-600')
+        
+        factory.classList.add('hidden')
+        ide.classList.remove('hidden')
+        render_workbench()
+
+def handle_main_action(ev):
+    if app_state['phase'] == 2: set_phase(3)
+    else: open_deploy_modal(ev)
+
+# --- 7. LOGIQUE SETTINGS & DEPLOY ---
+
+def open_settings_modal(ev):
+    document['settings-modal'].classList.remove('hidden')
+    render_media_library()
+    update_brand_preview('#10B981', '8px', 'Inter')
+
+def close_settings_modal(ev): document['settings-modal'].classList.add('hidden')
+
+def switch_settings_tab(tab_name):
+    if tab_name == 'brand':
+        document['view-settings-brand'].classList.remove('hidden')
+        document['view-settings-media'].classList.add('hidden')
+        document['tab-settings-brand'].classList.add('border-indigo-500', 'text-white', 'bg-slate-800/50')
+        document['tab-settings-media'].classList.remove('border-indigo-500', 'text-white', 'bg-slate-800/50')
+    else:
+        document['view-settings-brand'].classList.add('hidden')
+        document['view-settings-media'].classList.remove('hidden')
+        document['tab-settings-media'].classList.add('border-indigo-500', 'text-white', 'bg-slate-800/50')
+        document['tab-settings-brand'].classList.remove('border-indigo-500', 'text-white', 'bg-slate-800/50')
+
+def render_media_library():
+    grid = document['media-grid']
+    grid.clear()
+    for asset in MEDIA_ASSETS:
+        card = html.DIV(Class="bg-slate-800 rounded-lg overflow-hidden border border-slate-700 group relative")
+        if asset['type'] == 'img': media = html.IMG(src=asset['url'], Class="w-full h-24 object-cover opacity-70 group-hover:opacity-100")
+        else: media = html.DIV(html.I(data_lucide="video", Class="h-8 w-8 text-slate-500"), Class="w-full h-24 flex items-center justify-center bg-black/50")
+        footer = html.DIV(asset['name'], Class="p-2 bg-slate-900 text-[10px] text-white font-bold truncate")
+        card <= media
+        card <= footer
+        grid <= card
+    if hasattr(window, 'lucide'): window.lucide.createIcons()
+
+def update_brand_preview(color, radius, font):
+    document['preview-btn'].style.backgroundColor = color
+    document['preview-btn'].style.borderRadius = radius
+    document['brand-preview-box'].style.fontFamily = font
+
+def open_deploy_modal(ev):
+    document['deploy-modal'].classList.remove('hidden')
+    slug = "velo-express"
+    document['deploy-slug'].text = slug
+    dist = document['deploy-distribution-area']
+    dist.clear()
+    
+    # Rendu Hybride
+    row = html.DIV(Class="flex gap-6")
+    col_mob = html.DIV(Class="flex-1 bg-slate-800/50 rounded-lg p-4 border border-slate-700 flex flex-col items-center text-center")
+    col_mob <= html.DIV(html.I(data_lucide="smartphone", Class="h-8 w-8 text-emerald-400 mb-2"))
+    col_mob <= html.H5("ACCÈS MOBILE", Class="font-bold text-white text-sm mb-1")
+    qr = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://{slug}.yourfirstship.com/app&color=fff&bgcolor=1e293b"
+    col_mob <= html.IMG(src=qr, Class="w-24 h-24 my-2 rounded border border-slate-600 p-1")
+    row <= col_mob
+    dist <= row
+    if hasattr(window, 'lucide'): window.lucide.createIcons()
+
+def close_deploy_modal(ev): document['deploy-modal'].classList.add('hidden')
+
+# --- 8. HELPERS ---
+
+def render_sitemap_nav():
+    container = document['nav-tree']
+    container.clear()
+    for folder in SITEMAP_TREE:
+        folder_div = html.DIV(Class="nav-folder")
+        folder_div <= html.SPAN("🔻" if folder['open'] else "▶️", Class="text-[10px]")
+        folder_div <= html.SPAN(folder['name'])
+        folder_div.bind('click', lambda ev, f=folder: toggle_folder(f))
+        container <= folder_div
+        if not folder['open']: continue
+        for page in folder['pages']:
+            cls = "nav-item nav-active" if page['id'] == app_state['current_page'] else "nav-item"
+            div = html.DIV(Class=cls)
+            div <= html.DIV(html.SPAN(STATUS_ICONS[page['status']], Class="mr-2") + html.SPAN(f"[{page['id']}] ", Class="font-mono text-slate-500 text-[10px]") + html.SPAN(page['name']))
+            container <= div
+
+def toggle_folder(f):
+    f['open'] = not f['open']
+    render_sitemap_nav()
+
+def render_content_variables(container, variables):
+    container.clear()
+    for key, val in variables.items():
+        grp = html.DIV(Class="flex flex-col gap-1")
+        grp <= html.SPAN(key, Class="text-[10px] font-mono text-indigo-400")
+        grp <= html.INPUT(type="text", value=val, Class="bg-slate-900 border border-slate-700 text-slate-300 text-xs rounded p-2")
+        container <= grp
+
+def change_tone_variables(ev):
+    new_tone = ev.target.value
+    new_vars = {"$Success_Msg": "Bingo !" if "Fun" in new_tone else "C'est noté."}
+    CURRENT_PAGE_STATE['specs']['content']['tone'] = new_tone
+    render_content_variables(document['content-vars-list'], new_vars)
+
+def handle_chat(ev):
+    inp = document['chat-input']
+    if inp.value.strip():
+        # 1. Log : Analyse en cours
+        log_system("Analyse de la demande en cours...", duration=45)
+        
+        document['chat-messages'] <= html.DIV(inp.value, Class="bg-indigo-600 p-2 rounded-lg text-white ml-8 mb-2")
+        val = inp.value
+        inp.value = ""
+
+        def response():
+            document['chat-messages'] <= html.DIV("🤖 C'est noté. Je modifie le code.", Class="bg-slate-800 p-2 rounded-lg text-slate-300 mr-8 mb-2")
+            # 2. Log : Action terminée
+            import random
+            time_taken = random.randint(120, 350)
+            log_system(f"Modification '{val}' appliquée au code React.", duration=time_taken)
+            
+        timer.set_timeout(response, 800)
+        
+        # Simulation de la réponse IA
+        def response():
+            document['chat-messages'] <= html.DIV("🤖 C'est noté. Je modifie le code.", Class="bg-slate-800 p-2 rounded-lg text-slate-300 mr-8 mb-2")
+            # 2. Log : Action terminée
+            import random
+            time_taken = random.randint(120, 350)
+            log_system(f"Modification '{val}' appliquée au code React.", duration=time_taken)
+            
+        timer.set_timeout(response, 800)
+
+def switch_companion_tab(tab_name):
+    # Les Vues
+    chat_view = document['chat-view']
+    hist_view = document['history-view']
+    
+    # Les Boutons
+    btn_chat = document['tab-chat']
+    btn_hist = document['tab-history']
+    
+    if tab_name == 'chat':
+        # Afficher Chat
+        chat_view.classList.remove('hidden')
+        hist_view.classList.add('hidden')
+        btn_chat.classList.add('comp-tab-active')
+        btn_chat.classList.remove('comp-tab-inactive')
+        btn_hist.classList.remove('comp-tab-active')
+        btn_hist.classList.add('comp-tab-inactive')
+        
+        # Styles Onglets
+        btn_chat.classList.add('comp-tab-active')
+        btn_chat.classList.remove('comp-tab-inactive')
+        btn_hist.classList.remove('comp-tab-active')
+        btn_hist.classList.add('comp-tab-inactive')
+    else:
+        # Afficher Historique
+        chat_view.classList.add('hidden')
+        hist_view.classList.remove('hidden')
+        
+        # Styles Onglets
+        btn_hist.classList.add('comp-tab-active')
+        btn_hist.classList.remove('comp-tab-inactive')
+        btn_chat.classList.remove('comp-tab-active')
+        btn_chat.classList.add('comp-tab-inactive')
+        render_history_view()
+
+
+def render_history_view():
+    container = document['history-view']
+    container.clear()
+    
+    container <= html.H4("HISTORIQUE DES 5 DERNIERS ÉTATS", Class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4 border-b border-slate-800 pb-2")
+    
+    # On crée une ligne verticale pour l'effet "Timeline"
+    timeline = html.DIV(Class="space-y-6 border-l-2 border-slate-800 ml-2 pl-6 relative")
+    
+    for item in MOCK_HISTORY:
+        # Le Point sur la ligne (Vert ou Gris)
+        dot_color = "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" if item['current'] else "bg-slate-600"
+        dot = html.DIV(Class=f"absolute -left-[5px] w-2 h-2 rounded-full {dot_color} mt-1.5")
+        
+        # Le Bloc Contenu
+        item_div = html.DIV(Class="relative")
+        item_div <= dot
+        
+        # L'heure et le statut
+        header = html.DIV(Class="flex items-center gap-2 mb-1")
+        header <= html.SPAN(item['time'], Class="font-mono text-[10px] text-slate-400")
+        if item['current']:
+            header <= html.SPAN("(Actuel)", Class="text-[10px] text-emerald-500 font-bold")
+        
+        item_div <= header
+        
+        # L'action
+        item_div <= html.DIV(f'Action: "{item["action"]}"', Class="text-xs text-white font-bold mb-2")
+        
+        # Le Bouton Restaurer (Seulement si pas actuel)
+        if not item['current']:
+            btn = html.BUTTON("⏮️ RESTAURER", Class="text-[10px] bg-slate-800 hover:bg-indigo-600 hover:text-white text-indigo-400 border border-slate-700 px-2 py-1 rounded transition-colors")
+            # Petit effet click pour la démo
+            btn.bind('click', lambda ev: alert("↺ Restauration de l'état..."))
+            item_div <= btn
+            
+        timeline <= item_div
+        
+    container <= timeline
+
+
+
+init()
+</script>

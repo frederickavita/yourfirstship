@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Holodeck - {{=project.title}}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/brython@3/brython.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/brython@3/brython_stdlib.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; overflow: hidden; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        .glass-panel { 
+            background: rgba(30, 41, 59, 0.4); 
+            backdrop-filter: blur(12px); 
+            border: 1px solid rgba(255,255,255,0.08); 
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Animations */
+        .architect-msg { animation: slideRight 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .blueprint-item { animation: fadeIn 0.6s ease-out; }
+        
+        @keyframes slideRight { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .console-line { opacity: 0; animation: fadeInConsole 0.2s forwards; }
+        @keyframes fadeInConsole { to { opacity: 1; } }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+
+<body onload="brython()" class="flex h-screen w-screen">
+
+    <input type="hidden" id="project-id" value="{{=project.id}}">
+    <input type="hidden" id="current-step" value="{{=project.narrative_step}}">
+    <textarea id="initial-prompt" class="hidden">{{=project.blueprint_json.get('original_prompt', '')}}</textarea>
+
+    <aside class="w-[400px] h-full flex flex-col border-r border-slate-800 bg-slate-900/95 relative z-20">
+        
+        <div class="h-16 flex items-center px-6 border-b border-slate-800 gap-3 bg-slate-900">
+            <div class="h-8 w-8 rounded bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                <i data-lucide="bot" class="text-white h-5 w-5"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-sm text-white uppercase tracking-widest">Architect_AI</h1>
+                <div class="flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                    <p class="text-[10px] text-slate-400 font-mono">Online • v2.4</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="chat-stream" class="flex-1 overflow-y-auto p-6 space-y-8 scroll-smooth pb-32">
+            </div>
+
+        <div id="thinking-log" class="absolute bottom-0 left-0 right-0 bg-slate-950 border-t border-slate-800 p-4 font-mono text-xs hidden transition-all duration-300">
+            <div class="text-indigo-400 font-bold mb-2 flex items-center gap-2">
+                <i data-lucide="cpu" class="h-3 w-3"></i> PROCESSING
+            </div>
+            <div id="console-output" class="space-y-1 text-slate-400 h-24 overflow-y-auto custom-scrollbar">
+                </div>
+        </div>
+
+        <div class="p-4 border-t border-slate-800 bg-slate-900 relative z-30">
+            <button id="btn-next-step" class="group w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-900/20">
+                <span id="btn-text">Start Analysis</span> 
+                <i data-lucide="arrow-right" class="h-4 w-4 group-hover:translate-x-1 transition-transform"></i>
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 h-full bg-slate-950 relative overflow-hidden flex flex-col">
+        <div class="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:40px_40px] opacity-[0.1] pointer-events-none"></div>
+
+        <div class="h-16 flex items-center justify-between px-8 z-20 pointer-events-none">
+            <div class="pointer-events-auto">
+                <a href="{{=URL('dashboard')}}" class="text-slate-500 hover:text-white transition flex items-center gap-2 text-xs font-bold uppercase tracking-wide">
+                    <i data-lucide="arrow-left" class="h-4 w-4"></i> Mission Control
+                </a>
+            </div>
+            <div class="flex gap-2">
+                 <div class="px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-[10px] text-indigo-300 font-mono uppercase tracking-wider">
+                    Project: {{=project.title}}
+                </div>
+            </div>
+        </div>
+
+        <div id="blueprint-canvas" class="flex-1 overflow-y-auto p-12 flex flex-col items-center justify-center relative z-10">
+            
+            <div id="canvas-placeholder" class="text-center opacity-30 flex flex-col items-center">
+                <div class="h-32 w-32 border-2 border-dashed border-slate-600 rounded-full flex items-center justify-center mb-6 animate-[spin_10s_linear_infinite]">
+                    <i data-lucide="hexagon" class="h-16 w-16 text-slate-500"></i>
+                </div>
+                <h2 class="text-2xl font-light text-slate-400">Holodeck Initialized</h2>
+                <p class="text-sm text-slate-600 mt-2 font-mono">Waiting for neural link...</p>
+            </div>
+
+            <div id="view-step-1" class="hidden w-full max-w-3xl text-center blueprint-item">
+                <div class="glass-panel p-10 rounded-2xl shadow-2xl relative overflow-hidden border-t-4 border-indigo-500">
+                    <h3 class="text-indigo-400 font-mono text-xs uppercase tracking-widest mb-6">Module 1: Story Extractor</h3>
+                    <div class="text-left space-y-4">
+                        <div class="bg-slate-800/50 p-4 rounded-lg border-l-2 border-red-500">
+                            <span class="text-xs text-red-400 font-bold uppercase">Trigger</span>
+                            <p id="txt-trigger" class="text-white">...</p>
+                        </div>
+                        <div class="bg-slate-800/50 p-4 rounded-lg border-l-2 border-amber-500">
+                            <span class="text-xs text-amber-400 font-bold uppercase">Emotional Chain</span>
+                            <p id="txt-emotions" class="text-white">...</p>
+                        </div>
+                        <div class="p-4">
+                            <p id="txt-narrative" class="text-xl md:text-2xl font-serif italic leading-relaxed text-slate-100">"..."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-step-2" class="hidden w-full max-w-6xl blueprint-item">
+                <div class="text-center mb-8">
+                    <h3 class="text-indigo-400 font-mono text-xs uppercase tracking-widest mb-2">Module 2: Perspective Generator</h3>
+                    <h2 class="text-2xl font-bold text-white">The Prism Effect</h2>
+                </div>
+                <div id="cards-container" class="flex flex-wrap justify-center gap-6"></div>
+            </div>
+
+            <div id="view-step-3" class="hidden w-full max-w-4xl blueprint-item">
+                 <div class="flex gap-8 items-start">
+                    <div class="glass-panel w-1/3 p-6 rounded-xl flex flex-col items-center text-center border-t-2 border-indigo-500">
+                        <div class="h-28 w-28 rounded-full bg-slate-800 border-4 border-slate-700 mb-4 flex items-center justify-center relative">
+                             <i data-lucide="user" class="h-12 w-12 text-slate-600"></i>
+                        </div>
+                        <h2 id="u0-name" class="text-2xl font-bold text-white">Thomas</h2>
+                        <p id="u0-role" class="text-indigo-400 text-sm font-mono mt-1">Solopreneur</p>
+                        <div class="mt-6 w-full space-y-2">
+                             <div class="bg-slate-800/50 p-2 rounded text-xs text-slate-400 flex justify-between">
+                                 <span>Age</span> <span class="text-white">29</span>
+                             </div>
+                             <div class="bg-slate-800/50 p-2 rounded text-xs text-slate-400 flex justify-between">
+                                 <span>Tech</span> <span class="text-white">High</span>
+                             </div>
+                        </div>
+                    </div>
+                    <div class="flex-1 space-y-4">
+                        <h3 class="text-indigo-400 font-mono text-xs uppercase tracking-widest">Module 3: User Zero</h3>
+                        <div class="glass-panel p-6 rounded-xl">
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div><span class="text-xs text-slate-500 uppercase font-bold">Context</span><p id="u0-context" class="text-sm text-slate-300">...</p></div>
+                                <div><span class="text-xs text-slate-500 uppercase font-bold">Language</span><p id="u0-lang" class="text-sm text-slate-300">...</p></div>
+                            </div>
+                            <div class="border-l-4 border-red-500 pl-4 py-2 bg-red-500/10 rounded-r">
+                                <span class="text-xs text-red-400 uppercase font-bold">Primary Pain Point</span>
+                                <p id="u0-pain" class="text-lg text-white font-medium">...</p>
+                            </div>
+                        </div>
+                    </div>
+                 </div>
+            </div>
+
+            <div id="view-step-4" class="hidden w-full max-w-3xl blueprint-item">
+                <div class="text-center mb-8">
+                    <h3 class="text-indigo-400 font-mono text-xs uppercase tracking-widest mb-2">Module 4: Distribution</h3>
+                    <h2 class="text-2xl font-bold text-white">Role Identification (RBAC)</h2>
+                </div>
+                <div id="roles-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </div>
+
+            <div id="view-step-5" class="hidden w-full max-w-5xl blueprint-item">
+                 <div class="text-center mb-8">
+                    <h3 class="text-green-400 font-mono text-xs uppercase tracking-widest mb-2">Module 5: Specifications</h3>
+                    <h2 class="text-2xl font-bold text-white">Technical Backlog</h2>
+                </div>
+                <div id="specs-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+                <div class="text-center mt-12">
+                     <button onclick="window.location.href='{{=URL('dashboard')}}'" class="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-white transition-all duration-200 bg-green-600 font-mono rounded-lg hover:bg-green-500 hover:shadow-lg hover:shadow-green-900/50 ring-offset-2 focus:outline-none">
+                         <span class="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-black"></span>
+                         <span class="relative flex items-center gap-3">
+                            COMMIT ARCHITECTURE <i data-lucide="database" class="h-5 w-5"></i>
+                         </span>
+                     </button>
+                     <p class="text-xs text-slate-500 mt-4">Module 6: Validation Gate</p>
+                 </div>
+            </div>
+
+        </div>
+    </main>
+
+<script type="text/python">
+from browser import document, html, window, ajax, timer
+import json
+
+URL_ENGINE = "{{=URL('default', 'ai_narrative_engine')}}"
+PID = document['project-id'].value
+CURRENT_STEP = int(document['current-step'].value)
+
+def init():
+    if hasattr(window, 'lucide'): window.lucide.createIcons()
+    add_chat_msg("Architect", f"Neural link established. Analyzing input: '{document['initial-prompt'].value[:40]}...'", 'bot')
+    document['btn-next-step'].bind('click', trigger_next_step)
+
+def add_chat_msg(sender, text, type='bot'):
+    container = document['chat-stream']
+    wrapper = html.DIV(Class="architect-msg flex gap-4")
+    color = "bg-indigo-600" if type == 'bot' else "bg-slate-700"
+    icon = "bot" if type == 'bot' else "user"
+    avatar = html.DIV(Class=f"h-10 w-10 rounded-lg shrink-0 {color} flex items-center justify-center shadow-md")
+    avatar <= html.I(**{'data-lucide': icon, 'class': 'h-5 w-5 text-white'})
+    content_col = html.DIV(Class="flex-1 space-y-1")
+    name = html.DIV(sender, Class="text-[10px] font-bold uppercase tracking-wider text-slate-500")
+    bubble_cls = "text-slate-300" if type == 'bot' else "text-white"
+    msg_txt = html.P(text, Class=f"text-sm leading-relaxed {bubble_cls}")
+    content_col <= name
+    content_col <= msg_txt
+    wrapper <= avatar
+    wrapper <= content_col
+    container <= wrapper
+    container.scrollTop = container.scrollHeight
+    if hasattr(window, 'lucide'): window.lucide.createIcons()
+
+def show_thinking_log(show=True):
+    log_panel = document['thinking-log']
+    console = document['console-output']
+    btn = document['btn-next-step']
+    if show:
+        log_panel.classList.remove('hidden')
+        console.clear()
+        btn.disabled = True
+        btn.classList.add('opacity-50', 'grayscale')
+        document['btn-text'].text = "Processing..."
+    else:
+        timer.set_timeout(lambda: log_panel.classList.add('hidden'), 500)
+        btn.disabled = False
+        btn.classList.remove('opacity-50', 'grayscale')
+        document['btn-text'].text = "Next Phase"
+
+def log_line(text, delay_ms):
+    timer.set_timeout(lambda: _append_log(text), delay_ms)
+
+def _append_log(text):
+    console = document['console-output']
+    line = html.DIV(Class="console-line flex items-center gap-2")
+    line <= html.SPAN(">", Class="text-indigo-500 font-bold")
+    line <= html.SPAN(text)
+    console <= line
+    console.scrollTop = console.scrollHeight
+
+def trigger_next_step(ev):
+    global CURRENT_STEP
+    next_step = CURRENT_STEP + 1
+    show_thinking_log(True)
+    
+    if next_step == 1:
+        log_line("Ingesting raw intent...", 100)
+        log_line("De-biasing solution...", 600)
+        log_line("Identifying emotional triggers...", 1200)
+    elif next_step == 2:
+        log_line("Generating parallel realities...", 100)
+        log_line("Calibrating Value Matrix...", 800)
+    elif next_step == 5:
+        log_line("Compiling User Stories...", 100)
+        log_line("Drafting Acceptance Criteria...", 700)
+        log_line("Finalizing Database Schema...", 1400)
+
+    req = ajax.ajax()
+    req.bind('complete', lambda r: on_step_complete(r, next_step))
+    req.open('POST', URL_ENGINE, True)
+    req.set_header('content-type', 'application/x-www-form-urlencoded')
+    req.send({'project_id': PID, 'step': next_step})
+
+def on_step_complete(req, step):
+    global CURRENT_STEP
+    timer.set_timeout(lambda: show_thinking_log(False), 1500)
+    res = json.loads(req.text)
+    data = res['data']
+    CURRENT_STEP = step
+    document['canvas-placeholder'].classList.add('hidden')
+    for i in range(1, 6):
+        if f'view-step-{i}' in document:
+            document[f'view-step-{i}'].classList.add('hidden')
+
+    if step == 1:
+        add_chat_msg("Architect", "Module 1 Complete. I've extracted the raw story and emotional triggers.")
+        document['txt-trigger'].text = data['raw_story']['trigger']
+        document['txt-emotions'].text = ", ".join(data['raw_story']['emotions'])
+        document['txt-narrative'].text = f"\"{data['raw_story']['narrative']}\""
+        document['view-step-1'].classList.remove('hidden')
+    elif step == 2:
+        add_chat_msg("Architect", "Module 2 Running. Generating 5 perspectives based on the raw story.")
+        render_personas(data['perspectives'])
+        document['view-step-2'].classList.remove('hidden')
+        document['btn-next-step'].classList.add('hidden') 
+    elif step == 3:
+        add_chat_msg("Architect", f"Module 3 Complete. User Zero '{data['user_zero']['name']}' instantiated.")
+        u0 = data['user_zero']
+        document['u0-name'].text = u0['name']
+        document['u0-role'].text = u0['role']
+        document['u0-context'].text = u0['context']
+        document['u0-lang'].text = u0['language']
+        document['u0-pain'].text = u0['pain_points'][0]
+        document['view-step-3'].classList.remove('hidden')
+        timer.set_timeout(lambda: trigger_next_step(None), 3000) 
+    elif step == 4:
+        add_chat_msg("Architect", "Module 4 Complete. Extracting secondary roles and permissions.")
+        render_roles(data['roles'])
+        document['view-step-4'].classList.remove('hidden')
+        timer.set_timeout(lambda: trigger_next_step(None), 3000)
+    elif step == 5:
+        add_chat_msg("Architect", "Module 5 Complete. Functional decomposition finished. Please review the Backlog.")
+        render_specs(data['specs'])
+        document['view-step-5'].classList.remove('hidden')
+        document['btn-next-step'].classList.add('hidden') 
+
+def render_personas(list_data):
+    c = document['cards-container']
+    c.clear()
+    for p in list_data:
+        card = html.DIV(Class="glass-panel w-64 p-0 rounded-xl cursor-pointer hover:bg-slate-800 transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl hover:shadow-indigo-500/20 group border border-slate-700/50 hover:border-indigo-500 relative overflow-hidden")
+        card <= html.DIV(Class="h-2 w-full bg-gradient-to-r from-slate-700 to-slate-600 group-hover:from-indigo-500 group-hover:to-purple-500 transition-all")
+        body = html.DIV(Class="p-6 text-center")
+        body <= html.DIV(html.I(**{'data-lucide': 'user', 'class': 'h-8 w-8 text-slate-400 group-hover:text-white'}), Class="h-16 w-16 mx-auto bg-slate-800 rounded-full flex items-center justify-center mb-4 group-hover:bg-indigo-600 transition-colors")
+        body <= html.H4(p['who'], Class="font-bold text-white text-lg mb-2")
+        body <= html.P(p['goal'], Class="text-xs text-indigo-300 font-mono uppercase tracking-widest mb-4")
+        body <= html.SPAN(p['emotion'], Class="inline-block px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-xs text-slate-400 group-hover:text-white group-hover:border-indigo-500/50 transition-colors")
+        card <= body
+        card.bind('click', lambda ev, pid=p['id']: select_persona(pid))
+        c <= card
+    if hasattr(window, 'lucide'): window.lucide.createIcons()
+
+def select_persona(pid):
+    add_chat_msg("User", f"I'm choosing the {pid} perspective.", 'user')
+    req = ajax.ajax()
+    req.bind('complete', lambda r: on_step_complete(r, 3)) 
+    req.open('POST', URL_ENGINE, True)
+    req.set_header('content-type', 'application/x-www-form-urlencoded')
+    req.send({'project_id': PID, 'step': 3, 'choice': pid})
+
+def render_roles(roles_list):
+    c = document['roles-container']
+    c.clear()
+    for r in roles_list:
+        card = html.DIV(Class="glass-panel p-4 rounded-lg flex items-center justify-between")
+        left = html.DIV(Class="flex items-center gap-3")
+        icon = "user" if r['type'] != 'System' else "cpu"
+        color = "bg-indigo-600" if r['type'] == 'Primary' else "bg-slate-700"
+        avt = html.DIV(Class=f"h-10 w-10 rounded-full {color} flex items-center justify-center")
+        avt <= html.I(**{'data-lucide': icon, 'class': 'h-5 w-5 text-white'})
+        info = html.DIV()
+        info <= html.H4(r['name'], Class="font-bold text-white text-sm")
+        info <= html.P(r['type'], Class="text-xs text-slate-400 uppercase tracking-widest")
+        left <= avt
+        left <= info
+        perm = html.SPAN(r['access'], Class="text-xs font-mono text-indigo-300 bg-indigo-900/30 px-2 py-1 rounded")
+        card <= left
+        card <= perm
+        c <= card
+    if hasattr(window, 'lucide'): window.lucide.createIcons()
+
+def render_specs(specs_dict):
+    c = document['specs-container']
+    c.clear()
+    for theme, stories in specs_dict.items():
+        box = html.DIV(Class="glass-panel p-5 rounded-lg border-l-2 border-indigo-500 bg-slate-900/40")
+        box <= html.H4(theme, Class="font-bold text-indigo-300 mb-3 text-sm uppercase tracking-wide")
+        ul = html.UL(Class="space-y-3")
+        for us in stories:
+            li = html.LI(Class="text-slate-300 text-xs flex items-start gap-3 bg-slate-900 p-2 rounded border border-slate-800")
+            li <= html.I(**{'data-lucide': 'check-square', 'class': 'h-4 w-4 text-slate-500 mt-0.5'})
+            li <= html.SPAN(us)
+            ul <= li
+        box <= ul
+        c <= box
+    if hasattr(window, 'lucide'): window.lucide.createIcons()
+
+init()
+</script>
+</body>
+</html>

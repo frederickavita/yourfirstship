@@ -1,3 +1,6 @@
+
+import sys
+print(sys.path)
 import stripe
 
 # --- CONFIGURATION STRIPE ---
