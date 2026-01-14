@@ -852,6 +852,9 @@ def stripe_webhook():
     return 'success'
 
 
+def studio3():
+    return dict()
+
 # controllers/default.py
 
 @auth.requires_login()
@@ -983,14 +986,99 @@ def confirmation_email_sent():
 # THE HOLODECK (Narrative Engine)
 # -------------------------------------------------------------------------
 
+def web_manifest():
+    """
+    Génère le manifest.json dynamiquement pour qu'une app soit installable (PWA).
+    """
+    import json
+    p_uid = request.vars.project_uid
+    project = db(db.projects.project_uid == p_uid).select().first()
+    
+    if not project: raise HTTP(404)
+    
+    # Récupérer les métadonnées (ou valeurs par défaut)
+    meta = project.current_state.get('app_meta', {})
+    name = meta.get('name', project.title)
+    theme_color = meta.get('theme_color', '#3498db')
+    
+    manifest = {
+        "name": name,
+        "short_name": name[:12], # Nom court pour l'icône
+        "start_url": URL('default', 'studio', vars=dict(project_uid=p_uid), scheme=True),
+        "display": "standalone", # Enlève la barre d'URL du navigateur (Mode App)
+        "background_color": "#ffffff",
+        "theme_color": theme_color,
+        "icons": [
+            {
+                "src": URL('static', 'images/default_icon.png', scheme=True), # À remplacer par l'icône du projet plus tard
+                "sizes": "192x192",
+                "type": "image/png"
+            }
+        ]
+    }
+    
+    response.headers['Content-Type'] = 'application/manifest+json'
+    return json.dumps(manifest)
+
+
 
 @auth.requires_login()
 def studio():
-    """
-    L'Atelier de Design.
-    Ici, on ne code pas. On définit l'Intelligence des Pages.
-    """
-    return dict()
+    # 1. Vérif Login
+    if not auth.user: redirect(URL('default', 'connect', args='login'))
+    
+    # 2. Charger le projet
+    p_uid = request.vars.project_uid
+    project = db(db.projects.project_uid == p_uid).select().first()
+    
+    # 3. SÉCURITÉ : Vérifier que c'est bien le propriétaire
+    if not project or project.owner_id != auth.user.id:
+        redirect(URL('default', 'dashboard')) # Ou page d'erreur
+        
+    # 4. SÉCURITÉ : Générer un Token de Session Unique pour l'Édition
+    import uuid
+    session.studio_token = str(uuid.uuid4()) # Stocké côté serveur
+    
+    return dict(project=project, studio_token=session.studio_token)
+
+@auth.requires_login()
+def api_studio_save():
+    """Sauvegarde rapide (Auto-save sur disque SSD)"""
+    p_uid = request.vars.project_uid
+    state = request.vars.state
+    
+    # Vérif éclair
+    if not db((db.projects.project_uid == p_uid) & (db.projects.owner_id == auth.user.id)).count():
+        return response.json({'status': 'error', 'msg': 'Auth'})
+    
+    # Écriture Fichier (Cache)
+    try:
+        path = os.path.join(DRAFT_FOLDER, f"{p_uid}_draft.json")
+        with open(path, 'w', encoding='utf-8') as f:
+            f.write(state)
+        return response.json({'status': 'cached'})
+    except Exception as e:
+        return response.json({'status': 'error', 'msg': str(e)})
+
+@auth.requires_login()
+def api_studio_load():
+    """Charge le JSON (Priorité : Fichier > BDD > Vide)"""
+    p_uid = request.args(0)
+    
+    # 1. Fichier Brouillon ?
+    path = os.path.join(DRAFT_FOLDER, f"{p_uid}_draft.json")
+    if os.path.exists(path):
+        with open(path, 'r', encoding='utf-8') as f:
+            return f.read() # JSON Brut
+            
+    # 2. Sinon BDD ?
+    p = db(db.projects.project_uid == p_uid).select().first()
+    if p and p.current_state:
+        return json.dumps(p.current_state)
+        
+    return "{}" # Vide
+
+
         
 @auth.requires_login()
 def cockpit():
@@ -1352,6 +1440,113 @@ def ai_narrative_engine():
 
     return json.dumps({'status': 'success', 'data': response_data, 'step': step})
 
+
+
+
+# # controllers/default.py
+
+@auth.requires_login()
+def api_engine_execute():
+    """
+    Point d'entrée unique pour modifier le projet.
+    Sécurisé par Token de Session + Vérification Propriétaire + Injection d'ID.
+    """
+    import json
+    import os
+    
+    # ---------------------------------------------------------
+    # 1. SÉCURITÉ (Session & Propriétaire)
+    # ---------------------------------------------------------
+    
+    # A. Vérification du Token de Session (Anti-CSRF / Console Hack)
+    client_token = request.vars.studio_token
+    server_token = session.studio_token
+    
+    if not server_token or client_token != server_token:
+        return response.json({'status': 'error', 'msg': 'Session invalide ou expirée. Rechargez la page studio.'})
+
+    p_uid = request.vars.project_uid
+    if not p_uid:
+        return response.json({'status': 'error', 'msg': 'Project UID manquant'})
+
+    # B. Vérification du Propriétaire (Owner Check)
+    # On vérifie que le projet existe ET appartient à l'utilisateur connecté
+    project = db((db.projects.project_uid == p_uid) & (db.projects.owner_id == auth.user.id)).select().first()
+    
+    if not project:
+        return response.json({'status': 'error', 'msg': 'Accès non autorisé à ce projet.'})
+
+    # ---------------------------------------------------------
+    # 2. PRÉPARATION (Parsing & Injection)
+    # ---------------------------------------------------------
+    
+    try:
+        actions = json.loads(request.vars.actions)
+    except:
+        return response.json({'status': 'error', 'msg': 'Invalid JSON actions'})
+
+    # C. Injection de Sécurité (Project UID)
+    # On force l'ID du projet dans les commandes sensibles pour empêcher
+    # qu'un script n'écrive dans le projet d'un autre via une faille logique.
+    sensitive_cmds = [
+        'AUTH_REGISTER', 
+        'AUTH_SOCIAL_LOGIN', 
+        'CODE_CREATE_SCRIPT', 
+        'CODE_EXECUTE_SCRIPT'
+    ]
+    
+    if actions:
+        for action in actions:
+            if action.get('type') in sensitive_cmds:
+                if 'payload' not in action: action['payload'] = {}
+                action['payload']['project_uid'] = p_uid
+
+    # ---------------------------------------------------------
+    # 3. EXÉCUTION (Le Moteur)
+    # ---------------------------------------------------------
+    
+    # On passe l'état actuel (JSON) et les actions au moteur virtuel
+    result = VirtualDBEngine.execute_transaction(project.current_state, actions)
+    
+    # ---------------------------------------------------------
+    # 4. SAUVEGARDE (Persistance)
+    # ---------------------------------------------------------
+    
+    # On sauvegarde seulement si succès ou s'il y a des logs (actions partielles)
+    if result['success'] or len(result['logs']) > 0:
+        
+        # A. Sauvegarde SQL (Base de données)
+        project.update_record(
+            current_state=result['new_state'],
+            last_updated=request.now,
+            last_action="API Update"
+        )
+        
+        # B. Sauvegarde Fichier (Cache / Backup)
+        # Utile pour ne pas perdre le travail si la DB flanche
+        try:
+            # DRAFT_FOLDER doit être défini en haut du controller ou dans models
+            # Sinon on utilise un chemin par défaut
+            draft_path = os.path.join(request.folder, 'private', 'drafts')
+            if not os.path.exists(draft_path):
+                os.makedirs(draft_path)
+                
+            path = os.path.join(draft_path, f"{p_uid}_draft.json")
+            with open(path, 'w', encoding='utf-8') as f:
+                f.write(json.dumps(result['new_state']))
+        except Exception as e:
+            # On ne bloque pas la réponse pour une erreur de fichier, mais on log
+            print(f"Erreur sauvegarde fichier: {e}")
+
+    # ---------------------------------------------------------
+    # 5. RÉPONSE CLIENT
+    # ---------------------------------------------------------
+    
+    return response.json({
+        'status': 'success' if result['success'] else 'partial_error',
+        'logs': result['logs'],
+        'new_state': result['new_state']
+    })
 
 
 

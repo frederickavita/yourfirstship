@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.11.3/brython.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.11.3/brython_stdlib.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Grille de fond pour le Canvas */
+        .grid-bg {
+            background-size: 20px 20px;
+            background-image:
+                linear-gradient(to right, #334155 1px, transparent 1px),
+                linear-gradient(to bottom, #334155 1px, transparent 1px);
+            background-position: 0 0, 0 0;
+        }
+        /* Style des câbles SVG */
+        svg { pointer-events: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: visible; }
+        path { fill: none; stroke: #6366f1; stroke-width: 3px; stroke-linecap: round; }
+    </style>
+</head>
+
+<body onload="brython()" class="bg-[#0f172a] text-slate-300 h-screen w-screen overflow-hidden flex flex-col font-sans">
+
+    <header class="h-14 bg-[#1e293b] border-b border-slate-700 flex items-center justify-between px-6 shrink-0">
+        <h1 class="font-bold text-white tracking-wider flex items-center gap-2">
+            <i data-lucide="cpu"></i> MOTEUR NO-CODE <span class="text-xs bg-indigo-600 px-2 py-0.5 rounded">DEMO ARCHITECTURE</span>
+        </h1>
+        <div class="text-xs text-slate-400">Glissez les nœuds • Modifiez les champs • Observez le code</div>
+    </header>
+
+    <div class="flex-1 flex overflow-hidden">
+        
+        <div class="w-16 bg-[#0f172a] border-r border-slate-700 flex flex-col items-center py-4 gap-4 z-20">
+            <button id="btn-add-start" class="w-10 h-10 rounded bg-emerald-600 text-white flex items-center justify-center hover:scale-110 transition" title="Ajouter Début">
+                <i data-lucide="play" class="w-5 h-5"></i>
+            </button>
+            <button id="btn-add-csv" class="w-10 h-10 rounded bg-blue-600 text-white flex items-center justify-center hover:scale-110 transition" title="Ajouter CSV">
+                <i data-lucide="file-spreadsheet" class="w-5 h-5"></i>
+            </button>
+            <button id="btn-add-filter" class="w-10 h-10 rounded bg-amber-600 text-white flex items-center justify-center hover:scale-110 transition" title="Ajouter Filtre">
+                <i data-lucide="filter" class="w-5 h-5"></i>
+            </button>
+            <button id="btn-add-api" class="w-10 h-10 rounded bg-violet-600 text-white flex items-center justify-center hover:scale-110 transition" title="Ajouter API">
+                <i data-lucide="globe" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <div id="canvas-container" class="flex-1 relative bg-[#1e293b] grid-bg overflow-hidden cursor-grab active:cursor-grabbing">
+            <svg id="svg-layer"></svg>
+            <div id="nodes-layer" class="absolute inset-0"></div>
+        </div>
+
+        <div class="w-[450px] bg-[#0b1120] border-l border-slate-700 flex flex-col z-20 shadow-2xl">
+            
+            <div class="h-1/2 border-b border-slate-800 flex flex-col">
+                <div class="bg-[#1e293b] px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 border-b border-slate-700 flex justify-between">
+                    <span>💾 ÉTAT (JSON MODEL)</span>
+                    <span class="text-emerald-500">LIVE UPDATE</span>
+                </div>
+                <div class="flex-1 overflow-auto p-4 font-mono text-[10px] text-green-400 leading-relaxed">
+                    <pre id="code-json">{}</pre>
+                </div>
+            </div>
+
+            <div class="h-1/2 flex flex-col bg-[#111]">
+                <div class="bg-[#1e293b] px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 border-b border-slate-700 flex justify-between">
+                    <span>🐍 CODE GÉNÉRÉ (PYTHON)</span>
+                    <span class="text-amber-500">READY TO RUN</span>
+                </div>
+                <div class="flex-1 overflow-auto p-4 font-mono text-[10px] text-blue-300 leading-relaxed">
+                    <pre id="code-python"># En attente de nœuds...</pre>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="text/python">
+        from browser import document, html, window, timer
+        import json
+
+        # =========================================================
+        # 1. ÉTAT GLOBAL (La Source de Vérité)
+        # =========================================================
+        app_state = {
+            "nodes": [], # Liste de dictionnaires (id, type, x, y, config)
+            "links": []  # Liste de dictionnaires (source_id, target_id)
+        }
+
+        # Compteur pour IDs uniques
+        node_counter = 0
+
+        # =========================================================
+        # 2. TEMPLATES DE COMPILATION (Le Cerveau)
+        # =========================================================
+        PYTHON_TEMPLATES = {
+            "START": "# Début du flux\nprint('🚀 Démarrage du Workflow...')",
+            
+            "CSV": """# Lecture CSV
+df_{id} = ToolsHelper.Data.read(
+    filename="{filename}",
+    delimiter="{delimiter}"
+)""",
+            
+            "FILTER": """# Filtrage Données
+df_{id} = [row for row in df_{prev_id} if row['{col}'] == '{val}']""",
+            
+            "API": """# Envoi API
+response_{id} = ToolsHelper.Web.post(
+    url="{url}",
+    data=df_{prev_id}
+)"""
+        }
+
+        # =========================================================
+        # 3. MOTEUR VISUEL (Rendering)
+        # =========================================================
+        
+        def render_node(node_data):
+            """Crée le DOM pour un nœud."""
+            
+            # Couleurs selon le type
+            colors = {
+                "START": "border-emerald-500 bg-emerald-900/20",
+                "CSV": "border-blue-500 bg-blue-900/20",
+                "FILTER": "border-amber-500 bg-amber-900/20",
+                "API": "border-violet-500 bg-violet-900/20"
+            }
+            theme = colors.get(node_data['type'], "border-slate-500")
+
+            # Structure principale
+            card = html.DIV(Class=f"absolute w-48 rounded-lg border-l-4 {theme} bg-[#1e293b] shadow-xl text-xs select-none")
+            card.style = {'left': f"{node_data['x']}px", 'top': f"{node_data['y']}px"}
+            card.id = node_data['id'] # Important pour le DOM
+
+            # Header (Drag Handle)
+            header = html.DIV(Class="p-2 cursor-move bg-white/5 border-b border-white/5 flex justify-between items-center")
+            header <= html.SPAN(f"{node_data['type']} #{node_data['id'].split('_')[-1]}", Class="font-bold text-slate-200")
+            
+            # Bouton Supprimer
+            btn_del = html.BUTTON("×", Class="text-slate-500 hover:text-red-400 font-bold px-2")
+            btn_del.bind('click', lambda ev, nid=node_data['id']: delete_node(nid))
+            header <= btn_del
+            card <= header
+
+            # Body (Config Inputs)
+            body = html.DIV(Class="p-3 space-y-2")
+            
+            # Inputs dynamiques selon le type
+            config = node_data['config']
+            
+            if node_data['type'] == "CSV":
+                inp_file = html.INPUT(value=config.get('filename', 'data.csv'), Class="w-full bg-[#0f172a] border border-slate-700 rounded p-1 text-slate-300 mb-1")
+                inp_file.bind('input', lambda ev: update_node_config(node_data['id'], 'filename', ev.target.value))
+                body <= inp_file
+                
+                inp_delim = html.INPUT(value=config.get('delimiter', ','), Class="w-8 bg-[#0f172a] border border-slate-700 rounded p-1 text-center text-slate-300")
+                inp_delim.bind('input', lambda ev: update_node_config(node_data['id'], 'delimiter', ev.target.value))
+                body <= html.DIV(html.SPAN("Sep: ") + inp_delim, Class="flex items-center gap-2")
+
+            elif node_data['type'] == "API":
+                inp_url = html.INPUT(value=config.get('url', 'https://api.com'), Class="w-full bg-[#0f172a] border border-slate-700 rounded p-1 text-slate-300")
+                inp_url.bind('input', lambda ev: update_node_config(node_data['id'], 'url', ev.target.value))
+                body <= inp_url
+
+            elif node_data['type'] == "FILTER":
+                body <= html.DIV("Garder si:", Class="text-[10px] text-slate-500")
+                inp_col = html.INPUT(value=config.get('col', 'status'), Class="w-full bg-[#0f172a] border border-slate-700 rounded p-1 text-slate-300 mb-1")
+                inp_col.bind('input', lambda ev: update_node_config(node_data['id'], 'col', ev.target.value))
+                body <= inp_col
+                
+                inp_val = html.INPUT(value=config.get('val', 'active'), Class="w-full bg-[#0f172a] border border-slate-700 rounded p-1 text-slate-300")
+                inp_val.bind('input', lambda ev: update_node_config(node_data['id'], 'val', ev.target.value))
+                body <= inp_val
+
+            card <= body
+
+            # Events Drag & Drop
+            header.bind('mousedown', lambda ev: start_drag(ev, card, node_data))
+
+            return card
+
+        # =========================================================
+        # 4. LOGIQUE D'INTERACTION (Actions)
+        # =========================================================
+
+        current_drag = {"el": None, "node": None, "offset_x": 0, "offset_y": 0}
+
+        def add_node(n_type):
+            global node_counter
+            node_counter += 1
+            
+            # 1. Création Donnée (Model)
+            new_node = {
+                "id": f"node_{node_counter}",
+                "type": n_type,
+                "x": 50 + (node_counter * 20),
+                "y": 50 + (node_counter * 20),
+                "config": {}
+            }
+            
+            # Config par défaut
+            if n_type == "CSV": new_node['config'] = {"filename": "export.csv", "delimiter": ";"}
+            if n_type == "API": new_node['config'] = {"url": "https://hooks.slack.com/..."}
+            if n_type == "FILTER": new_node['config'] = {"col": "pays", "val": "France"}
+
+            app_state['nodes'].append(new_node)
+            
+            # 2. Rendu (View)
+            el = render_node(new_node)
+            document['nodes-layer'] <= el
+            
+            # 3. Auto-Link (Pour la démo, on relie au précédent)
+            if len(app_state['nodes']) > 1:
+                prev = app_state['nodes'][-2]
+                app_state['links'].append({"source": prev['id'], "target": new_node['id']})
+                draw_links()
+
+            refresh_outputs()
+
+        def update_node_config(node_id, key, value):
+            """Met à jour le modèle quand l'input change."""
+            for n in app_state['nodes']:
+                if n['id'] == node_id:
+                    n['config'][key] = value
+                    break
+            refresh_outputs()
+
+        def delete_node(node_id):
+            """Supprime un nœud et ses liens."""
+            # Suppr Node
+            app_state['nodes'] = [n for n in app_state['nodes'] if n['id'] != node_id]
+            # Suppr Liens liés
+            app_state['links'] = [l for l in app_state['links'] if l['source'] != node_id and l['target'] != node_id]
+            
+            # Suppr DOM
+            if node_id in document: document[node_id].remove()
+            draw_links()
+            refresh_outputs()
+
+        # --- DRAG & DROP LOGIC ---
+        
+        def start_drag(ev, el, node_data):
+            ev.preventDefault()
+            current_drag['el'] = el
+            current_drag['node'] = node_data
+            rect = el.getBoundingClientRect()
+            current_drag['offset_x'] = ev.clientX - rect.left
+            current_drag['offset_y'] = ev.clientY - rect.top
+            
+            document.bind('mousemove', on_drag)
+            document.bind('mouseup', stop_drag)
+
+        def on_drag(ev):
+            if not current_drag['el']: return
+            
+            # Calcul position relative au conteneur
+            container_rect = document['canvas-container'].getBoundingClientRect()
+            new_x = ev.clientX - container_rect.left - current_drag['offset_x']
+            new_y = ev.clientY - container_rect.top - current_drag['offset_y']
+            
+            # Mise à jour DOM (Rapide)
+            current_drag['el'].style.left = f"{new_x}px"
+            current_drag['el'].style.top = f"{new_y}px"
+            
+            # Mise à jour Model (Données)
+            current_drag['node']['x'] = int(new_x)
+            current_drag['node']['y'] = int(new_y)
+            
+            # Redessiner les câbles
+            draw_links()
+            
+            # Mise à jour JSON (Throttle pour perf si besoin, ici direct)
+            refresh_outputs()
+
+        def stop_drag(ev):
+            document.unbind('mousemove')
+            document.unbind('mouseup')
+            current_drag['el'] = None
+
+        # --- SVG LINK DRAWING ---
+
+        def draw_links():
+            svg = document['svg-layer']
+            svg.clear()
+            
+            for link in app_state['links']:
+                # Trouver les nœuds
+                src = next((n for n in app_state['nodes'] if n['id'] == link['source']), None)
+                tgt = next((n for n in app_state['nodes'] if n['id'] == link['target']), None)
+                
+                if src and tgt:
+                    # Coordonnées (Centrées sur les cartes de 192px de large approx)
+                    x1 = src['x'] + 192
+                    y1 = src['y'] + 40
+                    x2 = tgt['x']
+                    y2 = tgt['y'] + 40
+                    
+                    # Bézier Curve
+                    path_d = f"M {x1} {y1} C {x1+50} {y1}, {x2-50} {y2}, {x2} {y2}"
+                    
+                    # Création élément SVG
+                    path = document.createElementNS("http://www.w3.org/2000/svg", "path")
+                    path.setAttribute("d", path_d)
+                    path.setAttribute("stroke", "#6366f1")
+                    path.setAttribute("stroke-width", "3")
+                    path.setAttribute("fill", "none")
+                    svg <= path
+
+        # =========================================================
+        # 5. COMPILATEUR (Generator)
+        # =========================================================
+        
+        def refresh_outputs():
+            """Met à jour les vues JSON et PYTHON."""
+            
+            # 1. Update JSON View
+            document['code-json'].text = json.dumps(app_state, indent=2)
+            
+            # 2. Update Python View (Compilation)
+            script = ["import ToolsHelper", ""]
+            
+            # On suit simplement l'ordre de la liste pour cette démo
+            # (Dans le vrai système, on ferait un tri topologique des liens)
+            
+            prev_id = None
+            
+            for i, node in enumerate(app_state['nodes']):
+                template = PYTHON_TEMPLATES.get(node['type'], "# No template")
+                
+                # Injection des variables
+                code_block = template.format(
+                    id=node['id'],
+                    prev_id=prev_id, # Chainage
+                    **node['config']
+                )
+                
+                script.append(code_block)
+                script.append("") # Ligne vide
+                prev_id = node['id']
+                
+            document['code-python'].text = "\n".join(script)
+
+        # =========================================================
+        # INIT
+        # =========================================================
+        
+        document['btn-add-start'].bind('click', lambda ev: add_node("START"))
+        document['btn-add-csv'].bind('click', lambda ev: add_node("CSV"))
+        document['btn-add-filter'].bind('click', lambda ev: add_node("FILTER"))
+        document['btn-add-api'].bind('click', lambda ev: add_node("API"))
+        
+        if hasattr(window, 'lucide'): window.lucide.createIcons()
+
+    </script>
+</body>
+</html>

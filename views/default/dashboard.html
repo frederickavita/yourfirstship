@@ -1,5 +1,7 @@
 {{extend 'malayout.html'}}
 
+<script type="text/python" src="{{=URL('static', 'editor/core/lib_tools.py')}}" ></script>
+
 <script id="initial-data" type="application/json">
     {{=XML(projects_json)}}
 </script>

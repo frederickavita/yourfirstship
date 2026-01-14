@@ -25,7 +25,11 @@ db.define_table('support_messages',
 
 unread_support_count = 0
 if auth.user:
-    unread_support_count = db(
-        (db.support_tickets.owner_id == auth.user.id) & 
-        (db.support_tickets.status == 'answered')
-    ).count()
+    try:
+        unread_support_count = db(
+            (db.support_tickets.owner_id == auth.user.id) & 
+            (db.support_tickets.status == 'answered')
+        ).count()
+    except Exception:
+        # Si la table n'existe pas encore (premier lancement), on ignore silencieusement
+        unread_support_count = 0
